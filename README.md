@@ -12,19 +12,19 @@ flowchart TD
         regcat["registerCategories()"]
         init["initializeAddons()"]
         loadAll["ConfigSystem.loadAll()"]
-        notify["notifyConfigsLoaded()"]
-        shutdown["AddonManager.shutdown()"]
+        started["notifyStarted()"]
+        stopping["notifyStopping()"]
         storeAll["ConfigSystem.storeAll()"]
     end
 
-    discover --> regcat --> init --> loadAll --> notify
-    notify --> running(["game running"])
-    running --> shutdown --> storeAll
+    discover --> regcat --> init --> loadAll --> started
+    started --> running(["game running"])
+    running --> stopping --> storeAll
 
-    regcat -. your code .-> h1["onRegisterCategories()<br/>registerCategory(...)"]
+    regcat -. your code .-> h1["categories"]
     init -. your code .-> h2["onInitialize()<br/>registerModules / registerCommand / config"]
-    notify -. your code .-> h3["onConfigsLoaded()<br/>settings are restored"]
-    shutdown -. your code .-> h4["onShutdown()<br/>flush state"]
+    started -. your code .-> h3["onStarted()<br/>settings are restored"]
+    stopping -. your code .-> h4["onStopping()<br/>flush state"]
 ```
 
 ## Requirements

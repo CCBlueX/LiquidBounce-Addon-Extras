@@ -11,13 +11,7 @@ import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
  */
 class ExampleAddon : LiquidBounceAddon() {
 
-    /**
-     * Runs before any add-on registers modules, so a module may reference a category declared here
-     * by another add-on.
-     */
-    override fun onRegisterCategories() {
-        ExampleCategories.register(this)
-    }
+    override val categories = listOf(ExampleCategories.EXAMPLE)
 
     override fun onInitialize() {
         logger.info("Example add-on starting up")
@@ -29,11 +23,11 @@ class ExampleAddon : LiquidBounceAddon() {
     /**
      * Settings have been restored from disk by this point.
      */
-    override fun onConfigsLoaded() {
+    override fun onStarted() {
         logger.info("Example module is ${if (ModuleExample.enabled) "enabled" else "disabled"}")
     }
 
-    override fun onShutdown() {
+    override fun onStopping() {
         logger.info("Example add-on shutting down")
     }
 
