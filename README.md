@@ -82,6 +82,10 @@ compiles and then fails on every Minecraft call.
 
 Client translation keys always win on collision, so an add-on cannot redefine a built-in string.
 
+Everything marked `@AddonApi` in the client is stable between releases; the rest may change. For a
+larger example, Kotlin and Java side by side and game tested, see
+[LiquidBounce-Addon-Extras](https://github.com/CCBlueX/LiquidBounce-Addon-Extras).
+
 ## License
 
 This project is subject to the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html). This
