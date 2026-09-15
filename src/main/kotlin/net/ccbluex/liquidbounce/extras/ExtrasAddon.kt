@@ -1,5 +1,6 @@
 package net.ccbluex.liquidbounce.extras
 
+import net.ccbluex.liquidbounce.extras.modules.ModuleSpeedometer
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
 
 /**
@@ -11,6 +12,7 @@ class ExtrasAddon : LiquidBounceAddon() {
     override val categories = listOf(ExtrasCategories.EXTRAS)
 
     override fun onInitialize() {
+        registerModules(ModuleSpeedometer())
     }
 
 }

@@ -1,1 +1,10 @@
-{}
+{
+  "liquidbounce.module.speedometer.description": "Shows your speed on the screen.",
+  "liquidbounce.module.speedometer.value.x.description": "Distance from the left edge.",
+  "liquidbounce.module.speedometer.value.y.description": "Distance from the top edge.",
+  "liquidbounce.module.speedometer.value.unit.description": "How the speed is measured.",
+  "liquidbounce.module.speedometer.value.color.description": "Text colour.",
+  "liquidbounce.module.speedometer.value.style.description": "Plain text or a box behind it.",
+  "liquidbounce.module.speedometer.value.style.boxed.value.background.description": "Colour of the box.",
+  "liquidbounce.module.speedometer.value.style.boxed.value.padding.description": "Space between text and box edge."
+}

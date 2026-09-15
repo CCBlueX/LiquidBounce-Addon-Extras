@@ -9,6 +9,14 @@ the modules show up in an `Extras` category.
 Every module is written against the stable add-on API, half in Kotlin and half in Java. Start with the
 [template](https://github.com/CCBlueX/LiquidBounce-Addon-Template), come here to see how something is done.
 
+## Modules
+
+### Speedometer (Java)
+
+Shows your speed on the screen in blocks per tick or per second, plain or in a box.
+
+![Speedometer](docs/speedometer.png)
+
 ## Building
 
 ```sh
