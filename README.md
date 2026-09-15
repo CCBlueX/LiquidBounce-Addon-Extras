@@ -70,6 +70,12 @@ Reports chunks with many containers as they load, in chat and as a notification.
 
 ![StashFinder](docs/stashfinder.png)
 
+## Commands
+
+`.where` prints your position, `.where share` tells the server chat.
+
+![Where](docs/where.png)
+
 ## Building
 
 ```sh
