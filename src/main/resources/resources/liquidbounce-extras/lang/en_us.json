@@ -1,4 +1,9 @@
 {
+  "liquidbounce.module.blockFinder.description": "Highlights every block of one type around you.",
+  "liquidbounce.module.blockFinder.value.block.description": "The block to look for.",
+  "liquidbounce.module.blockFinder.value.range.description": "How far to look in every direction.",
+  "liquidbounce.module.blockFinder.value.color.description": "Fill colour of the highlight.",
+  "liquidbounce.module.blockFinder.value.outline.description": "Draw the block's edges too.",
   "liquidbounce.module.speedometer.description": "Shows your speed on the screen.",
   "liquidbounce.module.speedometer.value.x.description": "Distance from the left edge.",
   "liquidbounce.module.speedometer.value.y.description": "Distance from the top edge.",

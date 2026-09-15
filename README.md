@@ -11,6 +11,12 @@ Every module is written against the stable add-on API, half in Kotlin and half i
 
 ## Modules
 
+### BlockFinder (Kotlin)
+
+Highlights every block of one type around you and puts the count into the module's HUD tag.
+
+![BlockFinder](docs/blockfinder.png)
+
 ### QuickRespawn (Java)
 
 Respawns a few ticks after you die and says so in chat.
