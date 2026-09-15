@@ -28,5 +28,7 @@
   "liquidbounce.module.stashFinder.value.minimum.description": "Containers a chunk needs to be reported.",
   "liquidbounce.module.stashFinder.value.notify.description": "Show a notification as well as the chat line.",
   "liquidbounce.module.autoShearer.description": "Shears every sheep in reach.",
-  "liquidbounce.module.autoShearer.value.range.description": "How close a sheep has to be."
+  "liquidbounce.module.autoShearer.value.range.description": "How close a sheep has to be.",
+  "liquidbounce.module.autoJump.description": "Jumps for you.",
+  "liquidbounce.module.autoJump.value.when.description": "Jump always, only while moving, or only while sprinting."
 }

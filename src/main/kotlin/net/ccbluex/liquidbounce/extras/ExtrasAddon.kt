@@ -1,5 +1,6 @@
 package net.ccbluex.liquidbounce.extras
 
+import net.ccbluex.liquidbounce.extras.modules.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.ModuleBlockFinder
 import net.ccbluex.liquidbounce.extras.modules.ModuleLightOverlay
@@ -18,7 +19,7 @@ class ExtrasAddon : LiquidBounceAddon() {
     override val categories = listOf(ExtrasCategories.EXTRAS)
 
     override fun onInitialize() {
-        registerModules(ModuleSpeedometer(), ModuleQuickRespawn(), ModuleBlockFinder, ModuleLightOverlay, ModulePacketCanceller, ModuleStashFinder, ModuleAutoShearer)
+        registerModules(ModuleSpeedometer(), ModuleQuickRespawn(), ModuleBlockFinder, ModuleLightOverlay, ModulePacketCanceller, ModuleStashFinder, ModuleAutoShearer, ModuleAutoJump())
     }
 
 }

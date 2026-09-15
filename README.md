@@ -11,6 +11,12 @@ Every module is written against the stable add-on API, half in Kotlin and half i
 
 ## Modules
 
+### AutoJump (Java)
+
+Jumps whenever you are on the ground: always, only while moving, or only while sprinting.
+
+![AutoJump](docs/autojump.png)
+
 ### AutoShearer (Kotlin)
 
 Shears every sheep in reach. Aims through the client's rotation engine, takes the shears without changing
