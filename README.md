@@ -17,6 +17,13 @@ Highlights every block of one type around you and puts the count into the module
 
 ![BlockFinder](docs/blockfinder.png)
 
+### LightOverlay (Kotlin)
+
+Marks blocks where hostile mobs can spawn: red where they spawn right now, yellow where only the daylight
+keeps them away.
+
+![LightOverlay](docs/lightoverlay.png)
+
 ### QuickRespawn (Java)
 
 Respawns a few ticks after you die and says so in chat.

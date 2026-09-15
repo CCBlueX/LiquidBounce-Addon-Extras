@@ -14,5 +14,11 @@
   "liquidbounce.module.speedometer.value.style.boxed.value.padding.description": "Space between text and box edge.",
   "liquidbounce.module.quickRespawn.description": "Respawns a few ticks after you die.",
   "liquidbounce.module.quickRespawn.value.delay.description": "Ticks to wait on the death screen.",
-  "liquidbounce.module.quickRespawn.value.announce.description": "Say so in chat."
+  "liquidbounce.module.quickRespawn.value.announce.description": "Say so in chat.",
+  "liquidbounce.module.lightOverlay.description": "Marks blocks where hostile mobs can spawn.",
+  "liquidbounce.module.lightOverlay.value.horizontalRange.description": "How far to check sideways.",
+  "liquidbounce.module.lightOverlay.value.verticalRange.description": "How far to check up and down.",
+  "liquidbounce.module.lightOverlay.value.lightLevel.description": "Highest light level that still allows spawning.",
+  "liquidbounce.module.lightOverlay.value.color.description": "Colour where mobs spawn right now.",
+  "liquidbounce.module.lightOverlay.value.potentialColor.description": "Colour where mobs spawn once it is dark."
 }
