@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 plugins {
     alias(libs.plugins.fabric.loom)
     alias(libs.plugins.kotlin.jvm)
@@ -29,6 +31,35 @@ repositories {
 
 loom {
     accessWidenerPath = file("src/main/resources/liquidbounce-extras.accesswidener")
+}
+
+// `./gradlew runClientGameTest` starts the client with the add-on and runs src/gametest.
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "liquidbounce-extras-gametest"
+        enableGameTests = false
+    }
+}
+
+loom.runs.named("clientGameTest") {
+    // Vanilla menus, but the client's HUD: the test navigates the world creation screens, which the
+    // client's web UI would otherwise replace.
+    environmentVars.put("LB_BASIC_MODE", "true")
+    // A loader error would otherwise wait on a dialog nobody sees.
+    systemProperties.put("fabric.noGui", "true")
+}
+
+// The run directory is wiped before every run and the client then downloads its browser (140 MB) into it.
+// Point it at an existing install to skip that: -Pgametest.mcef=$HOME/.minecraft/LiquidBounce/mcef/libraries
+tasks.named("runClientGameTest") {
+    doFirst {
+        providers.gradleProperty("gametest.mcef").orNull?.let { libraries ->
+            val target = layout.buildDirectory.dir("run/clientGameTest/LiquidBounce/mcef").get().asFile
+            target.mkdirs()
+            Files.createSymbolicLink(target.resolve("libraries").toPath(), file(libraries).toPath())
+        }
+    }
 }
 
 // Two things to leave alone here:

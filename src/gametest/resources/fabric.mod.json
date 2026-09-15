@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "liquidbounce-extras-gametest",
+  "version": "1.0.0",
+  "name": "LiquidBounce Extras Game Tests",
+  "license": "GPL-3.0-or-later",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "net.ccbluex.liquidbounce.extras.gametest.ExtrasGameTest"
+    ]
+  },
+  "depends": {
+    "liquidbounce-extras": "*",
+    "fabric-client-gametest-api-v1": "*"
+  }
+}

@@ -6,7 +6,8 @@ the modules show up in an `Extras` category.
 
 ![ClickGUI](docs/clickgui.png)
 
-Every module is written against the stable add-on API, half in Kotlin and half in Java. Start with the
+Every module is written against the stable add-on API, half in Kotlin and half in Java, and each one runs
+in a client game test that also takes the screenshots below. Start with the
 [template](https://github.com/CCBlueX/LiquidBounce-Addon-Template), come here to see how something is done.
 
 ## Modules
@@ -76,11 +77,15 @@ Reports chunks with many containers as they load, in chat and as a notification.
 
 ![Where](docs/where.png)
 
-## Building
+## Building and testing
 
 ```sh
 ./gradlew build
+./gradlew runClientGameTest
 ```
+
+The game test needs a display; CI uses Xvfb. Its screenshots land in `build/run/clientGameTest/screenshots/`.
+`-Pgametest.mcef=<path to an existing LiquidBounce/mcef/libraries>` skips the browser download.
 
 ## License
 
