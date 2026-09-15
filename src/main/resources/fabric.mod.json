@@ -13,7 +13,7 @@
     "issues": "https://github.com/CCBlueX/LiquidBounce-Addon-Template/issues"
   },
   "license": "GPL-3.0-or-later",
-  "icon": "assets/example-addon/icon.png",
+  "icon": "resources/example-addon/icon.png",
   "environment": "client",
   "entrypoints": {
     "liquidbounce": [

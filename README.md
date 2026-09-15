@@ -44,8 +44,7 @@ flowchart TD
    | `src/main/resources/fabric.mod.json` | `id`, `name`, `description`, `authors`, the entrypoint class |
    | `src/main/resources/example-addon.mixins.json` | filename, and the `package` |
    | `src/main/resources/example-addon.accesswidener` | filename (and `loom.accessWidenerPath` in `build.gradle.kts`) |
-   | `src/main/resources/resources/example-addon/lang/` | folder name, which must match your add-on id |
-   | `src/main/resources/assets/example-addon/` | folder name, and the `icon` path |
+   | `src/main/resources/resources/example-addon/` | folder name, which must match your add-on id, and the `icon` path |
    | `src/main/kotlin/com/example/addon/` | package name |
 
 3. `./gradlew build`, then drop `build/libs/<your-addon>.jar` into your `mods/` folder next to
@@ -81,6 +80,14 @@ compiles and then fails on every Minecraft call.
 - `resources/example-addon/lang/en_us.json`, translations merged into the client's language files
 
 Client translation keys always win on collision, so an add-on cannot redefine a built-in string.
+
+## Files your add-on ships
+
+Everything goes into `src/main/resources/resources/<your-addon-id>/`: translations under `lang/`, the mod
+icon, ClickGUI category icons (`ModuleCategory("Name", Identifier.fromNamespaceAndPath("<your-addon-id>", "clickgui/name.svg"))`).
+Never use `assets/<your-addon-id>/`. Fabric registers every mod jar as a resource pack, so anything under
+`assets/` becomes part of Minecraft's resources and could theoretically be used to detect LiquidBounce and
+the add-on. The client reads its own `resources/` folder from the jar directly, which nothing else sees.
 
 Everything marked `@AddonApi` in the client is stable between releases; the rest may change. For a
 larger example, Kotlin and Java side by side and game tested, see
