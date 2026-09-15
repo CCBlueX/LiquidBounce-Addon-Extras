@@ -26,5 +26,7 @@
   "liquidbounce.module.packetCanceller.value.incoming.description": "Packets never handled from the server.",
   "liquidbounce.module.stashFinder.description": "Reports chunks with many containers as they load.",
   "liquidbounce.module.stashFinder.value.minimum.description": "Containers a chunk needs to be reported.",
-  "liquidbounce.module.stashFinder.value.notify.description": "Show a notification as well as the chat line."
+  "liquidbounce.module.stashFinder.value.notify.description": "Show a notification as well as the chat line.",
+  "liquidbounce.module.autoShearer.description": "Shears every sheep in reach.",
+  "liquidbounce.module.autoShearer.value.range.description": "How close a sheep has to be."
 }

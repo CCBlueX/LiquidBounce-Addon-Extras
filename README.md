@@ -11,6 +11,13 @@ Every module is written against the stable add-on API, half in Kotlin and half i
 
 ## Modules
 
+### AutoShearer (Kotlin)
+
+Shears every sheep in reach. Aims through the client's rotation engine, takes the shears without changing
+the visible hotbar slot, and interacts once the server-side rotation has arrived.
+
+![AutoShearer](docs/autoshearer.png)
+
 ### BlockFinder (Kotlin)
 
 Highlights every block of one type around you and puts the count into the module's HUD tag.
