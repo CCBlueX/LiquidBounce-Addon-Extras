@@ -23,5 +23,8 @@
   "liquidbounce.module.lightOverlay.value.potentialColor.description": "Colour where mobs spawn once it is dark.",
   "liquidbounce.module.packetCanceller.description": "Drops the selected packets.",
   "liquidbounce.module.packetCanceller.value.outgoing.description": "Packets never sent to the server.",
-  "liquidbounce.module.packetCanceller.value.incoming.description": "Packets never handled from the server."
+  "liquidbounce.module.packetCanceller.value.incoming.description": "Packets never handled from the server.",
+  "liquidbounce.module.stashFinder.description": "Reports chunks with many containers as they load.",
+  "liquidbounce.module.stashFinder.value.minimum.description": "Containers a chunk needs to be reported.",
+  "liquidbounce.module.stashFinder.value.notify.description": "Show a notification as well as the chat line."
 }

@@ -5,6 +5,7 @@ import net.ccbluex.liquidbounce.extras.modules.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.ModulePacketCanceller
 import net.ccbluex.liquidbounce.extras.modules.ModuleQuickRespawn
 import net.ccbluex.liquidbounce.extras.modules.ModuleSpeedometer
+import net.ccbluex.liquidbounce.extras.modules.ModuleStashFinder
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
 
 /**
@@ -16,7 +17,7 @@ class ExtrasAddon : LiquidBounceAddon() {
     override val categories = listOf(ExtrasCategories.EXTRAS)
 
     override fun onInitialize() {
-        registerModules(ModuleSpeedometer(), ModuleQuickRespawn(), ModuleBlockFinder, ModuleLightOverlay, ModulePacketCanceller)
+        registerModules(ModuleSpeedometer(), ModuleQuickRespawn(), ModuleBlockFinder, ModuleLightOverlay, ModulePacketCanceller, ModuleStashFinder)
     }
 
 }

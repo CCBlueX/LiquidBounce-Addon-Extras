@@ -40,6 +40,12 @@ Shows your speed on the screen in blocks per tick or per second, plain or in a b
 
 ![Speedometer](docs/speedometer.png)
 
+### StashFinder (Kotlin)
+
+Reports chunks with many containers as they load, in chat and as a notification.
+
+![StashFinder](docs/stashfinder.png)
+
 ## Building
 
 ```sh
