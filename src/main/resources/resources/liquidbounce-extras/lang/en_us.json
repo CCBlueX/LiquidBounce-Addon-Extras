@@ -6,5 +6,8 @@
   "liquidbounce.module.speedometer.value.color.description": "Text colour.",
   "liquidbounce.module.speedometer.value.style.description": "Plain text or a box behind it.",
   "liquidbounce.module.speedometer.value.style.boxed.value.background.description": "Colour of the box.",
-  "liquidbounce.module.speedometer.value.style.boxed.value.padding.description": "Space between text and box edge."
+  "liquidbounce.module.speedometer.value.style.boxed.value.padding.description": "Space between text and box edge.",
+  "liquidbounce.module.quickRespawn.description": "Respawns a few ticks after you die.",
+  "liquidbounce.module.quickRespawn.value.delay.description": "Ticks to wait on the death screen.",
+  "liquidbounce.module.quickRespawn.value.announce.description": "Say so in chat."
 }

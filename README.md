@@ -11,6 +11,12 @@ Every module is written against the stable add-on API, half in Kotlin and half i
 
 ## Modules
 
+### QuickRespawn (Java)
+
+Respawns a few ticks after you die and says so in chat.
+
+![QuickRespawn](docs/quickrespawn.png)
+
 ### Speedometer (Java)
 
 Shows your speed on the screen in blocks per tick or per second, plain or in a box.
