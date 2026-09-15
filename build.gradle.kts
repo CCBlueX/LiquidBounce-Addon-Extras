@@ -50,6 +50,11 @@ dependencies {
     implementation(libs.liquidbounce)
 }
 
+// Gradle keeps a resolved snapshot for a day; the client publishes one on every push to nextgen.
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+}
+
 tasks.processResources {
     val modVersion = providers.gradleProperty("mod_version")
     val minecraftVersion = libs.versions.minecraft
