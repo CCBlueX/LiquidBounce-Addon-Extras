@@ -30,5 +30,9 @@
   "liquidbounce.module.autoShearer.description": "Shears every sheep in reach.",
   "liquidbounce.module.autoShearer.value.range.description": "How close a sheep has to be.",
   "liquidbounce.module.autoJump.description": "Jumps for you.",
-  "liquidbounce.module.autoJump.value.when.description": "Jump always, only while moving, or only while sprinting."
+  "liquidbounce.module.autoJump.value.when.description": "Jump always, only while moving, or only while sprinting.",
+  "liquidbounce.module.messageAura.description": "Whispers a message to every player who comes into view, one at a time.",
+  "liquidbounce.module.messageAura.value.message.description": "What to send.",
+  "liquidbounce.module.messageAura.value.ignoreFriends.description": "Leave friends alone.",
+  "liquidbounce.module.messageAura.value.delay.description": "Ticks between two messages."
 }

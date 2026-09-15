@@ -37,6 +37,11 @@ keeps them away.
 
 ![LightOverlay](docs/lightoverlay.png)
 
+### MessageAura (Java)
+
+Whispers a message to every player who comes into view, one message per delay window. Friends can be
+left alone, and joining a world greets nobody.
+
 ### PacketCanceller (Kotlin)
 
 Drops the packets picked in the settings, in either direction, before any other module sees them.
