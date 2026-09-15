@@ -28,7 +28,7 @@ repositories {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/example-addon.accesswidener")
+    accessWidenerPath = file("src/main/resources/liquidbounce-extras.accesswidener")
 }
 
 // Two things to leave alone here:

@@ -1,29 +1,26 @@
 {
   "schemaVersion": 1,
-  "id": "example-addon",
+  "id": "liquidbounce-extras",
   "version": "${version}",
-  "name": "Example Addon",
-  "description": "An add-on template for LiquidBounce add-ons.",
+  "name": "LiquidBounce Extras",
+  "description": "Modules the client does not ship, and the reference for the add-on API.",
   "authors": [
-    "You"
+    "CCBlueX"
   ],
   "contact": {
     "homepage": "https://liquidbounce.net/",
-    "sources": "https://github.com/CCBlueX/LiquidBounce-Addon-Template",
-    "issues": "https://github.com/CCBlueX/LiquidBounce-Addon-Template/issues"
+    "sources": "https://github.com/CCBlueX/LiquidBounce-Addon-Extras",
+    "issues": "https://github.com/CCBlueX/LiquidBounce-Addon-Extras/issues"
   },
   "license": "GPL-3.0-or-later",
-  "icon": "resources/example-addon/icon.png",
+  "icon": "resources/liquidbounce-extras/icon.png",
   "environment": "client",
   "entrypoints": {
     "liquidbounce": [
-      "com.example.addon.ExampleAddon"
+      "net.ccbluex.liquidbounce.extras.ExtrasAddon"
     ]
   },
-  "mixins": [
-    "example-addon.mixins.json"
-  ],
-  "accessWidener": "example-addon.accesswidener",
+  "accessWidener": "liquidbounce-extras.accesswidener",
   "depends": {
     "minecraft": ">=${minecraft_version}",
     "fabricloader": ">=${loader_version}",
