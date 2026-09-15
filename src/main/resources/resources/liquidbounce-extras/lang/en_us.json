@@ -34,5 +34,6 @@
   "liquidbounce.module.messageAura.description": "Whispers a message to every player who comes into view, one at a time.",
   "liquidbounce.module.messageAura.value.message.description": "What to send.",
   "liquidbounce.module.messageAura.value.ignoreFriends.description": "Leave friends alone.",
+  "liquidbounce.module.autoSign.description": "Writes every new sign with the text of the last one you wrote.",
   "liquidbounce.module.messageAura.value.delay.description": "Ticks between two messages."
 }

@@ -24,6 +24,12 @@ the visible hotbar slot, and interacts once the server-side rotation has arrived
 
 ![AutoShearer](docs/autoshearer.png)
 
+### AutoSign (Java)
+
+Writes every new sign with the text of the last one you wrote yourself. The sign editor never opens.
+
+![AutoSign](docs/autosign.png)
+
 ### BlockFinder (Kotlin)
 
 Highlights every block of one type around you and puts the count into the module's HUD tag.
