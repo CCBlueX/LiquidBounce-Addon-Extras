@@ -20,5 +20,8 @@
   "liquidbounce.module.lightOverlay.value.verticalRange.description": "How far to check up and down.",
   "liquidbounce.module.lightOverlay.value.lightLevel.description": "Highest light level that still allows spawning.",
   "liquidbounce.module.lightOverlay.value.color.description": "Colour where mobs spawn right now.",
-  "liquidbounce.module.lightOverlay.value.potentialColor.description": "Colour where mobs spawn once it is dark."
+  "liquidbounce.module.lightOverlay.value.potentialColor.description": "Colour where mobs spawn once it is dark.",
+  "liquidbounce.module.packetCanceller.description": "Drops the selected packets.",
+  "liquidbounce.module.packetCanceller.value.outgoing.description": "Packets never sent to the server.",
+  "liquidbounce.module.packetCanceller.value.incoming.description": "Packets never handled from the server."
 }

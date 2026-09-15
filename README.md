@@ -24,6 +24,10 @@ keeps them away.
 
 ![LightOverlay](docs/lightoverlay.png)
 
+### PacketCanceller (Kotlin)
+
+Drops the packets picked in the settings, in either direction, before any other module sees them.
+
 ### QuickRespawn (Java)
 
 Respawns a few ticks after you die and says so in chat.
