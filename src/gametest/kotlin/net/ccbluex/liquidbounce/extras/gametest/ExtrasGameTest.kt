@@ -4,7 +4,7 @@ import net.ccbluex.liquidbounce.extras.modules.ModuleBlockFinder
 import net.ccbluex.liquidbounce.features.command.CommandManager
 import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
-import net.ccbluex.liquidbounce.integration.backend.BrowserBackendManager
+import net.ccbluex.liquidbounce.integration.screen.ScreenManager
 import net.ccbluex.liquidbounce.integration.interop.persistant.PersistentLocalStorage
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext
@@ -45,8 +45,9 @@ class ExtrasGameTest : FabricClientGameTest {
             PersistentLocalStorage.map["clickgui.panel.$name"] = "{\"top\":20,\"left\":-10000,\"expanded\":false,\"scrollTop\":0,\"zIndex\":0}"
         }
         PersistentLocalStorage.map["clickgui.panel.Extras"] = "{\"top\":150,\"left\":20,\"expanded\":true,\"scrollTop\":0,\"zIndex\":1}"
-        // The client shows its own screens while the browser starts; let that settle first.
-        context.waitFor({ BrowserBackendManager.backend?.isInitialized == true }, 20 * 120)
+        // Joining a world while the client's main browser still loads its page aborts that load, which
+        // the client treats as fatal; wait for the page.
+        context.waitFor({ ScreenManager.mainBrowser != null }, 20 * 120)
         context.waitTicks(40)
         // Room for the ClickGUI without shrinking it.
         context.input.resizeWindow(1280, 720)

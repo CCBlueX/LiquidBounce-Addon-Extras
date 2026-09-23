@@ -46,8 +46,10 @@ loom.runs.named("clientGameTest") {
     // Vanilla menus, but the client's HUD: the test navigates the world creation screens, which the
     // client's web UI would otherwise replace.
     environmentVars.put("LB_BASIC_MODE", "true")
-    // A loader error would otherwise wait on a dialog nobody sees.
+    // A loader error would otherwise wait on a dialog nobody sees; the client's own fatal errors go to
+    // the log when CI is set.
     systemProperties.put("fabric.noGui", "true")
+    environmentVars.put("CI", "true")
 }
 
 // The run directory is wiped before every run and the client then downloads its browser (140 MB) into it.
