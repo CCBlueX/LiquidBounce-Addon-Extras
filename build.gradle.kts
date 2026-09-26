@@ -128,6 +128,8 @@ java {
 kotlin {
     compilerOptions {
         jvmToolchain(libs.versions.jdk.get().toInt())
+        // LiquidBounce is compiled with preview features, which marks its classes as pre-release
+        freeCompilerArgs.add("-Xskip-prerelease-check")
     }
 }
 
