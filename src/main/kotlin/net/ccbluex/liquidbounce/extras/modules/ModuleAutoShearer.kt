@@ -7,6 +7,7 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsValueGroup
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
+import net.ccbluex.liquidbounce.utils.block.SwingMode
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
@@ -45,7 +46,7 @@ object ModuleAutoShearer : ClientModule("AutoShearer", ExtrasCategories.EXTRAS) 
 
         SilentHotbar.selectSlotSilently(this@ModuleAutoShearer, shears, 20)
         interaction.interact(player, sheep, EntityHitResult(sheep), InteractionHand.MAIN_HAND)
-        player.swing(InteractionHand.MAIN_HAND)
+        SwingMode.DO_NOT_HIDE.swing(InteractionHand.MAIN_HAND)
         waitTicks(10)
     }
 

@@ -27,6 +27,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.StandingSignBlock
 import net.minecraft.world.level.block.entity.SignBlockEntity
+import net.minecraft.world.level.block.entity.SignTextSlot
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -54,7 +55,7 @@ class ExtrasGameTest : FabricClientGameTest {
         context.client { it.options.guiScale().set(2) }
 
         context.worldBuilder().create().use { world ->
-            world.clientLevel.waitForChunksRender()
+            world.connection.waitForChunksRender()
             context.waitFor { it.player?.onGround() == true }
             // Picking up wool later would otherwise pop a recipe toast into the screenshots.
             world.server.run { it.commands.performPrefixedCommand(it.createCommandSourceStack(), "recipe give @a *") }
@@ -117,7 +118,7 @@ class ExtrasGameTest : FabricClientGameTest {
                 player.teleportTo(stash.x - 3.0 + 0.5, stash.y.toDouble(), stash.z + 0.5)
             }
             context.waitFor({ it.chatLines().any { "containers at" in it } }, 200)
-            world.clientLevel.waitForChunksRender()
+            world.connection.waitForChunksRender()
             context.waitTicks(10)
             context.takeScreenshot("StashFinder")
             context.disable("StashFinder")
@@ -148,13 +149,13 @@ class ExtrasGameTest : FabricClientGameTest {
                 level.setBlock(second, facingPlayer, 3)
             }
             context.enable("AutoSign")
-            context.client { it.connection!!.send(ServerboundSignUpdatePacket(first, true, "Extras", "wrote this", "", "")) }
+            context.client { it.connection!!.send(ServerboundSignUpdatePacket(first, listOf("Extras", "wrote this", "", ""), SignTextSlot.FRONT)) }
             context.waitTicks(2)
             world.server.run { server ->
                 val sign = server.overworld().getBlockEntity(second) as SignBlockEntity
                 val serverPlayer = server.playerList.players.first()
                 sign.setAllowedPlayerEditor(serverPlayer.uuid)
-                serverPlayer.openTextEdit(sign, true)
+                serverPlayer.openTextEdit(sign, SignTextSlot.FRONT)
             }
             context.waitFor({ it.signText(second) == "Extras" }, 100)
             check(context.client { it.gui.screen() } !is AbstractSignEditScreen) { "AutoSign left the sign editor open" }
@@ -208,7 +209,7 @@ private fun <T> TestServerContext.compute(block: (MinecraftServer) -> T): T =
     computeOnServer<T, RuntimeException> { block(it) }
 
 private fun Minecraft.signText(pos: BlockPos): String? =
-    (level?.getBlockEntity(pos) as? SignBlockEntity)?.frontText?.getMessage(0, false)?.string
+    (level?.getBlockEntity(pos) as? SignBlockEntity)?.getText(SignTextSlot.FRONT)?.getMessages(false)?.firstOrNull()?.string
 
 // ChatComponent offers no read access to its history.
 private val allMessages = ChatComponent::class.java.getDeclaredField("allMessages").apply { isAccessible = true }

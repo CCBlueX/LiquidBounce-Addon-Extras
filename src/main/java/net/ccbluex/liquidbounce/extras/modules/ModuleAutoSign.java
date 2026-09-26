@@ -7,6 +7,8 @@ import net.ccbluex.liquidbounce.features.module.ClientModule;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 
+import java.util.List;
+
 /**
  * Writes every new sign with the text of the last one you wrote yourself. The sign editor never
  * opens: the screen event is cancelled and the packet the editor would send goes out directly. The
@@ -14,7 +16,7 @@ import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
  */
 public class ModuleAutoSign extends ClientModule {
 
-    private String[] lines;
+    private List<String> lines;
 
     public ModuleAutoSign() {
         super("AutoSign", ExtrasCategories.EXTRAS);
@@ -24,7 +26,7 @@ public class ModuleAutoSign extends ClientModule {
 
     private void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof ServerboundSignUpdatePacket packet) {
-            lines = packet.getLines();
+            lines = packet.lines();
         }
     }
 
@@ -34,7 +36,7 @@ public class ModuleAutoSign extends ClientModule {
         }
 
         getNetwork().send(new ServerboundSignUpdatePacket(
-            screen.sign.getBlockPos(), screen.isFrontText, lines[0], lines[1], lines[2], lines[3]
+            screen.sign.getBlockPos(), lines, screen.slot
         ));
         event.cancelEvent();
     }
