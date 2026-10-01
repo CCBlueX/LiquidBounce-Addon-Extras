@@ -11,6 +11,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
+import net.ccbluex.liquidbounce.extras.modules.basehunting.ModulePortalFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.minecraft.core.BlockPos
@@ -90,4 +91,13 @@ class CollectibleESPGameTest : PaperGameTest({
     screenshot("CollectibleESP")
     disable(ModuleCollectibleESP)
     check(client { ModuleCollectibleESP.findings.isEmpty() }) { "findings survived disabling" }
+})
+
+class PortalFinderGameTest : PaperGameTest({
+    enable(ModulePortalFinder)
+    val portal = origin.offset(4, 2, 4)
+    setBlock(portal, "minecraft:end_portal")
+    awaitClient("the portal report") { it.chatContains("Lit portal at 4 -58 4") }
+    check(client { ModulePortalFinder.portals[ChunkPos.containing(portal)] } == portal)
+    screenshot("PortalFinder")
 })

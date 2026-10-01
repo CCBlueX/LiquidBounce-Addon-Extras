@@ -12,6 +12,7 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 - **SuspiciousBlockDetector** (Kotlin) reports doors, trapdoors, chests, ladders, beds, obsidian and metal
   blocks that appear near you once the chunks around you have settled.
 - **CollectibleESP** (Kotlin) highlights valuables in item frames, filled maps included, and banners.
+- **PortalFinder** (Kotlin) reports and marks lit Nether and End portals.
 
 ![StashFinder](docs/stashfinder.png)
 ![SuspiciousBlockDetector](docs/suspiciousblockdetector.png)
