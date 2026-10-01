@@ -26,6 +26,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.WaypointsGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.MessageAuraGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.PacketCancellerGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.IntruderAlertGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

@@ -7,7 +7,9 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.chat
 import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
+import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
+import net.ccbluex.liquidbounce.extras.modules.extras.ModuleIntruderAlert
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleMessageAura
 import net.ccbluex.liquidbounce.extras.modules.extras.ModulePacketCanceller
 import net.ccbluex.liquidbounce.features.misc.FriendManager
@@ -33,6 +35,21 @@ class MessageAuraGameTest : PaperGameTest({
 
     players.forEach { hidePlayer(it) }
     client { FriendManager.remove("ExtrasFriend") }
+})
+
+class IntruderAlertGameTest : PaperGameTest({
+    client { FriendManager.add(FriendManager.Friend("ExtrasVisitor", null)) }
+    val visitor = showPlayer("ExtrasVisitor", origin.east(6))
+    enable(ModuleIntruderAlert)
+    ticks(20)
+    check(chat().none { "ExtrasVisitor is nearby" in it }) { "reported a friend" }
+
+    client { FriendManager.remove("ExtrasVisitor") }
+    awaitClient("the intruder report") { it.chatContains("ExtrasVisitor is nearby at 6 -60 0") }
+    ticks(20)
+    check(chat().count { "ExtrasVisitor is nearby" in it } == 1) { "reported the same intruder twice" }
+    screenshot("IntruderAlert")
+    hidePlayer(visitor)
 })
 
 class PacketCancellerGameTest : PaperGameTest({

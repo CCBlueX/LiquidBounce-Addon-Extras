@@ -103,5 +103,10 @@
 
   "liquidbounce.module.packetCanceller.description": "Drops the selected packets.",
   "liquidbounce.module.packetCanceller.value.outgoing.description": "Packets never sent to the server.",
-  "liquidbounce.module.packetCanceller.value.incoming.description": "Packets from the server that are never handled."
+  "liquidbounce.module.packetCanceller.value.incoming.description": "Packets from the server that are never handled.",
+
+  "liquidbounce.module.intruderAlert.description": "Reports players who are not your friends as they come near.",
+  "liquidbounce.module.intruderAlert.value.radius.description": "How near counts.",
+  "liquidbounce.module.intruderAlert.value.notify.description": "Show a notification as well.",
+  "liquidbounce.module.intruderAlert.messages.entered": "%s is nearby at %s."
 }

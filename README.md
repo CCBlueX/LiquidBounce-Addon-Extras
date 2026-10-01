@@ -46,6 +46,9 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 
 - **MessageAura** (Java) whispers a message to every player who comes into view, one per delay.
 - **PacketCanceller** (Kotlin) drops the packets you pick, in either direction.
+- **IntruderAlert** (Kotlin) reports players who are not your friends as they come near.
+
+![IntruderAlert](docs/intruderalert.png)
 
 ## HUD components
 
