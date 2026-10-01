@@ -1,6 +1,7 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.chat
 import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
@@ -10,6 +11,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
+import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.ChunkPos
@@ -47,4 +49,25 @@ class BaseFinderGameTest : PaperGameTest({
     awaitClient("the three bases") { ModuleBaseFinder.bases.containsAll(expected) }
     disable(ModuleBaseFinder)
     check(client { ModuleBaseFinder.bases.isEmpty() }) { "reports survived disabling" }
+})
+
+class SuspiciousBlockDetectorGameTest : PaperGameTest({
+    val block = origin.south(5)
+    enable(ModuleSuspiciousBlockDetector)
+    // Enabling rescans every chunk, so all of them are settling again
+    setBlock(block, "minecraft:gold_block")
+    ticks(20)
+    check(client { ModuleSuspiciousBlockDetector.findings.isEmpty() }) { "reported a block of a settling chunk" }
+
+    ticks(40)
+    setBlock(block, "minecraft:iron_block")
+    awaitClient("the iron block report") { it.chatContains("New Block of Iron at 0 -60 5") }
+
+    val trapdoor = block.east(3)
+    setBlock(trapdoor, "minecraft:oak_trapdoor")
+    awaitClient("the trapdoor report") { it.chatContains("New Oak Trapdoor at 3 -60 5") }
+    setBlock(trapdoor, "minecraft:oak_trapdoor[open=true]")
+    ticks(20)
+    check(chat().count { "Oak Trapdoor" in it } == 1) { "opening the trapdoor was reported as a new block" }
+    screenshot("SuspiciousBlockDetector")
 })

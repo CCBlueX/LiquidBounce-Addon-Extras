@@ -15,5 +15,11 @@
   "liquidbounce.module.stashFinder.description": "Reports chunks with many containers as they load.",
   "liquidbounce.module.stashFinder.value.minimum.description": "Containers a chunk needs to be reported.",
   "liquidbounce.module.stashFinder.value.notify.description": "Show a notification as well.",
-  "liquidbounce.module.stashFinder.messages.found": "%s containers in the chunk at %s."
+  "liquidbounce.module.stashFinder.messages.found": "%s containers in the chunk at %s.",
+
+  "liquidbounce.module.suspiciousBlockDetector.description": "Reports blocks players place near you, like doors, chests and obsidian.",
+  "liquidbounce.module.suspiciousBlockDetector.value.radius.description": "How far away a new block may be.",
+  "liquidbounce.module.suspiciousBlockDetector.value.settleTicks.description": "How long a freshly loaded chunk is ignored.",
+  "liquidbounce.module.suspiciousBlockDetector.value.notify.description": "Show a notification as well.",
+  "liquidbounce.module.suspiciousBlockDetector.messages.placed": "New %s at %s."
 }
