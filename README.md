@@ -2,6 +2,13 @@
 
 Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/LiquidBounce) does not ship. The code is proudly hallucinated by Claude Opus 5.5. In my opinion, for such an add-on, this is fine. I would not recommend making AI write module code for an actual client; however, Claude does kind of well with game testing. Its idea is to write simplistic code to give you an idea of how to write your own add-on.
 
+## HUD components
+
+Add **FPS**, **TPS**, **Ping**, **Player**, **CPS**, **Biome**, **Coordinates** or **Speedometer** in the HUD
+editor. Each has its own prefix, suffix, colour, shadow, padding and background.
+
+![HUD](docs/hud.png)
+
 ## Building and testing
 
 ```sh
