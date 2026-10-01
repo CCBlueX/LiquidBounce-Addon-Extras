@@ -1,109 +1,90 @@
 plugins {
     alias(libs.plugins.fabric.loom)
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.detekt)
 }
 
+val jdk = libs.versions.jdk.get().toInt()
+val minecraft = libs.versions.minecraft.get()
+
 base {
-    archivesName = project.property("archives_base_name") as String
-    // The Minecraft version the add-on is built for goes into its version, e.g. 1.0.0+26.3
-    version = "${project.property("mod_version")}+${libs.versions.minecraft.get()}"
-    group = project.property("maven_group") as String
+    archivesName = property("archives_base_name") as String
+    version = "${property("mod_version")}+$minecraft"
+    group = property("maven_group") as String
 }
 
 repositories {
     mavenCentral()
-    // Lets you test against a locally built client (`./gradlew publishToMavenLocal` in LiquidBounce).
     mavenLocal()
-    maven {
-        name = "CCBlueX Releases"
-        url = uri("https://maven.ccbluex.net/releases")
-    }
-    maven {
-        name = "CCBlueX Snapshots"
-        url = uri("https://maven.ccbluex.net/snapshots")
-    }
-    maven {
-        name = "Fabric"
-        url = uri("https://maven.fabricmc.net/")
-    }
+    maven("https://maven.ccbluex.net/releases")
+    maven("https://maven.ccbluex.net/snapshots")
+    maven("https://maven.fabricmc.net/")
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/example-addon.accesswidener")
+    accessWidenerPath = file("src/main/resources/liquidbounce-extras.accesswidener")
 }
 
-// Two things to leave alone here:
-//
-// 1. There is no `mappings(...)` line. LiquidBounce declares none either, and Loom defaults to
-//    Mojang official mappings for this Minecraft version. A different mapping set produces an
-//    add-on that compiles and then fails on every Minecraft call.
-// 2. Dependencies use plain `implementation`, not `modImplementation`. This Loom version has no
-//    remapping step - the development and production namespaces are both Mojang official - so the
-//    `mod*` configurations do not exist. LiquidBounce's own build does the same.
+// No `mappings(...)` and no `mod*` configurations: like LiquidBounce itself, this Loom version runs on
+// Mojang's official names without a remapping step. Another mapping set compiles and then fails on
+// every Minecraft call.
 dependencies {
     minecraft(libs.minecraft)
 
     implementation(libs.fabric.loader)
     implementation(libs.fabric.api)
     implementation(libs.fabric.kotlin)
-
-    // The client itself; there is no separate API artifact.
     implementation(libs.liquidbounce)
 }
 
-// Gradle keeps a resolved snapshot for a day; the client publishes one on every push to nextgen.
+// The client publishes a snapshot on every push to nextgen.
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
 
 tasks.processResources {
-    val modVersion = providers.gradleProperty("mod_version").zip(libs.versions.minecraft) { version, minecraft ->
-        "$version+$minecraft"
-    }
-    val minecraftVersion = libs.versions.minecraft
-    val loaderVersion = libs.versions.fabric.loader
-    val fabricKotlinVersion = libs.versions.fabric.kotlin
-
-    inputs.property("version", modVersion)
-    inputs.property("minecraft_version", minecraftVersion)
-    inputs.property("loader_version", loaderVersion)
-    inputs.property("fabric_kotlin_version", fabricKotlinVersion)
-
-    filesMatching("fabric.mod.json") {
-        expand(
-            mapOf(
-                "version" to modVersion.get(),
-                "minecraft_version" to minecraftVersion.get(),
-                "loader_version" to loaderVersion.get(),
-                "fabric_kotlin_version" to fabricKotlinVersion.get(),
-            )
-        )
-    }
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
-    options.release = libs.versions.jdk.get().toInt()
+    val properties = mapOf(
+        "version" to project.version.toString(),
+        "minecraft_version" to minecraft,
+        "loader_version" to libs.versions.fabric.loader.get(),
+        "fabric_kotlin_version" to libs.versions.fabric.kotlin.get(),
+    )
+    inputs.properties(properties)
+    filesMatching("fabric.mod.json") { expand(properties) }
 }
 
 java {
     withSourcesJar()
+    toolchain.languageVersion = JavaLanguageVersion.of(jdk)
+}
 
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(libs.versions.jdk.get().toInt())
-    }
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+    options.release = jdk
 }
 
 kotlin {
+    jvmToolchain(jdk)
     compilerOptions {
-        jvmToolchain(libs.versions.jdk.get().toInt())
-        // LiquidBounce is compiled with preview features, which marks its classes as pre-release
-        freeCompilerArgs.add("-Xskip-prerelease-check")
+        freeCompilerArgs.addAll(
+            // LiquidBounce is built with pre-release language features
+            "-Xskip-prerelease-check",
+            "-Xcollection-literals",
+            "-Xcompanion-blocks-and-extensions",
+            "-Xcontext-sensitive-resolution",
+            "-Xreturn-value-checker=full",
+        )
     }
+}
+
+// The same rules as LiquidBounce
+detekt {
+    config.setFrom(file("config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
 }
 
 tasks.jar {
     from("LICENSE") {
-        rename { "${it}_${project.base.archivesName.get()}" }
+        rename { "${it}_${base.archivesName.get()}" }
     }
 }

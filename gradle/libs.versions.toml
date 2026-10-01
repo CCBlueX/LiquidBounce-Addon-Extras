@@ -10,6 +10,7 @@ fabric-api = "0.160.5+26.3"
 
 kotlin = "2.4.20"
 fabric-kotlin = "1.14.1+kotlin.2.4.20"
+detekt = "2.0.0-alpha.6"
 
 # The add-on compiles against the client itself; there is no separate API artifact.
 # Use `<version>+<mc>` for a release or `<version>+<mc>-SNAPSHOT` to track nextgen.
@@ -25,3 +26,4 @@ liquidbounce = { group = "net.ccbluex", name = "liquidbounce", version.ref = "li
 [plugins]
 fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
