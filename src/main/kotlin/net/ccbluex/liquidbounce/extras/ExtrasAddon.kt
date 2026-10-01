@@ -11,6 +11,7 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSoundLocator
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
 
@@ -29,6 +30,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleCaveDisturbanceDetector,
             ModuleTunnelTrailESP,
             ModuleSoundLocator,
+            ModuleAutoJump.INSTANCE,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerListeners(ClickCounter)

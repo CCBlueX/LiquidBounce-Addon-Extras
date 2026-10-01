@@ -21,6 +21,12 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 ![StashFinder](docs/stashfinder.png)
 ![SuspiciousBlockDetector](docs/suspiciousblockdetector.png)
 
+### Grinding
+
+- **AutoJump** (Java) jumps for you: always, while moving, or while sprinting.
+
+![AutoJump](docs/autojump.png)
+
 ## HUD components
 
 Add **FPS**, **TPS**, **Ping**, **Player**, **CPS**, **Biome**, **Coordinates** or **Speedometer** in the HUD

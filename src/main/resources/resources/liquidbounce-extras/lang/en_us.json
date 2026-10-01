@@ -49,5 +49,8 @@
   "liquidbounce.module.soundLocator.value.lifetime.description": "How long a marker stays.",
   "liquidbounce.module.soundLocator.value.chat.description": "Also report each sound in chat.",
   "liquidbounce.module.soundLocator.value.color.description": "Marker colour.",
-  "liquidbounce.module.soundLocator.messages.heard": "Heard %s at %s."
+  "liquidbounce.module.soundLocator.messages.heard": "Heard %s at %s.",
+
+  "liquidbounce.module.autoJump.description": "Jumps for you.",
+  "liquidbounce.module.autoJump.value.when.description": "Jump always, only while moving, or only while sprinting."
 }
