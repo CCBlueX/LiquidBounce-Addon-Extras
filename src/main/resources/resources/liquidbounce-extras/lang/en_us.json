@@ -94,5 +94,10 @@
   "liquidbounce.module.waypoints.messages.ahead": "ahead",
   "liquidbounce.module.waypoints.messages.right": "right",
   "liquidbounce.module.waypoints.messages.behind": "behind",
-  "liquidbounce.module.waypoints.messages.left": "left"
+  "liquidbounce.module.waypoints.messages.left": "left",
+
+  "liquidbounce.module.messageAura.description": "Whispers a message to every player who comes into view.",
+  "liquidbounce.module.messageAura.value.message.description": "What to whisper.",
+  "liquidbounce.module.messageAura.value.delay.description": "Wait between two messages.",
+  "liquidbounce.module.messageAura.value.ignoreFriends.description": "Leave friends alone."
 }

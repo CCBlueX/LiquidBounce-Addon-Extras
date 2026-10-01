@@ -42,6 +42,10 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 ![LightOverlay](docs/lightoverlay.png)
 ![Waypoints](docs/waypoints.png)
 
+### Extras
+
+- **MessageAura** (Java) whispers a message to every player who comes into view, one per delay.
+
 ## HUD components
 
 Add **FPS**, **TPS**, **Ping**, **Player**, **CPS**, **Biome**, **Coordinates** or **Speedometer** in the HUD

@@ -24,6 +24,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.AutoAnvilRepairGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.LightOverlayGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.WaypointsGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.MessageAuraGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

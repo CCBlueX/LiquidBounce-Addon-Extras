@@ -12,6 +12,7 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSoundLocator
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
+import net.ccbluex.liquidbounce.extras.modules.extras.ModuleMessageAura
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
@@ -42,6 +43,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleAutoAnvilRepair,
             ModuleLightOverlay,
             ModuleWaypoints,
+            ModuleMessageAura.INSTANCE,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
