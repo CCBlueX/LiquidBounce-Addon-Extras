@@ -37,5 +37,10 @@
 
   "liquidbounce.module.caveDisturbanceDetector.description": "Marks plain air in cave walls, where someone mined.",
   "liquidbounce.module.caveDisturbanceDetector.value.range.description": "How far to look.",
-  "liquidbounce.module.caveDisturbanceDetector.value.color.description": "Marker colour."
+  "liquidbounce.module.caveDisturbanceDetector.value.color.description": "Marker colour.",
+
+  "liquidbounce.module.tunnelTrailESP.description": "Highlights dug tunnels, staircases and shafts.",
+  "liquidbounce.module.tunnelTrailESP.value.range.description": "How far to look.",
+  "liquidbounce.module.tunnelTrailESP.value.minimumLength.description": "Shortest passage worth highlighting.",
+  "liquidbounce.module.tunnelTrailESP.value.color.description": "Highlight colour."
 }

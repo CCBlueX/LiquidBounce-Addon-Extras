@@ -16,6 +16,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.CollectibleESPGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.PortalFinderGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.CaveDisturbanceDetectorGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.TunnelTrailESPGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

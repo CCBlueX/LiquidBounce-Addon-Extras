@@ -16,6 +16,7 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModulePortalFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
+import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.ChunkPos
@@ -115,4 +116,26 @@ class CaveDisturbanceDetectorGameTest : PaperGameTest({
     val mined = origin.offset(9, 2, 8)
     setBlock(mined, "minecraft:air")
     awaitClient("the mined block", timeout = 60) { ModuleCaveDisturbanceDetector.findings == setOf(mined) }
+})
+
+class TunnelTrailESPGameTest : PaperGameTest({
+    enable(ModuleTunnelTrailESP)
+
+    // A six long tunnel along X
+    fill(BlockPos(4, -60, 8), BlockPos(11, -57, 10), "minecraft:stone")
+    fill(BlockPos(5, -59, 9), BlockPos(10, -58, 9), "minecraft:air")
+    // Six steps up towards south, three blocks of headroom each
+    fill(BlockPos(-9, -60, 3), BlockPos(-7, -50, 11), "minecraft:stone")
+    for (step in 0..5) {
+        fill(BlockPos(-8, -59 + step, 4 + step), BlockPos(-8, -57 + step, 4 + step), "minecraft:air")
+    }
+    // A five deep shaft
+    fill(BlockPos(12, -60, -6), BlockPos(14, -54, -4), "minecraft:stone")
+    fill(BlockPos(13, -59, -5), BlockPos(13, -55, -5), "minecraft:air")
+
+    val entrances = listOf(BlockPos(5, -59, 9), BlockPos(-8, -59, 4), BlockPos(13, -55, -5))
+    awaitClient("the tunnel, staircase and shaft", timeout = 60) {
+        ModuleTunnelTrailESP.findings.containsAll(entrances)
+    }
+    screenshot("TunnelTrailESP")
 })
