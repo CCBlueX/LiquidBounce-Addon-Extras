@@ -8,6 +8,7 @@
   "entrypoints": {
     "fabric-client-gametest": [
       "net.ccbluex.liquidbounce.extras.gametest.tests.HarnessGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.AddonGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.HudGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.WhereGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.StashFinderGameTest",

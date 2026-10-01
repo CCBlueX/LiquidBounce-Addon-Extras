@@ -1,6 +1,8 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.config.ConfigSystem
+import net.ccbluex.liquidbounce.extras.ExtrasCategories
+import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
 import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.command
@@ -9,8 +11,14 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
 import net.ccbluex.liquidbounce.extras.hud.SpeedometerHud
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
+import net.ccbluex.liquidbounce.features.module.ModuleCategories
+import net.ccbluex.liquidbounce.features.module.ModuleManager
+import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
+import net.ccbluex.liquidbounce.integration.interop.persistant.PersistentLocalStorage
+import net.ccbluex.liquidbounce.integration.screen.impl.CustomStandaloneMinecraftScreen
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
+import net.ccbluex.liquidbounce.lang.LanguageManager
 import net.ccbluex.liquidbounce.utils.render.Alignment
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import com.mojang.blaze3d.platform.InputConstants
@@ -37,6 +45,47 @@ class HarnessGameTest : PaperGameTest({
         }
     }
 })
+
+class AddonGameTest : PaperGameTest({
+    client {
+        val modules = ModuleManager.filter { it.category in ExtrasCategories.all }
+        check(modules.size == 17) { "expected 17 add-on modules, found ${modules.map { it.name }}" }
+        check(ExtrasCategories.all.all { ModuleCategories.byName(it.tag) === it }) { "a category is missing" }
+        for (module in modules) {
+            check(LanguageManager.hasFallbackTranslation(module.descriptionKey!!)) {
+                "${module.name} has no description"
+            }
+        }
+    }
+
+    // Panels read the browser's localStorage as they mount, before the page copies the client's storage into
+    // it. The page cached on joining predates this layout, the next one syncs it, the one after shows it.
+    client {
+        for (category in ModuleCategories.entries) {
+            val index = ExtrasCategories.all.indexOf(category)
+            PersistentLocalStorage.map["clickgui.panel.${category.tag}"] = if (index < 0) {
+                """{"top":20,"left":-10000,"expanded":false,"scrollTop":0,"zIndex":0}"""
+            } else {
+                """{"top":150,"left":${20 + index * 300},"expanded":true,"scrollTop":0,"zIndex":1}"""
+            }
+        }
+        ModuleClickGui.invalidate()
+        ModuleClickGui.enabled = true
+    }
+    awaitClickGui()
+    client { ModuleClickGui.invalidate() }
+    awaitClickGui()
+    screenshot("ClickGui")
+    client { ModuleClickGui.enabled = false }
+})
+
+private fun GameTestScope.awaitClickGui() {
+    awaitClient("the ClickGUI page to load") {
+        val browser = (it.gui.screen() as? CustomStandaloneMinecraftScreen)?.browser
+        browser != null && browser.isInitialized && browser.state.isCompleted
+    }
+    ticks(40)
+}
 
 class HudGameTest : PaperGameTest({
     client {
