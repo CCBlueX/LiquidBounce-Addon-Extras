@@ -10,6 +10,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.hangItemFrame
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
+import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.minecraft.core.BlockPos
@@ -70,4 +71,23 @@ class SuspiciousBlockDetectorGameTest : PaperGameTest({
     ticks(20)
     check(chat().count { "Oak Trapdoor" in it } == 1) { "opening the trapdoor was reported as a new block" }
     screenshot("SuspiciousBlockDetector")
+})
+
+class CollectibleESPGameTest : PaperGameTest({
+    enable(ModuleCollectibleESP)
+    ticks(20)
+    check(client { ModuleCollectibleESP.findings.isEmpty() }) { "found collectibles in an empty world" }
+
+    val banner = origin.offset(-3, 0, 5)
+    val elytra = origin.offset(1, 1, 6)
+    val dirt = origin.offset(-1, 1, 6)
+    setBlock(banner, "minecraft:white_banner")
+    hangItemFrame(elytra, Direction.NORTH, "minecraft:elytra")
+    hangItemFrame(dirt, Direction.NORTH, "minecraft:dirt")
+
+    awaitClient("the banner and the elytra") { ModuleCollectibleESP.findings.containsAll(listOf(banner, elytra)) }
+    check(dirt !in client { ModuleCollectibleESP.findings }) { "a framed dirt block counted as collectible" }
+    screenshot("CollectibleESP")
+    disable(ModuleCollectibleESP)
+    check(client { ModuleCollectibleESP.findings.isEmpty() }) { "findings survived disabling" }
 })

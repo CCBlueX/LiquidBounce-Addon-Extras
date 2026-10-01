@@ -21,5 +21,12 @@
   "liquidbounce.module.suspiciousBlockDetector.value.radius.description": "How far away a new block may be.",
   "liquidbounce.module.suspiciousBlockDetector.value.settleTicks.description": "How long a freshly loaded chunk is ignored.",
   "liquidbounce.module.suspiciousBlockDetector.value.notify.description": "Show a notification as well.",
-  "liquidbounce.module.suspiciousBlockDetector.messages.placed": "New %s at %s."
+  "liquidbounce.module.suspiciousBlockDetector.messages.placed": "New %s at %s.",
+
+  "liquidbounce.module.collectibleESP.description": "Highlights valuables in item frames and banners.",
+  "liquidbounce.module.collectibleESP.value.range.description": "How far to look.",
+  "liquidbounce.module.collectibleESP.value.items.description": "Framed items worth highlighting.",
+  "liquidbounce.module.collectibleESP.value.enchantedGearOnly.description": "Ignore tools, weapons and armor without enchantments.",
+  "liquidbounce.module.collectibleESP.value.banners.description": "Highlight banners.",
+  "liquidbounce.module.collectibleESP.value.color.description": "Highlight colour."
 }

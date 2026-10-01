@@ -13,6 +13,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.StashFinderGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.BaseFinderGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.SuspiciousBlockDetectorGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.CollectibleESPGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },
