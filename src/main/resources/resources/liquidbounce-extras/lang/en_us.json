@@ -33,5 +33,9 @@
   "liquidbounce.module.portalFinder.description": "Reports and marks lit Nether and End portals.",
   "liquidbounce.module.portalFinder.value.color.description": "Marker colour.",
   "liquidbounce.module.portalFinder.value.notify.description": "Show a notification as well.",
-  "liquidbounce.module.portalFinder.messages.found": "Lit portal at %s."
+  "liquidbounce.module.portalFinder.messages.found": "Lit portal at %s.",
+
+  "liquidbounce.module.caveDisturbanceDetector.description": "Marks plain air in cave walls, where someone mined.",
+  "liquidbounce.module.caveDisturbanceDetector.value.range.description": "How far to look.",
+  "liquidbounce.module.caveDisturbanceDetector.value.color.description": "Marker colour."
 }

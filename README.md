@@ -13,6 +13,7 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
   blocks that appear near you once the chunks around you have settled.
 - **CollectibleESP** (Kotlin) highlights valuables in item frames, filled maps included, and banners.
 - **PortalFinder** (Kotlin) reports and marks lit Nether and End portals.
+- **CaveDisturbanceDetector** (Kotlin) marks plain air in cave walls, where someone mined into a cave.
 
 ![StashFinder](docs/stashfinder.png)
 ![SuspiciousBlockDetector](docs/suspiciousblockdetector.png)
@@ -59,6 +60,7 @@ submit a pull request.
 | File | Section | Taken from | Taken as |
 |---|---|---|---|
 | `modules/basehunting/ModuleStashFinder.kt` | Trial chamber filter | [Meteor Client `StashFinder`](https://github.com/MeteorDevelopment/meteor-client/blob/79a30a7c9ad459b9cfc1155c598aa58947db7fa5/src/main/java/meteordevelopment/meteorclient/systems/modules/world/StashFinder.java#L64-L73) | Idea and block list, GPL-3.0 |
+| `modules/basehunting/ModuleCaveDisturbanceDetector.kt` | Plain air next to cave air | [Trouser-Streak `CaveDisturbanceDetector`](https://github.com/etianl/Trouser-Streak/blob/0cf3231b56c25773cd66aa21931470bdf8799c9e/src/main/java/pwn/noobs/trouserstreak/modules/CaveDisturbanceDetector.java) | Idea |
 
 ## License
 

@@ -5,11 +5,13 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.chat
 import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
+import net.ccbluex.liquidbounce.extras.gametest.harness.fill
 import net.ccbluex.liquidbounce.extras.gametest.harness.forceLoad
 import net.ccbluex.liquidbounce.extras.gametest.harness.hangItemFrame
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
+import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCaveDisturbanceDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModulePortalFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
@@ -100,4 +102,17 @@ class PortalFinderGameTest : PaperGameTest({
     awaitClient("the portal report") { it.chatContains("Lit portal at 4 -58 4") }
     check(client { ModulePortalFinder.portals[ChunkPos.containing(portal)] } == portal)
     screenshot("PortalFinder")
+})
+
+class CaveDisturbanceDetectorGameTest : PaperGameTest({
+    enable(ModuleCaveDisturbanceDetector)
+    ticks(30)
+    check(client { ModuleCaveDisturbanceDetector.findings.isEmpty() }) { "found disturbances without caves" }
+
+    // A cave of one cave air block, and one block of plain air mined into its wall
+    fill(origin.offset(6, 0, 6), origin.offset(10, 4, 10), "minecraft:stone")
+    setBlock(origin.offset(8, 2, 8), "minecraft:cave_air")
+    val mined = origin.offset(9, 2, 8)
+    setBlock(mined, "minecraft:air")
+    awaitClient("the mined block", timeout = 60) { ModuleCaveDisturbanceDetector.findings == setOf(mined) }
 })

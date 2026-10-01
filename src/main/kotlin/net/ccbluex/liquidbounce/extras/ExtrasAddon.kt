@@ -4,6 +4,7 @@ import net.ccbluex.liquidbounce.extras.commands.CommandWhere
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
+import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCaveDisturbanceDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModulePortalFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
@@ -23,6 +24,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleSuspiciousBlockDetector,
             ModuleCollectibleESP,
             ModulePortalFinder,
+            ModuleCaveDisturbanceDetector,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerListeners(ClickCounter)
