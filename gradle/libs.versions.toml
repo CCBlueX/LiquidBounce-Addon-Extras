@@ -17,7 +17,7 @@ detekt = "2.0.0-alpha.6"
 liquidbounce = "0.40.1+26.3-SNAPSHOT"
 
 # Compile-only APIs of the game-test server plugin. The server and Grim it runs against are resolved
-# at test time.
+# at test time, see AGENTS.md.
 paper-api = "26.3.build.140-beta"
 grim-api = "1.6.0.12"
 

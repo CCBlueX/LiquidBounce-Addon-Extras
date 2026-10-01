@@ -74,7 +74,7 @@ editor. Each has its own prefix, suffix, colour, shadow, padding and background.
 ```
 
 Every game test boots its own Paper 26.3 server with the newest [Grim](https://modrinth.com/plugin/grimac) and
-fails when the server objects to anything the client did.
+fails when the server objects to anything the client did. [AGENTS.md](AGENTS.md) explains how.
 
 ## Commits
 
