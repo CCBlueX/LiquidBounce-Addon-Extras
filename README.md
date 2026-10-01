@@ -25,9 +25,11 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 
 - **AutoJump** (Java) jumps for you: always, while moving, or while sprinting.
 - **AutoShearer** (Kotlin) shears sheep in reach, switching to shears without changing your visible slot.
+- **AutoSign** (Java) writes every new sign with the text of the last sign you wrote. The editor never opens.
 
 ![AutoJump](docs/autojump.png)
 ![AutoShearer](docs/autoshearer.png)
+![AutoSign](docs/autosign.png)
 
 ## HUD components
 

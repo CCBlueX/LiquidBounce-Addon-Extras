@@ -57,5 +57,8 @@
   "liquidbounce.module.autoShearer.description": "Shears sheep in reach.",
   "liquidbounce.module.autoShearer.value.range.description": "How close a sheep has to be.",
   "liquidbounce.module.autoShearer.value.delay.description": "Pause after each sheep.",
-  "liquidbounce.module.autoShearer.value.antiBreak.description": "Leave shears alone that are about to break."
+  "liquidbounce.module.autoShearer.value.antiBreak.description": "Leave shears alone that are about to break.",
+
+  "liquidbounce.module.autoSign.description": "Writes new signs with the text of the last sign you wrote.",
+  "liquidbounce.module.autoSign.value.delay.description": "Wait before writing a sign."
 }

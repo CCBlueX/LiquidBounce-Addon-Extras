@@ -13,6 +13,7 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlock
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
 
@@ -33,6 +34,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleSoundLocator,
             ModuleAutoJump.INSTANCE,
             ModuleAutoShearer,
+            ModuleAutoSign.INSTANCE,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerListeners(ClickCounter)
