@@ -1,5 +1,14 @@
 {
   "liquidbounce.command.where.description": "Tells you where you are.",
   "liquidbounce.command.where.share.description": "Tells the server chat where you are.",
-  "liquidbounce.command.where.position": "You are at %s"
+  "liquidbounce.command.where.position": "You are at %s",
+
+  "liquidbounce.module.baseFinder.description": "Reports chunks with blocks and entities players leave behind.",
+  "liquidbounce.module.baseFinder.value.landmarks.description": "Report a single block that never generates, like a beacon.",
+  "liquidbounce.module.baseFinder.value.workstations.description": "Workstations a chunk needs to be reported.",
+  "liquidbounce.module.baseFinder.value.entities.description": "Placed entities a chunk needs to be reported.",
+  "liquidbounce.module.baseFinder.value.notify.description": "Show a notification as well.",
+  "liquidbounce.module.baseFinder.messages.landmark": "Possible base in the chunk at %s: a block only players place.",
+  "liquidbounce.module.baseFinder.messages.workstations": "Possible base in the chunk at %s: %s workstations.",
+  "liquidbounce.module.baseFinder.messages.entities": "Possible base in the chunk at %s: %s placed entities."
 }
