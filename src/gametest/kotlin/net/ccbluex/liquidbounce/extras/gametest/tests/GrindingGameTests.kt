@@ -6,15 +6,22 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.aim
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
+import net.ccbluex.liquidbounce.extras.gametest.harness.give
+import net.ccbluex.liquidbounce.extras.gametest.harness.query
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
+import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
+import net.minecraft.client.gui.screens.inventory.AnvilScreen
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.animal.sheep.Sheep
+import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.AnvilBlock
 import com.mojang.blaze3d.platform.InputConstants
 
 class AutoJumpGameTest : PaperGameTest({
@@ -68,5 +75,49 @@ class AutoSignGameTest : PaperGameTest({
     screenshot("AutoSign")
 })
 
+class AutoAnvilRepairGameTest : PaperGameTest({
+    val anvil = origin.south(2)
+    setBlock(anvil, "minecraft:anvil")
+    give("minecraft:diamond_pickaxe[damage=1000]", 2)
+    run("experience set $playerName 30 levels")
+
+    enable(ModuleAutoAnvilRepair)
+    openAnvil(anvil)
+    awaitServer("entity @a[name=$playerName,level=28]")
+    check(pickaxes() == 1) { "the pair was not combined into one pickaxe" }
+    screenshot("AutoAnvilRepair")
+    client { it.player!!.closeContainer() }
+
+    // Priced above MaxLevelCost: goes back untouched
+    run("clear $playerName")
+    give("minecraft:diamond_pickaxe[damage=1000,repair_cost=10]", 2)
+    ticks(20)
+    openAnvil(anvil)
+    ticks(60)
+    val inputs = client { minecraft ->
+        val menu = (minecraft.gui.screen() as AnvilScreen).menu
+        listOf(AnvilMenu.INPUT_SLOT, AnvilMenu.ADDITIONAL_SLOT).count { menu.getSlot(it).hasItem() }
+    }
+    check(inputs == 0) { "the expensive pair stayed in the anvil" }
+    check(pickaxes() == 2) { "the expensive pair was combined" }
+    awaitServer("entity @a[name=$playerName,level=28]")
+    client { it.player!!.closeContainer() }
+})
+
 private fun GameTestScope.awaitSignText(pos: BlockPos, text: String) =
     awaitAnswer("data get block ${pos.x} ${pos.y} ${pos.z} front_text.messages[0]", text)
+
+private fun GameTestScope.openAnvil(pos: BlockPos) {
+    awaitClient("the anvil to arrive") { it.level!!.getBlockState(pos).block is AnvilBlock }
+    aim(pos)
+    input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    awaitClient("the anvil to open") { it.gui.screen() is AnvilScreen }
+}
+
+private fun GameTestScope.pickaxes(): Int {
+    val answer = query(
+        "execute if items entity $playerName container.* minecraft:diamond_pickaxe",
+        Regex("""Test (?:passed\. Count: (\d+)|failed)"""),
+    )
+    return answer.groupValues[1].toIntOrNull() ?: 0
+}
