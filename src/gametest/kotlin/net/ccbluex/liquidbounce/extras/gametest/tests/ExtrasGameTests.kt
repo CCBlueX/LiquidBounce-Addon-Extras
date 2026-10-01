@@ -3,11 +3,17 @@ package net.ccbluex.liquidbounce.extras.gametest.tests
 import com.mojang.authlib.GameProfile
 import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.chat
+import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
+import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
+import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleMessageAura
+import net.ccbluex.liquidbounce.extras.modules.extras.ModulePacketCanceller
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.BlockPos
+import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
@@ -27,6 +33,20 @@ class MessageAuraGameTest : PaperGameTest({
 
     players.forEach { hidePlayer(it) }
     client { FriendManager.remove("ExtrasFriend") }
+})
+
+class PacketCancellerGameTest : PaperGameTest({
+    val incoming = ModulePacketCanceller.setting<MutableSet<Identifier>>("Incoming")
+    client { incoming.set(sortedSetOf(Identifier.withDefaultNamespace("system_chat"))) }
+    enable(ModulePacketCanceller)
+    run("""tellraw $playerName "first canary"""")
+    ticks(20)
+    check(chat().none { "first canary" in it }) { "a dropped chat packet was shown" }
+
+    disable(ModulePacketCanceller)
+    run("""tellraw $playerName "second canary"""")
+    awaitClient("chat to arrive again") { it.chatContains("second canary") }
+    client { incoming.set(sortedSetOf()) }
 })
 
 /**

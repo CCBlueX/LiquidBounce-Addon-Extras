@@ -99,5 +99,9 @@
   "liquidbounce.module.messageAura.description": "Whispers a message to every player who comes into view.",
   "liquidbounce.module.messageAura.value.message.description": "What to whisper.",
   "liquidbounce.module.messageAura.value.delay.description": "Wait between two messages.",
-  "liquidbounce.module.messageAura.value.ignoreFriends.description": "Leave friends alone."
+  "liquidbounce.module.messageAura.value.ignoreFriends.description": "Leave friends alone.",
+
+  "liquidbounce.module.packetCanceller.description": "Drops the selected packets.",
+  "liquidbounce.module.packetCanceller.value.outgoing.description": "Packets never sent to the server.",
+  "liquidbounce.module.packetCanceller.value.incoming.description": "Packets from the server that are never handled."
 }
