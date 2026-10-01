@@ -1,4 +1,17 @@
 {
+  "liquidbounce.command.waypoint.description": "Manages the waypoints of this session.",
+  "liquidbounce.command.waypoint.notInGame": "Join a world first.",
+  "liquidbounce.command.waypoint.add.description": "Adds a waypoint where you stand.",
+  "liquidbounce.command.waypoint.add.name.description": "Name of the waypoint.",
+  "liquidbounce.command.waypoint.add.added": "Waypoint %s added.",
+  "liquidbounce.command.waypoint.add.rejected": "Up to %s waypoints with names of up to %s characters.",
+  "liquidbounce.command.waypoint.remove.description": "Removes a waypoint.",
+  "liquidbounce.command.waypoint.remove.name.description": "Name of the waypoint.",
+  "liquidbounce.command.waypoint.remove.removed": "Waypoint %s removed.",
+  "liquidbounce.command.waypoint.remove.unknown": "There is no waypoint named %s.",
+  "liquidbounce.command.waypoint.list.description": "Lists the waypoints.",
+  "liquidbounce.command.waypoint.list.empty": "No waypoints yet.",
+  "liquidbounce.command.waypoint.list.entry": "%s at %s",
   "liquidbounce.command.where.description": "Tells you where you are.",
   "liquidbounce.command.where.share.description": "Tells the server chat where you are.",
   "liquidbounce.command.where.position": "You are at %s",
@@ -70,5 +83,16 @@
   "liquidbounce.module.lightOverlay.value.verticalRange.description": "How far to check up and down.",
   "liquidbounce.module.lightOverlay.value.lightLevel.description": "Highest light level that still allows spawning.",
   "liquidbounce.module.lightOverlay.value.color.description": "Colour where mobs spawn right now.",
-  "liquidbounce.module.lightOverlay.value.potentialColor.description": "Colour where mobs spawn once it is dark."
+  "liquidbounce.module.lightOverlay.value.potentialColor.description": "Colour where mobs spawn once it is dark.",
+
+  "liquidbounce.module.waypoints.description": "Lists the waypoints of this session; manage them with .waypoint.",
+  "liquidbounce.module.waypoints.value.x.description": "Distance from the left edge.",
+  "liquidbounce.module.waypoints.value.y.description": "Distance from the top edge.",
+  "liquidbounce.module.waypoints.value.color.description": "Text colour.",
+  "liquidbounce.module.waypoints.value.background.description": "Background colour.",
+  "liquidbounce.module.waypoints.messages.line": "%s: %sm %s (%s)",
+  "liquidbounce.module.waypoints.messages.ahead": "ahead",
+  "liquidbounce.module.waypoints.messages.right": "right",
+  "liquidbounce.module.waypoints.messages.behind": "behind",
+  "liquidbounce.module.waypoints.messages.left": "left"
 }

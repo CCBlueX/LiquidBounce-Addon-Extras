@@ -37,8 +37,10 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 ### QoL
 
 - **LightOverlay** (Kotlin) marks where hostile mobs can spawn: red right now, yellow once it is dark.
+- **Waypoints** (Kotlin) lists the waypoints of this session with distance and direction.
 
 ![LightOverlay](docs/lightoverlay.png)
+![Waypoints](docs/waypoints.png)
 
 ## HUD components
 
@@ -49,7 +51,8 @@ editor. Each has its own prefix, suffix, colour, shadow, padding and background.
 
 ## Commands
 
-`.where` prints your position, `.where share` says it in the server chat.
+`.where` prints your position, `.where share` says it in the server chat. `.waypoint add <name>`,
+`.waypoint remove <name>` and `.waypoint list` manage the waypoints.
 
 ![Where](docs/where.png)
 
