@@ -4,6 +4,7 @@ import net.ccbluex.liquidbounce.extras.commands.CommandWhere
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
+import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
 
@@ -15,6 +16,7 @@ class ExtrasAddon : LiquidBounceAddon() {
     override fun onInitialize() {
         registerModules(
             ModuleBaseFinder,
+            ModuleStashFinder,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerListeners(ClickCounter)

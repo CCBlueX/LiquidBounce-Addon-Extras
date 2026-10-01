@@ -8,6 +8,9 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 
 - **BaseFinder** (Kotlin) reports chunks with blocks only players place, a pile of workstations, or placed
   entities such as filled item frames, armor stands and boats.
+- **StashFinder** (Kotlin) reports chunks with many containers as they load. Trial chambers are left out.
+
+![StashFinder](docs/stashfinder.png)
 
 ## HUD components
 
@@ -45,6 +48,12 @@ repository. Add a body when the subject alone leaves the next reader guessing.
 
 We appreciate contributions. So if you want to support us, feel free to make changes to LiquidBounce's source code and
 submit a pull request.
+
+## Credits
+
+| File | Section | Taken from | Taken as |
+|---|---|---|---|
+| `modules/basehunting/ModuleStashFinder.kt` | Trial chamber filter | [Meteor Client `StashFinder`](https://github.com/MeteorDevelopment/meteor-client/blob/79a30a7c9ad459b9cfc1155c598aa58947db7fa5/src/main/java/meteordevelopment/meteorclient/systems/modules/world/StashFinder.java#L64-L73) | Idea and block list, GPL-3.0 |
 
 ## License
 

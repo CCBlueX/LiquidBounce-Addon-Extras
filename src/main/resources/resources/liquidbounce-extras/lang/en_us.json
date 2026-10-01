@@ -10,5 +10,10 @@
   "liquidbounce.module.baseFinder.value.notify.description": "Show a notification as well.",
   "liquidbounce.module.baseFinder.messages.landmark": "Possible base in the chunk at %s: a block only players place.",
   "liquidbounce.module.baseFinder.messages.workstations": "Possible base in the chunk at %s: %s workstations.",
-  "liquidbounce.module.baseFinder.messages.entities": "Possible base in the chunk at %s: %s placed entities."
+  "liquidbounce.module.baseFinder.messages.entities": "Possible base in the chunk at %s: %s placed entities.",
+
+  "liquidbounce.module.stashFinder.description": "Reports chunks with many containers as they load.",
+  "liquidbounce.module.stashFinder.value.minimum.description": "Containers a chunk needs to be reported.",
+  "liquidbounce.module.stashFinder.value.notify.description": "Show a notification as well.",
+  "liquidbounce.module.stashFinder.messages.found": "%s containers in the chunk at %s."
 }
