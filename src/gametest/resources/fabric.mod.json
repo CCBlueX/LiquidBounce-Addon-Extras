@@ -22,6 +22,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.AutoShearerGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.AutoSignGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.AutoAnvilRepairGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.LightOverlayGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

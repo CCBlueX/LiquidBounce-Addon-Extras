@@ -34,6 +34,12 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 ![AutoSign](docs/autosign.png)
 ![AutoAnvilRepair](docs/autoanvilrepair.png)
 
+### QoL
+
+- **LightOverlay** (Kotlin) marks where hostile mobs can spawn: red right now, yellow once it is dark.
+
+![LightOverlay](docs/lightoverlay.png)
+
 ## HUD components
 
 Add **FPS**, **TPS**, **Ping**, **Player**, **CPS**, **Biome**, **Coordinates** or **Speedometer** in the HUD
@@ -75,6 +81,7 @@ submit a pull request.
 
 | File | Section | Taken from | Taken as |
 |---|---|---|---|
+| `modules/qol/ModuleLightOverlay.kt` | Spawn rule | [Meteor Client `BlockUtils`](https://github.com/MeteorDevelopment/meteor-client/blob/79a30a7c9ad459b9cfc1155c598aa58947db7fa5/src/main/java/meteordevelopment/meteorclient/utils/world/BlockUtils.java#L313-L338) | Derived code, GPL-3.0 |
 | `modules/basehunting/ModuleStashFinder.kt` | Trial chamber filter | [Meteor Client `StashFinder`](https://github.com/MeteorDevelopment/meteor-client/blob/79a30a7c9ad459b9cfc1155c598aa58947db7fa5/src/main/java/meteordevelopment/meteorclient/systems/modules/world/StashFinder.java#L64-L73) | Idea and block list, GPL-3.0 |
 | `modules/basehunting/ModuleCaveDisturbanceDetector.kt` | Plain air next to cave air | [Trouser-Streak `CaveDisturbanceDetector`](https://github.com/etianl/Trouser-Streak/blob/0cf3231b56c25773cd66aa21931470bdf8799c9e/src/main/java/pwn/noobs/trouserstreak/modules/CaveDisturbanceDetector.java) | Idea |
 

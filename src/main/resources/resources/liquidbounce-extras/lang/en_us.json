@@ -63,5 +63,12 @@
   "liquidbounce.module.autoSign.value.delay.description": "Wait before writing a sign.",
 
   "liquidbounce.module.autoAnvilRepair.description": "Combines damaged items of the same kind in an open anvil.",
-  "liquidbounce.module.autoAnvilRepair.value.maxLevelCost.description": "Most levels to spend on one repair."
+  "liquidbounce.module.autoAnvilRepair.value.maxLevelCost.description": "Most levels to spend on one repair.",
+
+  "liquidbounce.module.lightOverlay.description": "Marks blocks where hostile mobs can spawn.",
+  "liquidbounce.module.lightOverlay.value.horizontalRange.description": "How far to check sideways.",
+  "liquidbounce.module.lightOverlay.value.verticalRange.description": "How far to check up and down.",
+  "liquidbounce.module.lightOverlay.value.lightLevel.description": "Highest light level that still allows spawning.",
+  "liquidbounce.module.lightOverlay.value.color.description": "Colour where mobs spawn right now.",
+  "liquidbounce.module.lightOverlay.value.potentialColor.description": "Colour where mobs spawn once it is dark."
 }
