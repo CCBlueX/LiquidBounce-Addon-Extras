@@ -15,6 +15,8 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 - **PortalFinder** (Kotlin) reports and marks lit Nether and End portals.
 - **CaveDisturbanceDetector** (Kotlin) marks plain air in cave walls, where someone mined into a cave.
 - **TunnelTrailESP** (Kotlin) highlights dug tunnels, staircases and one-wide shafts.
+- **SoundLocator** (Kotlin) marks where the server played explosions, containers and portals, or whichever
+  sounds you pick.
 
 ![StashFinder](docs/stashfinder.png)
 ![SuspiciousBlockDetector](docs/suspiciousblockdetector.png)

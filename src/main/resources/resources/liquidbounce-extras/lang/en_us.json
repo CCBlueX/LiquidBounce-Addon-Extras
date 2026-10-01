@@ -42,5 +42,12 @@
   "liquidbounce.module.tunnelTrailESP.description": "Highlights dug tunnels, staircases and shafts.",
   "liquidbounce.module.tunnelTrailESP.value.range.description": "How far to look.",
   "liquidbounce.module.tunnelTrailESP.value.minimumLength.description": "Shortest passage worth highlighting.",
-  "liquidbounce.module.tunnelTrailESP.value.color.description": "Highlight colour."
+  "liquidbounce.module.tunnelTrailESP.value.color.description": "Highlight colour.",
+
+  "liquidbounce.module.soundLocator.description": "Marks where the server played selected sounds.",
+  "liquidbounce.module.soundLocator.value.sounds.description": "Sounds to locate.",
+  "liquidbounce.module.soundLocator.value.lifetime.description": "How long a marker stays.",
+  "liquidbounce.module.soundLocator.value.chat.description": "Also report each sound in chat.",
+  "liquidbounce.module.soundLocator.value.color.description": "Marker colour.",
+  "liquidbounce.module.soundLocator.messages.heard": "Heard %s at %s."
 }

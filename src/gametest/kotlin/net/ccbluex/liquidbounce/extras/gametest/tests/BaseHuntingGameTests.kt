@@ -14,6 +14,7 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCaveDisturbanceDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModulePortalFinder
+import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSoundLocator
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
@@ -138,4 +139,14 @@ class TunnelTrailESPGameTest : PaperGameTest({
         ModuleTunnelTrailESP.findings.containsAll(entrances)
     }
     screenshot("TunnelTrailESP")
+})
+
+class SoundLocatorGameTest : PaperGameTest({
+    enable(ModuleSoundLocator)
+    run("playsound minecraft:block.chest.open block $playerName 4 -60 4")
+    run("playsound minecraft:block.stone.break block $playerName -4 -60 4")
+    awaitClient("the chest sound") { BlockPos(4, -60, 4) in ModuleSoundLocator.markers }
+    check(BlockPos(-4, -60, 4) !in client { ModuleSoundLocator.markers }) { "marked an unselected sound" }
+    disable(ModuleSoundLocator)
+    check(client { ModuleSoundLocator.markers.isEmpty() }) { "markers survived disabling" }
 })
