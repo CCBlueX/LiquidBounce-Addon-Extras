@@ -24,8 +24,10 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 ### Grinding
 
 - **AutoJump** (Java) jumps for you: always, while moving, or while sprinting.
+- **AutoShearer** (Kotlin) shears sheep in reach, switching to shears without changing your visible slot.
 
 ![AutoJump](docs/autojump.png)
+![AutoShearer](docs/autoshearer.png)
 
 ## HUD components
 

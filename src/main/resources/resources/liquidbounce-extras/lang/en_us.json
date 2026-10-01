@@ -52,5 +52,10 @@
   "liquidbounce.module.soundLocator.messages.heard": "Heard %s at %s.",
 
   "liquidbounce.module.autoJump.description": "Jumps for you.",
-  "liquidbounce.module.autoJump.value.when.description": "Jump always, only while moving, or only while sprinting."
+  "liquidbounce.module.autoJump.value.when.description": "Jump always, only while moving, or only while sprinting.",
+
+  "liquidbounce.module.autoShearer.description": "Shears sheep in reach.",
+  "liquidbounce.module.autoShearer.value.range.description": "How close a sheep has to be.",
+  "liquidbounce.module.autoShearer.value.delay.description": "Pause after each sheep.",
+  "liquidbounce.module.autoShearer.value.antiBreak.description": "Leave shears alone that are about to break."
 }
