@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     alias(libs.plugins.fabric.loom)
     alias(libs.plugins.kotlin.jvm)
@@ -23,6 +25,48 @@ repositories {
 
 loom {
     accessWidenerPath = file("src/main/resources/liquidbounce-extras.accesswidener")
+}
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "liquidbounce-extras-gametest"
+        enableGameTests = false
+    }
+}
+
+// Shared with LiquidBounce's own game tests, so the browser is downloaded once per machine.
+val gameTestLibraries = gradle.gradleUserHomeDir.resolve("liquidbounce-gametest")
+val paperDirectory = layout.buildDirectory.dir("paper").get().asFile
+val probeJar = project(":paper-probe").layout.buildDirectory.file("libs/paper-probe.jar").get().asFile
+
+loom.runs.named("clientGameTest") {
+    systemProperties.putAll(
+        mapOf(
+            "net.ccbluex.liquidbounce.ui.basicMode" to "true",
+            "net.ccbluex.liquidbounce.browser.libraries" to gameTestLibraries.resolve("mcef").path,
+            "net.ccbluex.liquidbounce.deeplearning.engines" to gameTestLibraries.resolve("djl").path,
+            "extras.paper.directory" to paperDirectory.path,
+            "extras.paper.probe" to probeJar.path,
+            "extras.paper.minecraft" to minecraft,
+            "fabric.noGui" to "true",
+        )
+    )
+    // Loader and client errors go to the log instead of a dialog nobody sees
+    environmentVars.put("CI", "true")
+    mapOf(
+        "gametest.only" to "extras.gametest.only",
+        "paper.build" to "extras.paper.build",
+        "grim.version" to "extras.grim.version",
+    ).forEach { (gradleProperty, systemProperty) ->
+        providers.gradleProperty(gradleProperty).orNull?.let { systemProperties.put(systemProperty, it) }
+    }
+}
+
+tasks.named<JavaExec>("runClientGameTest") {
+    dependsOn(":paper-probe:jar")
+    // A client that cannot start may wait on an error dialog forever
+    timeout = Duration.ofMinutes(45)
 }
 
 // No `mappings(...)` and no `mod*` configurations: like LiquidBounce itself, this Loom version runs on
@@ -81,6 +125,7 @@ kotlin {
 detekt {
     config.setFrom(file("config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
+    source.from("src/gametest/kotlin")
 }
 
 tasks.jar {

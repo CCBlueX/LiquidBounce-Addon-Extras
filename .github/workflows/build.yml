@@ -99,3 +99,59 @@ jobs:
             -F "file=@addon.zip" \
             --form-string "version=$VERSION" \
             --form-string "changelog=$CHANGELOG"
+
+  gametest:
+    runs-on: ubuntu-latest
+    # Every test boots its own Paper server; a client that hangs must not hold the runner for hours
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setting up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      # The game renders through Mesa's EGL, and the client's browser probes EGL as well.
+      - name: Install Xvfb and EGL
+        run: sudo apt-get update && sudo apt-get install -y xvfb libegl1 libegl-mesa0
+      # Paper's download API has outages; the harness then falls back to the server it downloaded last
+      - name: Restore Paper and Grim
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            build/paper/cache
+            build/paper/bundle
+          key: paper-${{ github.run_id }}
+          restore-keys: paper-
+      - name: Run game tests
+        env:
+          # Minecraft asks for an sRGB framebuffer, which Xvfb's GLX does not offer
+          SDL_VIDEO_FORCE_EGL: 1
+        # The client's browser now and then crashes it natively between tests; only that earns a second run
+        run: |
+          xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientGameTest && exit
+          compgen -G 'build/run/clientGameTest/hs_err_pid*.log' > /dev/null || exit 1
+          xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientGameTest
+
+      - name: Save Paper and Grim
+        if: always() && hashFiles('build/paper/cache/*.jar') != ''
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            build/paper/cache
+            build/paper/bundle
+          key: paper-${{ hashFiles('build/paper/cache/*.jar') }}
+      - name: Upload game test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gametest
+          path: |
+            build/run/clientGameTest/screenshots/
+            build/run/clientGameTest/logs/latest.log
+            build/run/clientGameTest/hs_err_pid*.log
+            build/paper/instances/*/logs/latest.log
+          if-no-files-found: ignore

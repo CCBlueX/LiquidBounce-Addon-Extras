@@ -2,11 +2,15 @@
 
 Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/LiquidBounce) does not ship. The code is proudly hallucinated by Claude Opus 5.5. In my opinion, for such an add-on, this is fine. I would not recommend making AI write module code for an actual client; however, Claude does kind of well with game testing. Its idea is to write simplistic code to give you an idea of how to write your own add-on.
 
-## Building
+## Building and testing
 
 ```sh
 ./gradlew build
+./gradlew runClientGameTest
 ```
+
+Every game test boots its own Paper 26.3 server with the newest [Grim](https://modrinth.com/plugin/grimac) and
+fails when the server objects to anything the client did.
 
 ## Commits
 

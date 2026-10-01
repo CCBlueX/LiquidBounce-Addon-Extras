@@ -1,0 +1,6 @@
+name: ExtrasProbe
+version: "1"
+main: net.ccbluex.liquidbounce.extras.probe.ExtrasProbe
+api-version: "26.3"
+depend: [GrimAC]
+description: Reports Grim flags, setbacks and Paper movement corrections to the console for the game tests.
