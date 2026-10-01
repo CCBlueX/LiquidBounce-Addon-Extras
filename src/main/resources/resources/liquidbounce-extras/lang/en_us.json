@@ -1,1 +1,5 @@
-{}
+{
+  "liquidbounce.command.where.description": "Tells you where you are.",
+  "liquidbounce.command.where.share.description": "Tells the server chat where you are.",
+  "liquidbounce.command.where.position": "You are at %s"
+}

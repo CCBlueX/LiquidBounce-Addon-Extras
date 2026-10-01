@@ -9,6 +9,12 @@ editor. Each has its own prefix, suffix, colour, shadow, padding and background.
 
 ![HUD](docs/hud.png)
 
+## Commands
+
+`.where` prints your position, `.where share` says it in the server chat.
+
+![Where](docs/where.png)
+
 ## Building and testing
 
 ```sh

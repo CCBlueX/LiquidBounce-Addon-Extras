@@ -2,6 +2,8 @@ package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
+import net.ccbluex.liquidbounce.extras.gametest.harness.command
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
@@ -81,4 +83,14 @@ class HudGameTest : PaperGameTest({
     screenshot("Hud")
     input.releaseKey { it.keyUp }
     client { extrasHudComponents.forEach { it.enabled = false } }
+})
+
+class WhereGameTest : PaperGameTest({
+    command("where")
+    awaitClient("the position in chat") { it.chatContains("You are at 0 -60 0") }
+    screenshot("Where")
+
+    val since = server.console.size
+    command("where share")
+    awaitConsole("the shared position in the server chat", since) { "<$playerName> I am at 0 -60 0" in it.message }
 })
