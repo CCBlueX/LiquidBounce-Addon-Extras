@@ -9,6 +9,8 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.multiplayer.ServerData
 import net.minecraft.client.multiplayer.resolver.ServerAddress
 import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.Level
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -67,15 +69,16 @@ class GameTestScope internal constructor(
      * Teleports and waits until the client stands there with the area rendered. Grim holds a player in
      * chunks the client has not received yet by setting them back; those setbacks belong to the trip.
      */
-    fun travel(pos: BlockPos, yaw: Float = 0f, pitch: Float = 0f) {
+    fun travel(pos: BlockPos, yaw: Float = 0f, pitch: Float = 0f, dimension: ResourceKey<Level>? = null) {
         val since = server.console.size
-        teleport(pos, yaw, pitch)
+        teleport(pos, yaw, pitch, dimension)
         // A player in a chunk the client does not have yet keeps its last on-ground state, and there is
         // nothing to render yet either, so the chunk itself has to be there first
         awaitClient("the player to arrive at $pos") { minecraft ->
             val player = minecraft.player!!
-            minecraft.level!!.hasChunkAt(pos) && player.blockPosition() == pos && player.onGround() &&
-                minecraft.levelRenderer.hasRenderedAllSections()
+            val level = minecraft.level!!
+            (dimension == null || level.dimension() == dimension) && level.hasChunkAt(pos) &&
+                player.blockPosition() == pos && player.onGround() && minecraft.levelRenderer.hasRenderedAllSections()
         }
         // Grim lets go only once it has seen the client confirm the chunk, which can take a few round trips
         repeat(SETTLE_ATTEMPTS) {
@@ -125,14 +128,18 @@ class GameTestScope internal constructor(
         travel(origin)
     }
 
-    /** Leaves the server like a player would, so that everything the server does afterwards is expected. */
+    fun reconnect() {
+        close()
+        join()
+    }
+
+    /** Leaves the server like a player would, so that the quit is expected. */
     override fun close() {
         if (!joined) {
             return
         }
         ticks(20)
         val since = server.console.size
-        verdict.leaving(since)
         // Like the pause menu: Minecraft.disconnect alone drops the world but leaves the connection open
         client { minecraft ->
             minecraft.level?.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE)
@@ -140,6 +147,8 @@ class GameTestScope internal constructor(
         }
         awaitClient("the client to leave") { it.level == null && it.gui.screen() is TitleScreen }
         awaitConsole("the server to see the player leave", since) { it.report == ProbeReport.QUIT }
+        verdict.departed(since until server.console.size)
+        joined = false
     }
 
     internal companion object {

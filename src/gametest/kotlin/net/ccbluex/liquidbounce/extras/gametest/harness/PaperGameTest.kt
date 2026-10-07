@@ -1,6 +1,7 @@
 package net.ccbluex.liquidbounce.extras.gametest.harness
 
 import net.ccbluex.liquidbounce.LiquidBounce
+import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.integration.screen.ScreenManager
@@ -24,9 +25,11 @@ abstract class PaperGameTest(private val body: GameTestScope.() -> Unit) : Fabri
 
         awaitClient(context)
         // Only the HUD stays on. AutoConfig, on by default, would load a marketplace config on join and
-        // switch built-in modules on in the middle of the test.
+        // switch built-in modules on in the middle of the test. Add-on settings an earlier test changed are
+        // saved with the client's config, so they go back to their defaults.
         context.runOnClient<RuntimeException> {
             ModuleManager.filter { it.enabled && it !== ModuleHud }.forEach { it.enabled = false }
+            ModuleManager.filter { it.category in ExtrasCategories.all }.forEach { it.restore() }
         }
         ClientErrors.reset()
         try {
@@ -91,5 +94,7 @@ object GameTestResults {
 }
 
 class ResultsGameTest : FabricClientGameTest {
-    override fun runTest(context: ClientGameTestContext) = GameTestResults.assertAllPassed()
+    // A failed command's message is translated on the client
+    override fun runTest(context: ClientGameTestContext) =
+        context.runOnClient<RuntimeException> { GameTestResults.assertAllPassed() }
 }

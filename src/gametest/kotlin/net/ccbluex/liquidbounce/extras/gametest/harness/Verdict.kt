@@ -8,7 +8,7 @@ class Verdict(private val server: PaperServer, private val playerName: () -> Str
 
     private val excused = mutableListOf<IntRange>()
     private val excusedSetbacks = mutableListOf<IntRange>()
-    private var leaving = Int.MAX_VALUE
+    private val departures = mutableListOf<IntRange>()
 
     fun excuse(lines: IntRange) {
         excused += lines
@@ -18,18 +18,18 @@ class Verdict(private val server: PaperServer, private val playerName: () -> Str
         excusedSetbacks += lines
     }
 
-    /** From the given console line on, the player leaves on purpose. */
-    fun leaving(since: Int) {
-        leaving = since
+    /** Between these console lines, the player left on purpose. */
+    fun departed(lines: IntRange) {
+        departures += lines
     }
 
     fun violations() = server.console.withIndex()
-        .filter { (index, line) -> !isExcused(line, index) && isViolation(line, index < leaving) }
+        .filter { (index, line) -> !isExcused(line, index) && isViolation(line, departures.any { index in it }) }
         .map { it.value }
 
-    fun isViolation(line: ConsoleLine, beforeLeaving: Boolean = true) = when (line.report) {
+    fun isViolation(line: ConsoleLine, leaving: Boolean = false) = when (line.report) {
         ProbeReport.FLAG, ProbeReport.SETBACK, ProbeReport.FAILMOVE, ProbeReport.KICK -> true
-        ProbeReport.QUIT -> beforeLeaving
+        ProbeReport.QUIT -> !leaving
         else -> (line.level == "WARN" || line.level == "ERROR") && playerName() in line.message
     }
 

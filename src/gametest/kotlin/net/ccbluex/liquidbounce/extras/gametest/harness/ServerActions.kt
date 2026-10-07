@@ -3,7 +3,9 @@ package net.ccbluex.liquidbounce.extras.gametest.harness
 import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope.Companion.DEFAULT_TIMEOUT
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.Level
 
 private const val RETRY_INTERVAL = 10
 
@@ -18,8 +20,15 @@ fun GameTestScope.summon(entity: String, pos: BlockPos, nbt: String = "") =
 
 fun GameTestScope.give(item: String, count: Int = 1) = run("give $playerName $item $count")
 
-fun GameTestScope.teleport(pos: BlockPos, yaw: Float = 0f, pitch: Float = 0f) =
-    run("tp $playerName ${pos.x + 0.5} ${pos.y} ${pos.z + 0.5} $yaw $pitch")
+fun GameTestScope.teleport(
+    pos: BlockPos,
+    yaw: Float = 0f,
+    pitch: Float = 0f,
+    dimension: ResourceKey<Level>? = null,
+) {
+    val teleport = "tp $playerName ${pos.x + 0.5} ${pos.y} ${pos.z + 0.5} $yaw $pitch"
+    run(if (dimension == null) teleport else "execute in ${dimension.identifier()} run $teleport")
+}
 
 fun GameTestScope.forceLoad(chunk: ChunkPos, load: Boolean = true) =
     run("forceload ${if (load) "add" else "remove"} ${chunk.minBlockX} ${chunk.minBlockZ}")
