@@ -4,6 +4,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.chat
 import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
+import net.ccbluex.liquidbounce.extras.gametest.harness.command
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
 import net.ccbluex.liquidbounce.extras.gametest.harness.fill
@@ -21,6 +22,8 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSoundLocator
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
+import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.ChunkPos
@@ -136,6 +139,33 @@ class BaseFinderEndGameTest : PaperGameTest({
             "{Item:{id:'minecraft:diamond',count:1}}",
     )
     awaitClient("diamond frames in the End") { ModuleBaseFinder.bases[chunk]?.get("entities") == 2 }
+})
+
+class FindingsGameTest : PaperGameTest({
+    for (x in 0..3) {
+        setBlock(BlockPos(x, -60, 20), "minecraft:chest")
+    }
+    enable(ModuleStashFinder)
+    awaitClient("the stash report") { it.chatContains("4 containers in the chunk at 0 16") }
+    val stash = "stash:0:1"
+    check(client { WorldJournal.findings[stash]?.evidence } == mapOf("minecraft:chest" to 4)) {
+        "the stash was not saved"
+    }
+
+    disable(ModuleStashFinder)
+    enable(ModuleStashFinder)
+    awaitClient("the stash found again") { ChunkPos(0, 1) in ModuleStashFinder.stashes }
+    check(chat().count { "containers in the chunk" in it } == 1) { "a saved stash was reported again" }
+    setBlock(BlockPos(4, -60, 20), "minecraft:barrel")
+    awaitClient("the changed stash reported") { it.chatContains("5 containers in the chunk at 0 16") }
+
+    command("findings list")
+    awaitClient("the listed stash") { it.chatContains("$stash at ") }
+    command("findings waypoint $stash Stash")
+    check(client { ModuleWaypoints.selected == "Stash" }) { "the finding did not become the selected waypoint" }
+    check(client { ModuleWaypoints.waypoints["Stash"] == WorldJournal.findings[stash]?.position })
+    command("findings forget $stash")
+    check(client { stash !in WorldJournal.findings }) { "forgetting the stash did not" }
 })
 
 class SuspiciousBlockDetectorGameTest : PaperGameTest({

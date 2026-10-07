@@ -15,6 +15,9 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.ATOMIC_MOVE
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import java.time.Instant
+
+class Finding(val position: Vec3i, val evidence: Map<String, Int>, val lastSeen: Instant)
 
 /**
  * What the add-on remembers about a server or singleplayer world, one file each in [folder], kept apart by
@@ -22,7 +25,10 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
  */
 object WorldJournal : EventListener, MinecraftShortcuts {
 
-    private class Dimension(val waypoints: MutableMap<String, Vec3i> = linkedMapOf())
+    private class Dimension(
+        val waypoints: MutableMap<String, Vec3i> = linkedMapOf(),
+        val findings: MutableMap<String, Finding> = linkedMapOf(),
+    )
 
     val folder = ConfigSystem.rootFolder.resolve("extras-worlds")
 
@@ -34,6 +40,8 @@ object WorldJournal : EventListener, MinecraftShortcuts {
     val ready get() = file != null
 
     val waypoints: Map<String, Vec3i> get() = current()?.waypoints.orEmpty()
+
+    val findings: Map<String, Finding> get() = current()?.findings.orEmpty()
 
     // The level of a server arrives before the player that knows the connection
     @Suppress("unused")
@@ -55,6 +63,16 @@ object WorldJournal : EventListener, MinecraftShortcuts {
 
     @IgnorableReturnValue
     fun removeWaypoint(name: String) = name in waypoints && edit { waypoints.remove(name) }
+
+    /** Saves what was seen at [pos] and returns what was seen there before. */
+    fun record(id: String, pos: Vec3i, evidence: Map<String, Int>): Map<String, Int>? {
+        val previous = findings[id]?.evidence
+        edit { findings[id] = Finding(pos, evidence, Instant.now()) }
+        return previous
+    }
+
+    @IgnorableReturnValue
+    fun forget(id: String) = id in findings && edit { findings.remove(id) }
 
     @IgnorableReturnValue
     private inline fun edit(change: Dimension.() -> Unit): Boolean {

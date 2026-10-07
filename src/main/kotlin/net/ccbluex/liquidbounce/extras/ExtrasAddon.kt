@@ -1,5 +1,6 @@
 package net.ccbluex.liquidbounce.extras
 
+import net.ccbluex.liquidbounce.extras.commands.CommandFindings
 import net.ccbluex.liquidbounce.extras.commands.CommandWaypoint
 import net.ccbluex.liquidbounce.extras.commands.CommandWhere
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
@@ -56,6 +57,7 @@ class ExtrasAddon : LiquidBounceAddon() {
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
+        registerCommand(CommandFindings)
         registerListeners(ClickCounter, WorldJournal)
         // The client does not persist native HUD components, so their settings live in the add-on's config
         config("extras-hud", extrasHudComponents.toMutableList())

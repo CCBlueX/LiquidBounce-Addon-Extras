@@ -72,7 +72,11 @@ editor. Each has its own prefix, suffix, colour, shadow, padding and background.
 
 `.where` prints your position, `.where share` says it in the server chat. `.waypoint add <name> [x y z]`,
 `.waypoint remove <name>` and `.waypoint list` manage the waypoints, `.waypoint select <name>` and
-`.waypoint deselect` the mark. Waypoints are saved in `LiquidBounce/extras-worlds/`.
+`.waypoint deselect` the mark.
+
+`.findings list`, `.findings show <id>` and `.findings forget <id>` manage what BaseFinder and StashFinder
+found, `.findings waypoint <id> <name>` turns a finding into a waypoint. Waypoints and findings are saved in
+`LiquidBounce/extras-worlds/`.
 
 ![Where](docs/where.png)
 

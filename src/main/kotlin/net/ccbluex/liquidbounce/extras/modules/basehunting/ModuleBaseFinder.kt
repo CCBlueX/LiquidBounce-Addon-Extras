@@ -6,6 +6,7 @@ import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.event.waitTicks
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.extras.util.BlockTracker
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.ccbluex.liquidbounce.extras.util.coordinates
 import net.ccbluex.liquidbounce.extras.util.report
 import net.ccbluex.liquidbounce.features.module.ClientModule
@@ -78,7 +79,7 @@ object ModuleBaseFinder : ClientModule("BaseFinder", ExtrasCategories.BASE_HUNTI
         bases.clear()
     }
 
-    private fun describe(evidence: Map<String, Int>) =
+    fun describe(evidence: Map<String, Int>) =
         evidence.entries.joinToString { (kind, count) -> message("evidence.$kind", count).string }
 
     private fun inspectChunks() {
@@ -88,7 +89,11 @@ object ModuleBaseFinder : ClientModule("BaseFinder", ExtrasCategories.BASE_HUNTI
         }.filterValues { it.isNotEmpty() }
 
         for ((chunk, evidence) in found) {
-            if (bases.put(chunk, evidence) != evidence) {
+            if (bases.put(chunk, evidence) == evidence) {
+                continue
+            }
+            val (pos, _) = clues.getValue(chunk).first { (_, kind) -> kind in evidence }
+            if (WorldJournal.record("base:${chunk.x}:${chunk.z}", pos, evidence) != evidence) {
                 report("found", chunk.coordinates, describe(evidence), notify = notify)
             }
         }

@@ -6,11 +6,13 @@ import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.event.waitTicks
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.extras.util.BlockTracker
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.ccbluex.liquidbounce.extras.util.coordinates
 import net.ccbluex.liquidbounce.extras.util.report
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.utils.block.ChunkScanner
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.ShulkerBoxBlock
@@ -63,6 +65,10 @@ object ModuleStashFinder : ClientModule("StashFinder", ExtrasCategories.BASE_HUN
         stashes.clear()
     }
 
+    fun describe(counts: Map<String, Int>) = counts.entries.joinToString { (block, count) ->
+        "$count ${BuiltInRegistries.BLOCK.getValue(Identifier.parse(block)).name.string}"
+    }
+
     private fun inspectChunks() {
         val found = tracker.iterate()
             .filter { (pos, _) -> world.getBlockState(pos.below()).block !in excludedSupports }
@@ -71,7 +77,10 @@ object ModuleStashFinder : ClientModule("StashFinder", ExtrasCategories.BASE_HUN
 
         for ((chunk, blocks) in found) {
             val counts = blocks.groupingBy { BuiltInRegistries.BLOCK.getKey(it.value).toString() }.eachCount()
-            if (stashes.put(chunk, counts) != counts) {
+            if (stashes.put(chunk, counts) == counts) {
+                continue
+            }
+            if (WorldJournal.record("stash:${chunk.x}:${chunk.z}", blocks.first().key, counts) != counts) {
                 report("found", blocks.size, chunk.coordinates, notify = notify)
             }
         }

@@ -14,6 +14,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.StashFinderGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.BaseFinderGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.BaseFinderEndGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.FindingsGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.SuspiciousBlockDetectorGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.CollectibleESPGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.PortalFinderGameTest",
