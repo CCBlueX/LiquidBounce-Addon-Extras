@@ -5,3 +5,6 @@ accessWidener	v1	official
 # ModuleAutoSign
 accessible field net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen sign Lnet/minecraft/world/level/block/entity/SignBlockEntity;
 accessible field net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen slot Lnet/minecraft/world/level/block/entity/SignTextSlot;
+
+# ModuleAutoBreed
+accessible method net/minecraft/world/entity/animal/feline/Ocelot isTrusting ()Z

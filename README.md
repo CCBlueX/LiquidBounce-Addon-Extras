@@ -34,12 +34,15 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
   Enchanted items are never sacrificed.
 - **AutoSmelter** (Kotlin) keeps an open furnace, blast furnace or smoker going: takes out what is done, loads
   allowed ingredients and puts in a little fuel once the fire is out.
+- **AutoBreed** (Kotlin) feeds adult animals in reach that have a partner nearby. Once the server shows hearts,
+  it leaves them alone until they can breed again.
 
 ![AutoJump](docs/autojump.png)
 ![AutoShearer](docs/autoshearer.png)
 ![AutoSign](docs/autosign.png)
 ![AutoAnvilRepair](docs/autoanvilrepair.png)
 ![AutoSmelter](docs/autosmelter.png)
+![AutoBreed](docs/autobreed.png)
 
 ### QoL
 

@@ -16,6 +16,7 @@ import net.ccbluex.liquidbounce.extras.modules.extras.ModuleIntruderAlert
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleMessageAura
 import net.ccbluex.liquidbounce.extras.modules.extras.ModulePacketCanceller
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoBreed
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
@@ -45,6 +46,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleAutoSign.INSTANCE,
             ModuleAutoAnvilRepair,
             ModuleAutoSmelter,
+            ModuleAutoBreed,
             ModuleLightOverlay,
             ModuleWaypoints,
             ModuleMessageAura.INSTANCE,

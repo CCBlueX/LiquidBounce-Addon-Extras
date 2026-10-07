@@ -8,6 +8,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
+import net.ccbluex.liquidbounce.extras.gametest.harness.fill
 import net.ccbluex.liquidbounce.extras.gametest.harness.give
 import net.ccbluex.liquidbounce.extras.gametest.harness.query
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
@@ -15,6 +16,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoBreed
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
@@ -23,12 +25,18 @@ import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import net.minecraft.client.gui.screens.inventory.AnvilScreen
 import net.minecraft.core.BlockPos
+import net.minecraft.core.UUIDUtil
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.entity.animal.sheep.Sheep
+import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.AbstractFurnaceBlock
 import net.minecraft.world.level.block.AnvilBlock
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.SignBlockEntity
 import net.minecraft.world.level.block.entity.SignTextSlot
 import com.mojang.blaze3d.platform.InputConstants
@@ -265,6 +273,107 @@ class AutoSmelterGameTest : PaperGameTest({
     client { it.player!!.closeContainer() }
 })
 
+class AutoBreedGameTest : PaperGameTest({
+    breed("cow", "wheat") {
+        awaitBaby("cow")
+        travel(origin.north(3), pitch = 15f)
+        screenshot("AutoBreed")
+    }
+    for ((species, food) in listOf(
+        "mooshroom" to "wheat", "sheep" to "wheat", "pig" to "carrot", "chicken" to "wheat_seeds",
+        "rabbit" to "carrot", "fox" to "sweet_berries", "bee" to "dandelion", "goat" to "wheat",
+        "armadillo" to "spider_eye", "camel" to "cactus",
+    )) {
+        breed(species, food)
+    }
+})
+
+class AutoBreedRareGameTest : PaperGameTest({
+    breed("sniffer", "torchflower_seeds") {
+        awaitServer("entity @e[type=minecraft:item,nbt={Item:{id:'minecraft:sniffer_egg'}}]", timeout = 400)
+    }
+    setBlock(origin.south(4), "minecraft:bamboo")
+    breed("panda", "bamboo", "MainGene:'normal',HiddenGene:'normal'")
+    run("difficulty normal")
+    breed("hoglin", "crimson_fungus", "IsImmuneToZombification:1b")
+    run("difficulty peaceful")
+    breed("strider", "warped_fungus")
+})
+
+class AutoBreedTamedGameTest : PaperGameTest({
+    val owner = owner()
+    for ((species, food) in listOf(
+        "horse" to "golden_carrot", "donkey" to "golden_carrot", "llama" to "hay_block", "trader_llama" to "hay_block",
+    )) {
+        breed(species, food, "Tame:1b,Owner:$owner")
+    }
+    breed("wolf", "beef", "Owner:$owner,Sitting:0b")
+    breed("cat", "cod", "Owner:$owner,Sitting:0b")
+    breed("ocelot", "cod", "Trusting:1b")
+})
+
+class AutoBreedAquaticGameTest : PaperGameTest({
+    fill(origin.offset(-2, -1, -2), origin.offset(3, 2, 5), "minecraft:stone hollow")
+    fill(origin.offset(-2, 2, -2), origin.offset(3, 2, 5), "minecraft:air")
+    fill(origin.offset(-1, 0, -1), origin.offset(2, 1, 4), "minecraft:water")
+    run("effect give $playerName minecraft:water_breathing 600 0 true")
+    breed("axolotl", "tropical_fish_bucket")
+    breed("nautilus", "cod", "Owner:${owner()},Sitting:0b")
+
+    fill(origin.offset(-2, 0, -2), origin.offset(3, 2, 5), "minecraft:air")
+    fill(origin.offset(-2, -1, -2), origin.offset(3, -1, 5), "minecraft:sand")
+    breed("turtle", "seagrass", "home_pos:[I;0,-60,2]") { awaitLaid(Blocks.TURTLE_EGG) }
+
+    fill(origin.offset(-2, 0, -2), origin.offset(3, 2, 5), "minecraft:air")
+    fill(origin.offset(-1, -1, 3), origin.offset(2, -1, 4), "minecraft:water")
+    val restless = "Brain:{memories:{'minecraft:long_jump_cooling_down':{value:600}}}"
+    breed("frog", "slime_ball", restless) {
+        // Frogs have to swim to lay their spawn
+        run("execute as @e[tag=parents] run attribute @s minecraft:movement_speed base set 1")
+        awaitLaid(Blocks.FROGSPAWN)
+    }
+})
+
+class AutoBreedSafetyGameTest : PaperGameTest({
+    run("item replace entity $playerName weapon.offhand with minecraft:wheat 16")
+    for (pos in listOf(origin.south(2), origin.south(2).east())) {
+        summon("minecraft:cow", pos, "{NoAI:1b,Age:-24000}")
+    }
+    awaitClient("two calves") { it.level!!.entitiesForRendering().count { cow -> cow is Animal && cow.isBaby } == 2 }
+    enable(ModuleAutoBreed)
+    ticks(60)
+    awaitServer("items entity $playerName weapon.offhand minecraft:wheat[count=16]")
+
+    run("execute as @e[type=minecraft:cow] run data merge entity @s {Age:0}")
+    fill(origin.offset(-1, 0, 1), origin.offset(2, 2, 1), "minecraft:stone")
+    ticks(60)
+    awaitServer("items entity $playerName weapon.offhand minecraft:wheat[count=16]")
+    fill(origin.offset(-1, 0, 1), origin.offset(2, 2, 1), "minecraft:air")
+    awaitClient("hearts for both cows") { ModuleAutoBreed.confirmed.size == 2 }
+    awaitServer("items entity $playerName weapon.offhand minecraft:wheat[count=14]")
+    ticks(140)
+    awaitServer("items entity $playerName weapon.offhand minecraft:wheat[count=14]")
+    disable(ModuleAutoBreed)
+    check(client { ModuleAutoBreed.confirmed.isEmpty() }) { "confirmations survived disabling" }
+    // Their beef would end up in the offhand
+    run("kill @e[type=minecraft:cow]")
+    run("kill @e[type=minecraft:item]")
+
+    // Wild, sitting and hurt wolves
+    val owner = owner()
+    for (wolf in listOf("{NoAI:1b}", "{NoAI:1b,Owner:$owner,Sitting:1b}", "{NoAI:1b,Owner:$owner,Health:2f}")) {
+        run("kill @e[type=minecraft:wolf]")
+        run("item replace entity $playerName weapon.offhand with minecraft:beef 16")
+        summon("minecraft:wolf", origin.south(2), wolf)
+        summon("minecraft:wolf", origin.south(2).east(), wolf)
+        awaitClient("two wolves") { it.level!!.entitiesForRendering().count { entity -> entity is Wolf } == 2 }
+        enable(ModuleAutoBreed)
+        ticks(60)
+        awaitServer("items entity $playerName weapon.offhand minecraft:beef[count=16]")
+        disable(ModuleAutoBreed)
+    }
+})
+
 private fun GameTestScope.awaitSignText(pos: BlockPos, text: String, side: String = "front", line: Int = 0) =
     awaitAnswer("data get block ${pos.x} ${pos.y} ${pos.z} ${side}_text.messages[$line]", text)
 
@@ -280,6 +389,54 @@ private fun GameTestScope.openFurnace(pos: BlockPos) {
     input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
     awaitClient("the furnace to open") { it.gui.screen() is AbstractFurnaceScreen<*> }
 }
+
+/** Has a fresh pair of [species] in front of the player fed, and waits for what they [made], a baby by default. */
+private fun GameTestScope.breed(
+    species: String,
+    food: String,
+    nbt: String = "",
+    made: GameTestScope.() -> Unit = { awaitBaby(species) },
+) {
+    run("kill @e[type=!minecraft:player]")
+    awaitClient("the previous animals to go") { it.level!!.entitiesForRendering().none { entity -> entity is Animal } }
+    travel(origin)
+    run("clear $playerName")
+    if (food.endsWith("_bucket")) {
+        // Buckets do not stack, and each parent needs its own
+        run("item replace entity $playerName hotbar.3 with minecraft:$food")
+        run("item replace entity $playerName hotbar.4 with minecraft:$food")
+    } else {
+        run("item replace entity $playerName hotbar.3 with minecraft:$food 16")
+    }
+    val parent = "{PersistenceRequired:1b,Tags:['parents']${if (nbt.isEmpty()) "" else ",$nbt"}}"
+    summon("minecraft:$species", origin.south(2), parent)
+    summon("minecraft:$species", origin.south(2).east(), parent)
+    // Standing still keeps them in reach until both are fed
+    run("execute as @e[tag=parents] run attribute @s minecraft:movement_speed base set 0")
+    awaitClient("the $species pair and its food") { minecraft ->
+        !minecraft.player!!.inventory.getItem(3).isEmpty &&
+            minecraft.level!!.entitiesForRendering().count { it is Animal && !it.isBaby } == 2
+    }
+    enable(ModuleAutoBreed)
+    awaitClient("hearts for both") { ModuleAutoBreed.confirmed.size == 2 }
+    made()
+    disable(ModuleAutoBreed)
+}
+
+/** Both parents and their baby, as the server counts them. */
+private fun GameTestScope.awaitBaby(species: String) =
+    awaitAnswer("execute if entity @e[type=minecraft:$species]", "Count: 3", 400)
+
+private fun GameTestScope.awaitLaid(block: Block) {
+    val area = BlockPos.betweenClosed(origin.offset(-8, -1, -8), origin.offset(8, 2, 8))
+    awaitClient("${block.name.string} laid", timeout = 1200) { minecraft ->
+        area.any { minecraft.level!!.getBlockState(it).`is`(block) }
+    }
+    val pos = client { minecraft -> area.first { minecraft.level!!.getBlockState(it).`is`(block) }.immutable() }
+    awaitServer("block ${pos.x} ${pos.y} ${pos.z} ${BuiltInRegistries.BLOCK.getKey(block)}")
+}
+
+private fun GameTestScope.owner() = client { UUIDUtil.uuidToIntArray(it.player!!.uuid).joinToString(",", "[I;", "]") }
 
 private fun GameTestScope.openAnvil(pos: BlockPos) {
     awaitClient("the anvil to arrive") { it.level!!.getBlockState(pos).block is AnvilBlock }

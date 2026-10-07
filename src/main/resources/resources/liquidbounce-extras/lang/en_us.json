@@ -104,6 +104,11 @@
   "liquidbounce.module.autoSmelter.value.fuels.description": "Fuel to put in.",
   "liquidbounce.module.autoSmelter.value.refill.description": "Fuel items to put in once the fire is out.",
 
+  "liquidbounce.module.autoBreed.description": "Feeds adult animals in reach that have a partner nearby.",
+  "liquidbounce.module.autoBreed.value.animals.description": "Animals to breed.",
+  "liquidbounce.module.autoBreed.value.range.description": "How close an animal has to be.",
+  "liquidbounce.module.autoBreed.value.delay.description": "Pause after each animal.",
+
   "liquidbounce.module.lightOverlay.description": "Marks blocks where hostile mobs can spawn.",
   "liquidbounce.module.lightOverlay.value.horizontalRange.description": "How far to check sideways.",
   "liquidbounce.module.lightOverlay.value.verticalRange.description": "How far to check up and down.",

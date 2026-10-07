@@ -49,7 +49,7 @@ class HarnessGameTest : PaperGameTest({
 class AddonGameTest : PaperGameTest({
     client {
         val modules = ModuleManager.filter { it.category in ExtrasCategories.all }
-        check(modules.size == 18) { "expected 18 add-on modules, found ${modules.map { it.name }}" }
+        check(modules.size == 19) { "expected 19 add-on modules, found ${modules.map { it.name }}" }
         check(ExtrasCategories.all.all { ModuleCategories.byName(it.tag) === it }) { "a category is missing" }
         for (module in modules) {
             check(LanguageManager.hasFallbackTranslation(module.descriptionKey!!)) {
