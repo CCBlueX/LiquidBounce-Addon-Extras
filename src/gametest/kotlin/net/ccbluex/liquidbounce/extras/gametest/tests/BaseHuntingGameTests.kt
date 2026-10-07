@@ -40,9 +40,35 @@ class StashFinderGameTest : PaperGameTest({
     enable(ModuleStashFinder)
     travel(BlockPos(196, -60, 0), yaw = -60f, pitch = 20f)
     awaitClient("the stash report") { it.chatContains("5 containers in the chunk at 192 0") }
-    check(client { ModuleStashFinder.stashes[stash] } == 5)
+    check(client { stash.containers } == 5)
     screenshot("StashFinder")
+
+    disable(ModuleStashFinder)
+    enable(ModuleStashFinder)
+    awaitClient("the stash after enabling again") { stash.containers == 5 }
+    setBlock(BlockPos(204, -60, 3), "minecraft:air")
+    awaitClient("one container less") { stash.containers == 4 }
+    setBlock(BlockPos(203, -61, 3), "minecraft:tuff_bricks")
+    awaitClient("a container on a trial chamber block left out") { stash !in ModuleStashFinder.stashes }
+    setBlock(BlockPos(203, -61, 3), "minecraft:stone")
+    awaitClient("the container back") { stash.containers == 4 }
+
+    setBlock(BlockPos(200, -60, 3), "minecraft:barrel")
+    setBlock(BlockPos(201, -60, 3), "minecraft:red_shulker_box")
+    awaitClient("containers counted by block") {
+        ModuleStashFinder.stashes[stash] ==
+            mapOf("minecraft:chest" to 2, "minecraft:barrel" to 1, "minecraft:red_shulker_box" to 1)
+    }
+    client { ModuleStashFinder.setting<Set<Block>>("Containers").set(linkedSetOf(Blocks.CHEST)) }
+    awaitClient("only chests counted") { stash !in ModuleStashFinder.stashes }
+    client { ModuleStashFinder.setting<Set<Block>>("Containers").restore() }
+    awaitClient("every container counted again") { stash.containers == 4 }
+
+    disable(ModuleStashFinder)
+    check(client { ModuleStashFinder.stashes.isEmpty() }) { "stashes survived disabling" }
 })
+
+private val ChunkPos.containers get() = ModuleStashFinder.stashes[this]?.values?.sum()
 
 class BaseFinderGameTest : PaperGameTest({
     enable(ModuleBaseFinder)

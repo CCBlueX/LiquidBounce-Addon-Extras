@@ -32,9 +32,11 @@
   "liquidbounce.module.baseFinder.messages.evidence.signs": "%s written signs",
   "liquidbounce.module.baseFinder.messages.evidence.villagers": "%s traded villagers",
 
-  "liquidbounce.module.stashFinder.description": "Reports chunks with many containers as they load.",
+  "liquidbounce.module.stashFinder.description": "Reports chunks with many containers and follows them as they change.",
   "liquidbounce.module.stashFinder.value.minimum.description": "Containers a chunk needs to be reported.",
   "liquidbounce.module.stashFinder.value.notify.description": "Show a notification as well.",
+  "liquidbounce.module.stashFinder.value.containers.description": "Blocks that count as containers; a double chest counts twice.",
+  "liquidbounce.module.stashFinder.value.excludedSupports.description": "Ignore containers standing on these, like those of trial chambers.",
   "liquidbounce.module.stashFinder.messages.found": "%s containers in the chunk at %s.",
 
   "liquidbounce.module.suspiciousBlockDetector.description": "Reports blocks players place near you, like doors, chests and obsidian.",

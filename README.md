@@ -10,7 +10,8 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 
 - **BaseFinder** (Kotlin) reports chunks with blocks only players place, a pile of workstations, placed
   entities such as filled item frames, armor stands and boats, written signs, or villagers that have traded.
-- **StashFinder** (Kotlin) reports chunks with many containers as they load. Trial chambers are left out.
+- **StashFinder** (Kotlin) reports chunks with many containers, counted by block, and follows them as they
+  change. Trial chambers are left out.
 - **SuspiciousBlockDetector** (Kotlin) reports doors, trapdoors, chests, ladders, beds, obsidian and metal
   blocks that appear near you once the chunks around you have settled.
 - **CollectibleESP** (Kotlin) highlights valuables in item frames, filled maps included, and banners.
