@@ -14,7 +14,7 @@ detekt = "2.0.0-alpha.6"
 
 # The add-on compiles against the client itself; there is no separate API artifact.
 # Use `<version>+<mc>` for a release or `<version>+<mc>-SNAPSHOT` to track nextgen.
-liquidbounce = "0.40.1+26.3-SNAPSHOT"
+liquidbounce = "0.41.0+26.3"
 
 # Compile-only APIs of the game-test server plugin. The server and Grim it runs against are resolved
 # at test time, see AGENTS.md.
