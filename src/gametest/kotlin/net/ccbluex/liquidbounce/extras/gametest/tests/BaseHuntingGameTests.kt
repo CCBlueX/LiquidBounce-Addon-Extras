@@ -1,6 +1,7 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.chat
 import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
@@ -10,6 +11,8 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.forceLoad
 import net.ccbluex.liquidbounce.extras.gametest.harness.hangItemFrame
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
+import net.ccbluex.liquidbounce.extras.gametest.harness.setting
+import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCaveDisturbanceDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
@@ -21,6 +24,9 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 
 class StashFinderGameTest : PaperGameTest({
     // Filled while the client cannot see it, so the chests arrive with the chunk
@@ -52,9 +58,58 @@ class BaseFinderGameTest : PaperGameTest({
     }
 
     val expected = setOf(ChunkPos(2, 2), ChunkPos(-3, 2), ChunkPos(2, -3))
-    awaitClient("the three bases") { ModuleBaseFinder.bases.containsAll(expected) }
+    awaitClient("the three bases") { ModuleBaseFinder.bases.keys.containsAll(expected) }
+
+    val sign = BlockPos(-20, -60, 20)
+    val signChunk = ChunkPos.containing(sign)
+    setBlock(sign, "minecraft:oak_sign")
+    ticks(30)
+    check(client { signChunk !in ModuleBaseFinder.bases }) { "a blank sign was evidence" }
+    run("data merge block -20 -60 20 {back_text:{messages:['A base','','','']}}")
+    awaitClient("text on the back of a sign") { ModuleBaseFinder.bases[signChunk]?.get("signs") == 1 }
+    run("data merge block -20 -60 20 {back_text:{messages:['','','','']}}")
+    awaitClient("the text erased") { signChunk !in ModuleBaseFinder.bases }
+
+    val villager = BlockPos(-20, -60, -20)
+    val villagerChunk = ChunkPos.containing(villager)
+    summon("minecraft:villager", villager, "{NoAI:1b,VillagerData:{level:1}}")
+    ticks(30)
+    check(client { villagerChunk !in ModuleBaseFinder.bases }) { "a novice was evidence" }
+    run("data merge entity @e[type=minecraft:villager,limit=1] {VillagerData:{level:2}}")
+    awaitClient("a traded villager") { ModuleBaseFinder.bases[villagerChunk]?.get("villagers") == 1 }
+
+    val landmark = BlockPos(20, -60, 20)
+    setBlock(landmark, "minecraft:diamond_block")
+    client { ModuleBaseFinder.setting<Set<Block>>("LandmarkBlocks").set(linkedSetOf(Blocks.DIAMOND_BLOCK)) }
+    awaitClient("a landmark of your own") { ChunkPos.containing(landmark) in ModuleBaseFinder.bases }
     disable(ModuleBaseFinder)
     check(client { ModuleBaseFinder.bases.isEmpty() }) { "reports survived disabling" }
+})
+
+class BaseFinderEndGameTest : PaperGameTest({
+    val pos = BlockPos(1000, 80, 1000)
+    run("execute in minecraft:the_end run forceload add 992 992")
+    awaitAnswer("execute in minecraft:the_end if loaded 1000 80 1000", "Test passed")
+    run("execute in minecraft:the_end run fill 998 80 998 1005 84 1005 minecraft:air")
+    run("execute in minecraft:the_end run fill 998 79 998 1005 79 1005 minecraft:stone")
+    travel(pos, dimension = Level.END)
+    // Like on an End ship
+    for (x in listOf(1000, 1002)) {
+        run("execute in minecraft:the_end run setblock $x 80 1003 minecraft:stone")
+        run(
+            "execute in minecraft:the_end run summon minecraft:item_frame $x.5 80 1002.5 " +
+                "{Pos:[$x.5d,80d,1002.5d],block_pos:[I;$x,80,1002],Facing:2b,Item:{id:'minecraft:elytra',count:1}}",
+        )
+    }
+    enable(ModuleBaseFinder)
+    ticks(60)
+    val chunk = ChunkPos.containing(pos)
+    check(client { chunk !in ModuleBaseFinder.bases }) { "elytra frames counted as placed entities" }
+    run(
+        "execute in minecraft:the_end as @e[type=minecraft:item_frame] run data merge entity @s " +
+            "{Item:{id:'minecraft:diamond',count:1}}",
+    )
+    awaitClient("diamond frames in the End") { ModuleBaseFinder.bases[chunk]?.get("entities") == 2 }
 })
 
 class SuspiciousBlockDetectorGameTest : PaperGameTest({

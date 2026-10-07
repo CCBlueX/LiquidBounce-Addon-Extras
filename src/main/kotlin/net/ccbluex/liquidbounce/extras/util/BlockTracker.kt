@@ -16,7 +16,7 @@ class BlockTracker<T : Any>(private val classify: (BlockState) -> T?) :
 
     // findBlocks skips whole sections whose palette cannot contain a match
     override fun chunkUpdate(chunk: LevelChunk) =
-        chunk.findBlocks({ classify(it) != null }) { pos, state -> track(pos, classify(state)!!) }
+        chunk.findBlocks({ classify(it) != null }) { pos, state -> classify(state)?.let { track(pos, it) } }
 
     override fun getStateFor(pos: BlockPos, state: BlockState) = classify(state)
 
