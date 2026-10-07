@@ -1,6 +1,9 @@
 package net.ccbluex.liquidbounce.extras
 
 import net.ccbluex.liquidbounce.extras.commands.CommandWaypoint
+import net.ccbluex.liquidbounce.extras.commands.CommandFindings
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
+import net.ccbluex.liquidbounce.extras.util.WorldEvents
 import net.ccbluex.liquidbounce.extras.commands.CommandWhere
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
@@ -19,6 +22,8 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoBreed
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
@@ -43,6 +48,8 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleAutoShearer,
             ModuleAutoSign.INSTANCE,
             ModuleAutoAnvilRepair,
+            ModuleAutoSmelter,
+            ModuleAutoBreed,
             ModuleLightOverlay,
             ModuleWaypoints,
             ModuleMessageAura.INSTANCE,
@@ -51,13 +58,17 @@ class ExtrasAddon : LiquidBounceAddon() {
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
-        registerListeners(ClickCounter)
+        registerCommand(CommandFindings)
+        registerListeners(ClickCounter, WorldJournal, WorldEvents)
         // The client does not persist native HUD components, so their settings live in the add-on's config
         config("extras-hud", extrasHudComponents.toMutableList())
     }
 
     override fun onStarted() = extrasHudComponents.forEach(HudComponentManager::register)
 
-    override fun onStopping() = extrasHudComponents.forEach(HudComponentManager::unregister)
+    override fun onStopping() {
+        extrasHudComponents.forEach(HudComponentManager::unregister)
+        WorldJournal.stop()
+    }
 
 }

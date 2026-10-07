@@ -9,6 +9,7 @@ class Verdict(private val server: PaperServer, private val playerName: () -> Str
     private val excused = mutableListOf<IntRange>()
     private val excusedSetbacks = mutableListOf<IntRange>()
     private var leaving = Int.MAX_VALUE
+    private val expectedQuits = mutableListOf<IntRange>()
 
     fun excuse(lines: IntRange) {
         excused += lines
@@ -23,8 +24,15 @@ class Verdict(private val server: PaperServer, private val playerName: () -> Str
         leaving = since
     }
 
+    fun arriving() {
+        if (leaving != Int.MAX_VALUE) expectedQuits += leaving until server.console.size
+        leaving = Int.MAX_VALUE
+    }
+
     fun violations() = server.console.withIndex()
-        .filter { (index, line) -> !isExcused(line, index) && isViolation(line, index < leaving) }
+        .filter { (index, line) ->
+            !isExcused(line, index) && isViolation(line, index < leaving && expectedQuits.none { index in it })
+        }
         .map { it.value }
 
     fun isViolation(line: ConsoleLine, beforeLeaving: Boolean = true) = when (line.report) {

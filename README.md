@@ -1,6 +1,6 @@
 # LiquidBounce Extras
 
-Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/LiquidBounce) does not ship. The code is proudly hallucinated by Claude Opus 5.5. In my opinion, for such an add-on, this is fine. I would not recommend making AI write module code for an actual client; however, Claude does kind of well with game testing. Its idea is to write simplistic code to give you an idea of how to write your own add-on.
+Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/LiquidBounce) does not ship. The code is proudly hallucinated by Claude Opus 5.5 and GPT-6 (Astra). In my opinion, for such an add-on, this is fine. I would not recommend making AI write module code for an actual client; however, Claude does kind of well with game testing. Its idea is to write simplistic code to give you an idea of how to write your own add-on.
 
 ![ClickGUI](docs/clickgui.png)
 
@@ -8,9 +8,10 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 
 ### Base Hunting
 
-- **BaseFinder** (Kotlin) reports chunks with blocks only players place, a pile of workstations, or placed
-  entities such as filled item frames, armor stands and boats.
-- **StashFinder** (Kotlin) reports chunks with many containers as they load. Trial chambers are left out.
+- **BaseFinder** (Kotlin) records landmarks, workstation clusters, placed entities, written signs and traded
+  villagers. Block lists are configurable; natural End elytra frames are ignored.
+- **StashFinder** (Kotlin) records container clusters with counts by block type, including changes in loaded
+  chunks. Containers and excluded supporting blocks are configurable.
 - **SuspiciousBlockDetector** (Kotlin) reports doors, trapdoors, chests, ladders, beds, obsidian and metal
   blocks that appear near you once the chunks around you have settled.
 - **CollectibleESP** (Kotlin) highlights valuables in item frames, filled maps included, and banners.
@@ -27,19 +28,27 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 
 - **AutoJump** (Java) jumps for you: always, while moving, or while sprinting.
 - **AutoShearer** (Kotlin) shears sheep in reach, switching to shears without changing your visible slot.
-- **AutoSign** (Java) writes every new sign with the text of the last sign you wrote. The editor never opens.
+- **AutoSign** (Java) repeats remembered text or four-line front and back templates. Optional nearby editing
+  opens the visible side with an empty main hand; replacing existing text needs `Overwrite`.
 - **AutoAnvilRepair** (Kotlin) combines damaged items of the same kind in an open anvil, up to a level cost.
   Enchanted items are never sacrificed.
+- **AutoSmelter** (Kotlin) loads allowed inputs and fuel in an open furnace, blast furnace or smoker, and
+  collects results. Fuel refills default to one item. Pauses while moving or when output has nowhere to go.
+- **AutoBreed** (Kotlin) feeds compatible adult animals from the hotbar or offhand, including tamed and aquatic
+  species. Server hearts confirm feeding; confirmed animals wait through their breeding cooldown.
 
 ![AutoJump](docs/autojump.png)
 ![AutoShearer](docs/autoshearer.png)
 ![AutoSign](docs/autosign.png)
 ![AutoAnvilRepair](docs/autoanvilrepair.png)
+![AutoSmelter](docs/autosmelter.png)
+![AutoBreed](docs/autobreed.png)
 
 ### QoL
 
 - **LightOverlay** (Kotlin) marks where hostile mobs can spawn: red right now, yellow once it is dark.
-- **Waypoints** (Kotlin) lists the waypoints of this session with distance and direction.
+- **Waypoints** (Kotlin) saves locations per server or local world and dimension, with distance, direction and
+  a selectable world marker. Disabling it hides the markers and keeps saved locations.
 
 ![LightOverlay](docs/lightoverlay.png)
 ![Waypoints](docs/waypoints.png)
@@ -61,8 +70,13 @@ editor. Each has its own prefix, suffix, colour, shadow, padding and background.
 
 ## Commands
 
-`.where` prints your position, `.where share` says it in the server chat. `.waypoint add <name>`,
-`.waypoint remove <name>` and `.waypoint list` manage the waypoints.
+`.where` prints your position; `.where share` says it in server chat. `.waypoint add <name> [x y z]`,
+`.waypoint remove <name>` and `.waypoint list` manage saved locations; `select <name>` and `deselect` control
+the world marker.
+
+`.findings list`, `show <id>`, `forget <id>` and `waypoint <id> <name>` manage BaseFinder and StashFinder history.
+IDs use `base:<chunk-x>:<chunk-z>` or `stash:<chunk-x>:<chunk-z>`. History describes the last observation,
+including its time; it is not a claim about unloaded chunks. Journals live in `LiquidBounce/extras-worlds/`.
 
 ![Where](docs/where.png)
 
@@ -97,6 +111,7 @@ submit a pull request.
 | `modules/qol/ModuleLightOverlay.kt` | Spawn rule | [Meteor Client `BlockUtils`](https://github.com/MeteorDevelopment/meteor-client/blob/79a30a7c9ad459b9cfc1155c598aa58947db7fa5/src/main/java/meteordevelopment/meteorclient/utils/world/BlockUtils.java#L313-L338) | Derived code, GPL-3.0 |
 | `modules/basehunting/ModuleStashFinder.kt` | Trial chamber filter | [Meteor Client `StashFinder`](https://github.com/MeteorDevelopment/meteor-client/blob/79a30a7c9ad459b9cfc1155c598aa58947db7fa5/src/main/java/meteordevelopment/meteorclient/systems/modules/world/StashFinder.java#L64-L73) | Idea and block list, GPL-3.0 |
 | `modules/basehunting/ModuleCaveDisturbanceDetector.kt` | Plain air next to cave air | [Trouser-Streak `CaveDisturbanceDetector`](https://github.com/etianl/Trouser-Streak/blob/0cf3231b56c25773cd66aa21931470bdf8799c9e/src/main/java/pwn/noobs/trouserstreak/modules/CaveDisturbanceDetector.java) | Idea |
+| `modules/basehunting/ModuleBaseFinder.kt` | Written signs and developed villagers | [Trouser-Streak `BaseFinder`](https://github.com/etianl/Trouser-Streak/blob/be39bf88955d91261471a3462af4ef8a5f18b9f4/src/main/java/pwn/noobs/trouserstreak/modules/BaseFinder.java) | Ideas |
 
 ## License
 

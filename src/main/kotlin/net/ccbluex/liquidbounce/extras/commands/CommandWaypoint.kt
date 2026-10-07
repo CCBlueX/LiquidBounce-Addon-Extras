@@ -2,6 +2,9 @@ package net.ccbluex.liquidbounce.extras.commands
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.arguments.IntegerArgumentType.integer
+import net.minecraft.core.BlockPos
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.extras.util.coordinates
 import net.ccbluex.liquidbounce.features.command.CommandException
@@ -24,7 +27,15 @@ object CommandWaypoint : CommandRegistrar {
         dispatcher.register("waypoint") {
             literal("add") {
                 argument("name", ClientStringArgumentType.word()) { name ->
-                    exec { context -> add(context.get(name)) }
+                    optional("x", integer(-30_000_000, 30_000_000)) { x ->
+                        optional("y", integer(-2048, 2048)) { y ->
+                            optional("z", integer(-30_000_000, 30_000_000)) { z ->
+                                exec { ctx ->
+                                    add(ctx.get(name), coordinates(ctx.get(x), ctx.get(y), ctx.get(z)))
+                                }
+                            }
+                        }
+                    }
                 }
             }
             literal("remove") {
@@ -36,12 +47,41 @@ object CommandWaypoint : CommandRegistrar {
             literal("list") {
                 exec { list() }
             }
+            literal("select") {
+                argument("name", ClientStringArgumentType.word()) { name ->
+                    exec { ctx ->
+                        requireReady()
+                        val selected = ctx.get(name)
+                        if (!ModuleWaypoints.select(selected)) throw CommandException(t("remove.unknown", selected))
+                        ModuleWaypoints.enabled = true
+                        chat(regular(t("select.selected", selected)))
+                        Command.SINGLE_SUCCESS
+                    }
+                }
+            }
+            literal("deselect") {
+                exec {
+                    ModuleWaypoints.select(null)
+                    Command.SINGLE_SUCCESS
+                }
+            }
         }
     }
 
-    private fun CmdI18n.add(name: String): Int {
+    private fun CmdI18n.requireReady() {
+        if (!WorldJournal.ready) throw CommandException(t("notReady"))
+    }
+
+    private fun CmdI18n.coordinates(x: Int?, y: Int?, z: Int?): BlockPos? {
+        if (x == null) return null
+        if (y == null || z == null) throw CommandException(t("coordinates"))
+        return BlockPos(x, y, z)
+    }
+
+    private fun CmdI18n.add(name: String, position: BlockPos? = null): Int {
+        requireReady()
         val player = mc.player ?: throw CommandException(t("notInGame"))
-        if (!ModuleWaypoints.add(name, player.blockPosition())) {
+        if (!ModuleWaypoints.add(name, position ?: player.blockPosition())) {
             throw CommandException(t("add.rejected", ModuleWaypoints.LIMIT, ModuleWaypoints.NAME_LENGTH))
         }
         ModuleWaypoints.enabled = true
@@ -50,6 +90,7 @@ object CommandWaypoint : CommandRegistrar {
     }
 
     private fun CmdI18n.remove(name: String): Int {
+        requireReady()
         if (!ModuleWaypoints.remove(name)) {
             throw CommandException(t("remove.unknown", name))
         }
@@ -58,6 +99,7 @@ object CommandWaypoint : CommandRegistrar {
     }
 
     private fun CmdI18n.list(): Int {
+        requireReady()
         val waypoints = ModuleWaypoints.waypoints
         if (waypoints.isEmpty()) {
             chat(regular(t("list.empty")))

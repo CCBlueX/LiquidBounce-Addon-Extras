@@ -2,9 +2,13 @@ package net.ccbluex.liquidbounce.extras.modules.qol
 
 import net.ccbluex.liquidbounce.event.events.OverlayRenderEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
+import net.ccbluex.liquidbounce.event.events.WorldRenderEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.extras.util.WorldEvents
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.extras.util.coordinates
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
+import net.ccbluex.liquidbounce.extras.util.drawMarkers
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.render.FontManager
 import net.ccbluex.liquidbounce.render.drawQuad
@@ -14,7 +18,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.util.Mth
 import kotlin.math.roundToInt
 
-/** Named spots for this session, listed with distance and direction. Managed with `.waypoint`. */
+/** Saved spots in the current world and dimension, managed with `.waypoint`. */
 object ModuleWaypoints : ClientModule("Waypoints", ExtrasCategories.QOL) {
 
     const val LIMIT = 16
@@ -25,18 +29,30 @@ object ModuleWaypoints : ClientModule("Waypoints", ExtrasCategories.QOL) {
     private val color by color("Color", Color4b.WHITE)
     private val background by color("Background", Color4b(0, 0, 0, 160))
 
-    val waypoints: Map<String, BlockPos>
-        field = LinkedHashMap<String, BlockPos>()
+    val waypoints get() = WorldJournal.waypoints.mapValues { it.value.blockPos() }
+
+    var selected: String? = null
+        private set
 
     fun add(name: String, pos: BlockPos): Boolean {
-        if (name.length > NAME_LENGTH || waypoints.size >= LIMIT && name !in waypoints) {
-            return false
-        }
-        waypoints[name] = pos.immutable()
+        return WorldJournal.addWaypoint(name, pos)
+    }
+
+    fun remove(name: String): Boolean {
+        if (selected == name) selected = null
+        return WorldJournal.removeWaypoint(name)
+    }
+
+    fun select(name: String?): Boolean {
+        if (name != null && name !in waypoints) return false
+        selected = name
         return true
     }
 
-    fun remove(name: String) = waypoints.remove(name) != null
+    @Suppress("unused")
+    private val markerHandler = handler<WorldRenderEvent> { event ->
+        selected?.let { waypoints[it] }?.let { event.drawMarkers(listOf(it), color.alpha(80)) }
+    }
 
     @Suppress("unused")
     private val renderHandler = handler<OverlayRenderEvent> { event ->
@@ -51,9 +67,9 @@ object ModuleWaypoints : ClientModule("Waypoints", ExtrasCategories.QOL) {
     }
 
     @Suppress("unused")
-    private val worldChangeHandler = handler<WorldChangeEvent> { waypoints.clear() }
+    private val worldChangeHandler = WorldEvents.handler<WorldChangeEvent> { selected = null }
 
-    override fun onDisabled() = waypoints.clear()
+    override fun onDisabled() { selected = null }
 
     private fun direction(pos: BlockPos): String {
         val towards = Mth.atan2(-(pos.x + 0.5 - player.x), pos.z + 0.5 - player.z) * Mth.RAD_TO_DEG

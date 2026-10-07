@@ -1,6 +1,7 @@
 package net.ccbluex.liquidbounce.extras.gametest.harness
 
 import net.ccbluex.liquidbounce.LiquidBounce
+import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.integration.screen.ScreenManager
@@ -27,6 +28,7 @@ abstract class PaperGameTest(private val body: GameTestScope.() -> Unit) : Fabri
         // switch built-in modules on in the middle of the test.
         context.runOnClient<RuntimeException> {
             ModuleManager.filter { it.enabled && it !== ModuleHud }.forEach { it.enabled = false }
+            ModuleManager.filter { it.category in ExtrasCategories.all }.forEach { it.restore() }
         }
         ClientErrors.reset()
         try {
@@ -35,7 +37,14 @@ abstract class PaperGameTest(private val body: GameTestScope.() -> Unit) : Fabri
                 scope.use {
                     it.awaitReady()
                     it.join()
-                    it.body()
+                    try {
+                        it.body()
+                    } finally {
+                        context.runOnClient<RuntimeException> {
+                            ModuleManager.filter { module -> module.enabled && module !== ModuleHud }
+                                .forEach { module -> module.enabled = false }
+                        }
+                    }
                 }
                 val violations = scope.verdict.violations()
                 check(violations.isEmpty()) {
@@ -91,5 +100,6 @@ object GameTestResults {
 }
 
 class ResultsGameTest : FabricClientGameTest {
-    override fun runTest(context: ClientGameTestContext) = GameTestResults.assertAllPassed()
+    override fun runTest(context: ClientGameTestContext) =
+        context.runOnClient<RuntimeException> { GameTestResults.assertAllPassed() }
 }

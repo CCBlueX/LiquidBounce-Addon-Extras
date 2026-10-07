@@ -10,6 +10,12 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.forceLoad
 import net.ccbluex.liquidbounce.extras.gametest.harness.hangItemFrame
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
+import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.liquidbounce.extras.gametest.harness.setting
+import net.ccbluex.liquidbounce.extras.gametest.harness.command
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCaveDisturbanceDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
@@ -36,6 +42,29 @@ class StashFinderGameTest : PaperGameTest({
     awaitClient("the stash report") { it.chatContains("5 containers in the chunk at 192 0") }
     check(client { ModuleStashFinder.stashes[stash] } == 5)
     screenshot("StashFinder")
+
+    disable(ModuleStashFinder)
+    enable(ModuleStashFinder)
+    awaitClient("an already-loaded stash") { ModuleStashFinder.stashes[stash] == 5 }
+    setBlock(BlockPos(204, -60, 3), "minecraft:air")
+    awaitClient("the updated count") { ModuleStashFinder.stashes[stash] == 4 }
+    setBlock(BlockPos(203, -61, 3), "minecraft:tuff_bricks")
+    awaitClient("the support exclusion") { stash !in ModuleStashFinder.stashes }
+    setBlock(BlockPos(203, -61, 3), "minecraft:stone")
+    awaitClient("the changed support") { ModuleStashFinder.stashes[stash] == 4 }
+    setBlock(BlockPos(200, -60, 3), "minecraft:barrel")
+    setBlock(BlockPos(201, -60, 3), "minecraft:red_shulker_box")
+    awaitClient("container types counted separately") {
+        ModuleStashFinder.counts[stash] == mapOf(
+            "minecraft:chest" to 2, "minecraft:barrel" to 1, "minecraft:red_shulker_box" to 1,
+        )
+    }
+    client { ModuleStashFinder.setting<Set<Block>>("Containers").set(linkedSetOf(Blocks.CHEST)) }
+    awaitClient("the container filter") { stash !in ModuleStashFinder.stashes }
+    client { ModuleStashFinder.setting<Set<Block>>("Containers").restore() }
+    awaitClient("restored container types") { ModuleStashFinder.stashes[stash] == 4 }
+    disable(ModuleStashFinder)
+    check(client { ModuleStashFinder.stashes.isEmpty() && ModuleStashFinder.counts.isEmpty() })
 })
 
 class BaseFinderGameTest : PaperGameTest({
@@ -53,6 +82,32 @@ class BaseFinderGameTest : PaperGameTest({
 
     val expected = setOf(ChunkPos(2, 2), ChunkPos(-3, 2), ChunkPos(2, -3))
     awaitClient("the three bases") { ModuleBaseFinder.bases.containsAll(expected) }
+    val written = BlockPos(-20, -60, 20)
+    val signChunk = ChunkPos.containing(written)
+    setBlock(written, "minecraft:oak_sign")
+    ticks(30)
+    check(client { signChunk !in ModuleBaseFinder.bases }) { "a blank sign was evidence" }
+    run("data merge block -20 -60 20 {back_text:{messages:['A base','','','']}}")
+    awaitClient("text on the back of a sign") { ModuleBaseFinder.evidence[signChunk]?.get("signs") == 1 }
+    run("data merge block -20 -60 20 {back_text:{messages:['','','','']}}")
+    awaitClient("erased text") { signChunk !in ModuleBaseFinder.bases }
+    val villagers = BlockPos(-20, -60, -20)
+    val villagerChunk = ChunkPos.containing(villagers)
+    summon("minecraft:villager", villagers, "{NoAI:1b,VillagerData:{level:1}}")
+    ticks(30)
+    check(client { villagerChunk !in ModuleBaseFinder.bases }) { "a novice was evidence" }
+    run("data merge entity @e[type=minecraft:villager,limit=1] {VillagerData:{level:2}}")
+    awaitClient("a traded villager") { ModuleBaseFinder.evidence[villagerChunk]?.get("villagers") == 1 }
+    val custom = BlockPos(20, -60, 20)
+    setBlock(custom, "minecraft:diamond_block")
+    client { ModuleBaseFinder.setting<Set<Block>>("LandmarkBlocks").set(linkedSetOf(Blocks.DIAMOND_BLOCK)) }
+    awaitClient("a custom landmark") { ChunkPos.containing(custom) in ModuleBaseFinder.bases }
+    check(client { WorldJournal.findings["base:-2:1"]?.evidence?.get("signs") == 1 })
+    command("findings show base:-2:1")
+    command("findings waypoint base:-2:1 OldSign")
+    screenshot("BaseFinder-findings")
+    command("findings forget base:-2:1")
+    check(client { "base:-2:1" !in WorldJournal.findings })
     disable(ModuleBaseFinder)
     check(client { ModuleBaseFinder.bases.isEmpty() }) { "reports survived disabling" }
 })

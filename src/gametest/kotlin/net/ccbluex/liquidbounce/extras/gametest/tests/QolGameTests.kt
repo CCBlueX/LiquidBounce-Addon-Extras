@@ -24,15 +24,20 @@ class LightOverlayGameTest : PaperGameTest({
 })
 
 class WaypointsGameTest : PaperGameTest({
+    awaitClient("the world journal") { net.ccbluex.liquidbounce.extras.util.WorldJournal.ready }
     command("waypoint add Home")
     check(client { ModuleWaypoints.enabled && ModuleWaypoints.waypoints["Home"] == origin }) {
         "adding a waypoint did not store it and show the list"
     }
 
-    travel(origin.east(10))
+    travel(origin.east(10), yaw = 90f, pitch = 15f)
+    command("waypoint select Home")
+    check(client { ModuleWaypoints.selected == "Home" })
     command("waypoint list")
     awaitClient("the listed waypoint") { it.chatContains("Home at 0 -60 0") }
     screenshot("Waypoints")
+    command("waypoint deselect")
+    check(client { ModuleWaypoints.selected == null })
 
     command("waypoint remove Home")
     check(client { ModuleWaypoints.waypoints.isEmpty() }) { "removing the waypoint did not" }

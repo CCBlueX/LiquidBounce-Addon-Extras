@@ -9,6 +9,8 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.multiplayer.ServerData
 import net.minecraft.client.multiplayer.resolver.ServerAddress
 import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.Level
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -67,14 +69,20 @@ class GameTestScope internal constructor(
      * Teleports and waits until the client stands there with the area rendered. Grim holds a player in
      * chunks the client has not received yet by setting them back; those setbacks belong to the trip.
      */
-    fun travel(pos: BlockPos, yaw: Float = 0f, pitch: Float = 0f) {
+    fun travel(pos: BlockPos, yaw: Float = 0f, pitch: Float = 0f, dimension: ResourceKey<Level>? = null) {
         val since = server.console.size
-        teleport(pos, yaw, pitch)
+        if (dimension == null) {
+            teleport(pos, yaw, pitch)
+        } else {
+            run("execute in ${dimension.identifier()} run tp $playerName " +
+                "${pos.x + 0.5} ${pos.y} ${pos.z + 0.5} $yaw $pitch")
+        }
         // A player in a chunk the client does not have yet keeps its last on-ground state, and there is
         // nothing to render yet either, so the chunk itself has to be there first
         awaitClient("the player to arrive at $pos") { minecraft ->
             val player = minecraft.player!!
-            minecraft.level!!.hasChunkAt(pos) && player.blockPosition() == pos && player.onGround() &&
+            (dimension == null || minecraft.level!!.dimension() == dimension) &&
+                minecraft.level!!.hasChunkAt(pos) && player.blockPosition() == pos && player.onGround() &&
                 minecraft.levelRenderer.hasRenderedAllSections()
         }
         // Grim lets go only once it has seen the client confirm the chunk, which can take a few round trips
@@ -110,6 +118,7 @@ class GameTestScope internal constructor(
     }
 
     internal fun join() {
+        verdict.arriving()
         joined = true
         // The runner resets window and options before every test; the README's screenshots need room
         input.resizeWindow(1280, 720)
@@ -123,6 +132,11 @@ class GameTestScope internal constructor(
         }
         awaitClient("the client to join", JOIN_TIMEOUT) { it.player != null && it.level != null }
         travel(origin)
+    }
+
+    fun reconnect() {
+        close()
+        join()
     }
 
     /** Leaves the server like a player would, so that everything the server does afterwards is expected. */
@@ -140,6 +154,7 @@ class GameTestScope internal constructor(
         }
         awaitClient("the client to leave") { it.level == null && it.gui.screen() is TitleScreen }
         awaitConsole("the server to see the player leave", since) { it.report == ProbeReport.QUIT }
+        joined = false
     }
 
     internal companion object {
