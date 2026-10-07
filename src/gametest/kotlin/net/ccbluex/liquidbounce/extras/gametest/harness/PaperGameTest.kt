@@ -2,6 +2,7 @@ package net.ccbluex.liquidbounce.extras.gametest.harness
 
 import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleHud
 import net.ccbluex.liquidbounce.integration.screen.ScreenManager
@@ -26,10 +27,11 @@ abstract class PaperGameTest(private val body: GameTestScope.() -> Unit) : Fabri
         awaitClient(context)
         // Only the HUD stays on. AutoConfig, on by default, would load a marketplace config on join and
         // switch built-in modules on in the middle of the test. Add-on settings an earlier test changed are
-        // saved with the client's config, so they go back to their defaults.
+        // saved with the client's config, so they go back to their defaults, and every world starts unknown.
         context.runOnClient<RuntimeException> {
             ModuleManager.filter { it.enabled && it !== ModuleHud }.forEach { it.enabled = false }
             ModuleManager.filter { it.category in ExtrasCategories.all }.forEach { it.restore() }
+            WorldJournal.folder.deleteRecursively()
         }
         ClientErrors.reset()
         try {

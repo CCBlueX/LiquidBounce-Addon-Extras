@@ -6,7 +6,7 @@ import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.client.regular
 import net.ccbluex.liquidbounce.utils.client.variable
-import net.minecraft.core.BlockPos
+import net.minecraft.core.Vec3i
 import net.minecraft.world.level.ChunkPos
 
 /**
@@ -22,6 +22,6 @@ fun report(key: String, vararg args: Any, notify: Boolean = false) {
     }
 }
 
-val BlockPos.coordinates get() = "$x $y $z"
+val Vec3i.coordinates get() = "$x $y $z"
 
 val ChunkPos.coordinates get() = "$minBlockX $minBlockZ"

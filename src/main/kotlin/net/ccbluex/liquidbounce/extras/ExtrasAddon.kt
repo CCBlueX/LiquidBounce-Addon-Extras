@@ -23,6 +23,7 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
+import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
 
@@ -55,7 +56,7 @@ class ExtrasAddon : LiquidBounceAddon() {
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
-        registerListeners(ClickCounter)
+        registerListeners(ClickCounter, WorldJournal)
         // The client does not persist native HUD components, so their settings live in the add-on's config
         config("extras-hud", extrasHudComponents.toMutableList())
     }
