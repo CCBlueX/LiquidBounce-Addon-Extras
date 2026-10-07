@@ -99,6 +99,11 @@
   "liquidbounce.module.autoAnvilRepair.description": "Combines damaged items of the same kind in an open anvil.",
   "liquidbounce.module.autoAnvilRepair.value.maxLevelCost.description": "Most levels to spend on one repair.",
 
+  "liquidbounce.module.autoSmelter.description": "Keeps an open furnace, blast furnace or smoker going.",
+  "liquidbounce.module.autoSmelter.value.inputs.description": "Ingredients to load.",
+  "liquidbounce.module.autoSmelter.value.fuels.description": "Fuel to put in.",
+  "liquidbounce.module.autoSmelter.value.refill.description": "Fuel items to put in once the fire is out.",
+
   "liquidbounce.module.lightOverlay.description": "Marks blocks where hostile mobs can spawn.",
   "liquidbounce.module.lightOverlay.value.horizontalRange.description": "How far to check sideways.",
   "liquidbounce.module.lightOverlay.value.verticalRange.description": "How far to check up and down.",

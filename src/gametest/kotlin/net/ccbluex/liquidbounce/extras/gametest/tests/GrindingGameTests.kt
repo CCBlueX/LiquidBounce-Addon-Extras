@@ -18,12 +18,16 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
+import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import net.minecraft.client.gui.screens.inventory.AnvilScreen
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.animal.sheep.Sheep
 import net.minecraft.world.inventory.AnvilMenu
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.AbstractFurnaceBlock
 import net.minecraft.world.level.block.AnvilBlock
 import net.minecraft.world.level.block.entity.SignBlockEntity
 import net.minecraft.world.level.block.entity.SignTextSlot
@@ -173,6 +177,94 @@ class AutoAnvilRepairGameTest : PaperGameTest({
     client { it.player!!.closeContainer() }
 })
 
+class AutoSmelterGameTest : PaperGameTest({
+    val furnace = origin.south(2)
+    val inputs = linkedSetOf(Items.RAW_IRON, Items.RAW_GOLD, Items.BEEF)
+    client { ModuleAutoSmelter.setting<Set<Item>>("Inputs").set(inputs) }
+    for ((station, ingredient, result) in listOf(
+        Triple("furnace", "raw_iron", "iron_ingot"),
+        Triple("blast_furnace", "raw_gold", "gold_ingot"),
+        Triple("smoker", "beef", "cooked_beef"),
+    )) {
+        run("clear $playerName")
+        setBlock(furnace, "minecraft:$station")
+        give("minecraft:$ingredient", 2)
+        give("minecraft:coal", 8)
+        openFurnace(furnace)
+        enable(ModuleAutoSmelter)
+        awaitServer("items entity $playerName container.* minecraft:$result[count=2]", timeout = 600)
+        awaitServer("items entity $playerName container.* minecraft:coal[count=7]")
+        if (station == "furnace") {
+            screenshot("AutoSmelter")
+        }
+        disable(ModuleAutoSmelter)
+        client { it.player!!.closeContainer() }
+    }
+
+    // A smoker has no recipe for raw iron
+    run("clear $playerName")
+    give("minecraft:raw_iron", 8)
+    give("minecraft:coal", 8)
+    openFurnace(furnace)
+    enable(ModuleAutoSmelter)
+    ticks(60)
+    awaitServer("items entity $playerName container.* minecraft:raw_iron[count=8]")
+    disable(ModuleAutoSmelter)
+    client { it.player!!.closeContainer() }
+
+    client { ModuleAutoSmelter.setting<Int>("Refill").set(3) }
+    setBlock(furnace, "minecraft:furnace")
+    openFurnace(furnace)
+    enable(ModuleAutoSmelter)
+    awaitServer("items block ${furnace.x} ${furnace.y} ${furnace.z} container.1 minecraft:coal[count=2]")
+    awaitServer("items entity $playerName container.* minecraft:coal[count=5]")
+    disable(ModuleAutoSmelter)
+    client { it.player!!.closeContainer() }
+
+    // Closed halfway through a refill, the coal on the cursor goes back
+    run("clear $playerName")
+    give("minecraft:raw_iron")
+    give("minecraft:coal", 8)
+    client {
+        val constraints = ModuleAutoSmelter.containedValues.first { it.name == "Constraints" } as ValueGroup
+        constraints.setting<IntRange>("ClickDelay").set(20..20)
+    }
+    setBlock(furnace, "minecraft:air")
+    setBlock(furnace, "minecraft:furnace")
+    openFurnace(furnace)
+    enable(ModuleAutoSmelter)
+    awaitClient("coal on the cursor") { !it.player!!.containerMenu.carried.isEmpty }
+    client { it.player!!.closeContainer() }
+    ticks(30)
+    awaitServer("items entity $playerName container.* minecraft:coal[count=8]")
+    disable(ModuleAutoSmelter)
+
+    run("clear $playerName")
+    give("minecraft:raw_iron")
+    give("minecraft:lava_bucket")
+    client { ModuleAutoSmelter.setting<Set<Item>>("Fuels").set(linkedSetOf(Items.LAVA_BUCKET)) }
+    setBlock(furnace, "minecraft:air")
+    setBlock(furnace, "minecraft:furnace")
+    openFurnace(furnace)
+    enable(ModuleAutoSmelter)
+    awaitServer("items entity $playerName container.* minecraft:bucket")
+    awaitServer("items entity $playerName container.* minecraft:iron_ingot", timeout = 300)
+    disable(ModuleAutoSmelter)
+    client { it.player!!.closeContainer() }
+
+    // Output that does not fit stays in the furnace
+    setBlock(furnace, "minecraft:air")
+    setBlock(furnace, "minecraft:furnace{Items:[{Slot:2b,id:'minecraft:iron_ingot',count:64}]}")
+    repeat(36) { run("item replace entity $playerName container.$it with minecraft:cobblestone 64") }
+    awaitClient("a full inventory") { it.player!!.inventory.nonEquipmentItems.all { stack -> stack.count == 64 } }
+    openFurnace(furnace)
+    enable(ModuleAutoSmelter)
+    ticks(60)
+    awaitServer("items block ${furnace.x} ${furnace.y} ${furnace.z} container.2 minecraft:iron_ingot[count=64]")
+    disable(ModuleAutoSmelter)
+    client { it.player!!.closeContainer() }
+})
+
 private fun GameTestScope.awaitSignText(pos: BlockPos, text: String, side: String = "front", line: Int = 0) =
     awaitAnswer("data get block ${pos.x} ${pos.y} ${pos.z} ${side}_text.messages[$line]", text)
 
@@ -180,6 +272,13 @@ private fun GameTestScope.placeSign(pos: BlockPos, block: String, arrived: (Sign
     setBlock(pos, "minecraft:air")
     setBlock(pos, block)
     awaitClient("the sign") { (it.level!!.getBlockEntity(pos) as? SignBlockEntity)?.let(arrived) == true }
+}
+
+private fun GameTestScope.openFurnace(pos: BlockPos) {
+    awaitClient("the furnace to arrive") { it.level!!.getBlockState(pos).block is AbstractFurnaceBlock }
+    aim(pos)
+    input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    awaitClient("the furnace to open") { it.gui.screen() is AbstractFurnaceScreen<*> }
 }
 
 private fun GameTestScope.openAnvil(pos: BlockPos) {

@@ -19,6 +19,7 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
@@ -43,6 +44,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleAutoShearer,
             ModuleAutoSign.INSTANCE,
             ModuleAutoAnvilRepair,
+            ModuleAutoSmelter,
             ModuleLightOverlay,
             ModuleWaypoints,
             ModuleMessageAura.INSTANCE,

@@ -32,11 +32,14 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
   each side. The editor never opens. `Nearby` opens the blank signs around you for it, with an empty hand.
 - **AutoAnvilRepair** (Kotlin) combines damaged items of the same kind in an open anvil, up to a level cost.
   Enchanted items are never sacrificed.
+- **AutoSmelter** (Kotlin) keeps an open furnace, blast furnace or smoker going: takes out what is done, loads
+  allowed ingredients and puts in a little fuel once the fire is out.
 
 ![AutoJump](docs/autojump.png)
 ![AutoShearer](docs/autoshearer.png)
 ![AutoSign](docs/autosign.png)
 ![AutoAnvilRepair](docs/autoanvilrepair.png)
+![AutoSmelter](docs/autosmelter.png)
 
 ### QoL
 
