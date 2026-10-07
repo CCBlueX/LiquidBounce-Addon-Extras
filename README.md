@@ -28,7 +28,8 @@ Modules and HUD components that [LiquidBounce](https://github.com/CCBlueX/Liquid
 
 - **AutoJump** (Java) jumps for you: always, while moving, or while sprinting.
 - **AutoShearer** (Kotlin) shears sheep in reach, switching to shears without changing your visible slot.
-- **AutoSign** (Java) writes every new sign with the text of the last sign you wrote. The editor never opens.
+- **AutoSign** (Java) writes every new sign with the text of the last sign you wrote, or with a template for
+  each side. The editor never opens. `Nearby` opens the blank signs around you for it, with an empty hand.
 - **AutoAnvilRepair** (Kotlin) combines damaged items of the same kind in an open anvil, up to a level cost.
   Enchanted items are never sacrificed.
 

@@ -1,15 +1,18 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
+import net.ccbluex.liquidbounce.config.types.group.ValueGroup
 import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
 import net.ccbluex.liquidbounce.extras.gametest.harness.aim
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
+import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
 import net.ccbluex.liquidbounce.extras.gametest.harness.give
 import net.ccbluex.liquidbounce.extras.gametest.harness.query
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
+import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
@@ -22,6 +25,8 @@ import net.minecraft.world.entity.animal.sheep.Sheep
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.AnvilBlock
+import net.minecraft.world.level.block.entity.SignBlockEntity
+import net.minecraft.world.level.block.entity.SignTextSlot
 import com.mojang.blaze3d.platform.InputConstants
 
 class AutoJumpGameTest : PaperGameTest({
@@ -75,6 +80,70 @@ class AutoSignGameTest : PaperGameTest({
     screenshot("AutoSign")
 })
 
+class AutoSignTemplatesGameTest : PaperGameTest({
+    val module = ModuleAutoSign.INSTANCE
+    val nearby = client { module.containedValues.first { it.name == "Nearby" } as ValueGroup }
+    client {
+        module.setting<Any>("TextMode").setByString("Template")
+        for (line in 1..4) {
+            module.setting<String>("Front$line").set("Front $line")
+            module.setting<String>("Back$line").set("Back $line")
+        }
+        nearby.setting<Boolean>("Enabled").set(true)
+    }
+    val sign = origin.south(2)
+
+    placeSign(sign, "minecraft:oak_sign[rotation=8]")
+    enable(module)
+    for (line in 0..3) {
+        awaitSignText(sign, "Front ${line + 1}", line = line)
+    }
+    disable(module)
+    travel(origin.south(4), yaw = 180f)
+    enable(module)
+    for (line in 0..3) {
+        awaitSignText(sign, "Back ${line + 1}", side = "back", line = line)
+    }
+    screenshot("AutoSign-templates")
+    disable(module)
+
+    travel(origin)
+    placeSign(sign, "minecraft:oak_sign[rotation=8]{front_text:{messages:['Keep','','','']}}") {
+        it.getText(SignTextSlot.FRONT).hasMessage(false)
+    }
+    enable(module)
+    ticks(60)
+    awaitSignText(sign, "Keep")
+    client { nearby.setting<Boolean>("Overwrite").set(true) }
+    awaitSignText(sign, "Front 1")
+    disable(module)
+
+    placeSign(sign, "minecraft:oak_sign[rotation=8]{is_waxed:1b}") { it.isWaxed }
+    enable(module)
+    ticks(60)
+    awaitSignText(sign, "\"\"")
+    disable(module)
+
+    placeSign(sign, "minecraft:oak_sign[rotation=8]")
+    run("gamemode adventure $playerName")
+    awaitClient("adventure mode") { !it.player!!.mayBuild() }
+    enable(module)
+    ticks(60)
+    awaitSignText(sign, "\"\"")
+    disable(module)
+    run("gamemode survival $playerName")
+    awaitClient("survival mode") { it.player!!.mayBuild() }
+
+    setBlock(sign.south(), "minecraft:stone")
+    setBlock(sign.above(), "minecraft:stone")
+    for (block in listOf("minecraft:oak_wall_sign[facing=north]", "minecraft:oak_hanging_sign[rotation=8]")) {
+        placeSign(sign, block)
+        enable(module)
+        awaitSignText(sign, "Front 1")
+        disable(module)
+    }
+})
+
 class AutoAnvilRepairGameTest : PaperGameTest({
     val anvil = origin.south(2)
     setBlock(anvil, "minecraft:anvil")
@@ -104,8 +173,14 @@ class AutoAnvilRepairGameTest : PaperGameTest({
     client { it.player!!.closeContainer() }
 })
 
-private fun GameTestScope.awaitSignText(pos: BlockPos, text: String) =
-    awaitAnswer("data get block ${pos.x} ${pos.y} ${pos.z} front_text.messages[0]", text)
+private fun GameTestScope.awaitSignText(pos: BlockPos, text: String, side: String = "front", line: Int = 0) =
+    awaitAnswer("data get block ${pos.x} ${pos.y} ${pos.z} ${side}_text.messages[$line]", text)
+
+private fun GameTestScope.placeSign(pos: BlockPos, block: String, arrived: (SignBlockEntity) -> Boolean = { true }) {
+    setBlock(pos, "minecraft:air")
+    setBlock(pos, block)
+    awaitClient("the sign") { (it.level!!.getBlockEntity(pos) as? SignBlockEntity)?.let(arrived) == true }
+}
 
 private fun GameTestScope.openAnvil(pos: BlockPos) {
     awaitClient("the anvil to arrive") { it.level!!.getBlockState(pos).block is AnvilBlock }
