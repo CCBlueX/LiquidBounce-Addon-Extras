@@ -46,6 +46,8 @@ loom.runs.named("clientGameTest") {
             "net.ccbluex.liquidbounce.ui.basicMode" to "true",
             "net.ccbluex.liquidbounce.browser.libraries" to gameTestLibraries.resolve("mcef").path,
             "net.ccbluex.liquidbounce.deeplearning.engines" to gameTestLibraries.resolve("djl").path,
+            // Chromium's accelerated paint crashes natively on llvmpipe, which is all CI has
+            "net.ccbluex.liquidbounce.browser.disableAcceleration" to "true",
             "extras.paper.directory" to paperDirectory.path,
             "extras.paper.probe" to probeJar.path,
             "extras.paper.minecraft" to minecraft,

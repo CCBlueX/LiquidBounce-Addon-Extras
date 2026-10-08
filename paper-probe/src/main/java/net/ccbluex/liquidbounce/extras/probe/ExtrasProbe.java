@@ -35,6 +35,9 @@ public final class ExtrasProbe extends JavaPlugin implements Listener {
             report("SETBACK", user.getName(), x, y, z));
 
         getServer().getPluginManager().registerEvents(this, this);
+        // A client that crashes natively never stops the server it started, which then holds the instance
+        ProcessHandle.current().parent().ifPresent(client -> client.onExit().thenRun(() ->
+            getServer().getScheduler().runTask(this, () -> getServer().shutdown())));
         report("READY", grim.getGrimVersion());
     }
 
