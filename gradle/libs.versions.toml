@@ -18,7 +18,7 @@ liquidbounce = "0.41.0+26.3"
 
 # Compile-only APIs of the game-test server plugin. The server and Grim it runs against are resolved
 # at test time, see AGENTS.md.
-paper-api = "26.3.build.140-beta"
+paper-api = "26.3-rc-3.build.1-alpha"
 grim-api = "1.6.0.12"
 
 [libraries]
