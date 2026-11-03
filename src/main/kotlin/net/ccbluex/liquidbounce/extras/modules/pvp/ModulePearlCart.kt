@@ -10,7 +10,6 @@ import net.ccbluex.liquidbounce.utils.entity.getDamageFromExplosion
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfo
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfoRenderer
-import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryType
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
@@ -90,7 +89,7 @@ object ModulePearlCart : ClientModule("PearlCart", ExtrasCategories.PVP) {
     private fun landing(pearl: ThrownEnderpearl): Pair<BlockPos, Int>? {
         val simulation = TrajectoryInfoRenderer(
             pearl.owner ?: player, pearl.owner, ItemStack(Items.ENDER_PEARL), pearl.deltaMovement, pearl.position(),
-            TrajectoryInfo.GENERIC, TrajectoryType.EnderPearl, TrajectoryInfoRenderer.Type.REAL, Vec3.ZERO,
+            TrajectoryInfo.GENERIC, PEARL_TRAJECTORY, TrajectoryInfoRenderer.Type.REAL, Vec3.ZERO,
         ).runSimulation(MAX_FLIGHT)
         val hit = simulation.hitResult ?: return null
         if (hit.type == HitResult.Type.MISS) {

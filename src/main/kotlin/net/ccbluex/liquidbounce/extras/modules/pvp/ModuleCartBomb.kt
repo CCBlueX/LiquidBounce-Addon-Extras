@@ -26,7 +26,6 @@ import net.ccbluex.liquidbounce.utils.inventory.PlayerInventoryConstraints
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfo
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfoRenderer
-import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryType
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.tags.BlockTags
@@ -286,7 +285,7 @@ object ModuleCartBomb : ClientModule("CartBomb", ExtrasCategories.PVP) {
 
     /** The rail spot where an arrow shot with [info] facing [rotation] comes down, and in how many ticks. */
     private fun landing(info: TrajectoryInfo, rotation: Rotation): Pair<BlockPos, Int>? {
-        val simulation = TrajectoryInfoRenderer.getHypotheticalTrajectory(player, info, TrajectoryType.Arrow, rotation)
+        val simulation = TrajectoryInfoRenderer.getHypotheticalTrajectory(player, info, ARROW_TRAJECTORY, rotation)
             .runSimulation(MAX_FLIGHT)
         val hit = simulation.hitResult as? BlockHitResult ?: return null
         if (hit.type != HitResult.Type.BLOCK || hit.direction != Direction.UP) {

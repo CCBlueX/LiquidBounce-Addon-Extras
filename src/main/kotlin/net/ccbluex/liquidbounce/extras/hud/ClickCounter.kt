@@ -6,8 +6,9 @@ import net.ccbluex.liquidbounce.event.events.InputHandleEvent
 import net.ccbluex.liquidbounce.event.events.MouseButtonEvent
 import net.ccbluex.liquidbounce.event.events.UseCooldownEvent
 import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAutoClicker
+import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.utils.client.mc
+import net.ccbluex.liquidbounce.utils.clicking.Clicker
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -28,6 +29,14 @@ object ClickCounter : EventListener {
 
     private val playing get() = mc.player != null && mc.gui.screen() == null
 
+    // Found by name: after 0.42.0 AutoClicker moved package and its attack without input became TriggerBot
+    private val attackClickers by lazy {
+        listOf("AutoClicker", "TriggerBot").mapNotNull { ModuleManager[it] }.distinct()
+            .flatMap { it.collectValueGroupsRecursively() }
+            .filterIsInstance<Clicker<*>>()
+            .filter { it.keyBinding == mc.options.keyAttack }
+    }
+
     @Suppress("unused")
     private val mouseHandler = handler<MouseButtonEvent> { event ->
         if (playing && event.isLeftClick) leftClicks.add()
@@ -44,9 +53,10 @@ object ClickCounter : EventListener {
     @Suppress("unused")
     private val inputHandler = handler<InputHandleEvent> {
         if (playing) {
-            val attack = ModuleAutoClicker.AttackButton
-            if (attack.running) {
-                repeat(attack.clicker.clickAmount ?: 0) { leftClicks.add() }
+            for (clicker in attackClickers) {
+                if (clicker.running) {
+                    repeat(clicker.clickAmount ?: 0) { leftClicks.add() }
+                }
             }
             // A right click also starts using the item, so count the two once; uses without a click come
             // from a held button, FastPlace or AutoClicker

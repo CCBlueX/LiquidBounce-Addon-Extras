@@ -25,7 +25,6 @@ import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.render.WorldToScreen
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfo
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfoRenderer
-import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryType
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl
@@ -96,7 +95,7 @@ object ModuleAnchorAura : ClientModule("AnchorAura", ExtrasCategories.PVP, disab
                     velocity = pearl.deltaMovement,
                     pos = pearl.position(),
                     trajectoryInfo = TrajectoryInfo.GENERIC,
-                    trajectoryType = TrajectoryType.EnderPearl,
+                    trajectoryType = PEARL_TRAJECTORY,
                     type = TrajectoryInfoRenderer.Type.REAL,
                     renderOffset = Vec3.ZERO,
                 ).runSimulation(PEARL_TICKS)

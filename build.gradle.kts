@@ -75,9 +75,6 @@ tasks.named<JavaExec>("runClientGameTest") {
 dependencies {
     minecraft(libs.minecraft)
 
-    implementation(libs.fabric.loader)
-    implementation(libs.fabric.api)
-    implementation(libs.fabric.kotlin)
     implementation(libs.liquidbounce)
 }
 
@@ -86,15 +83,21 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
 
+val clientVersions = configurations.compileClasspath.map { classpath ->
+    classpath.incoming.resolutionResult.allComponents
+        .mapNotNull { it.moduleVersion }
+        .associate { "${it.group}:${it.name}" to it.version }
+}
+
 tasks.processResources {
     val properties = mapOf(
-        "version" to project.version.toString(),
-        "minecraft_version" to minecraft,
-        "loader_version" to libs.versions.fabric.loader.get(),
-        "fabric_kotlin_version" to libs.versions.fabric.kotlin.get(),
+        "version" to provider { project.version.toString() },
+        "minecraft_version" to provider { minecraft },
+        "loader_version" to clientVersions.map { it.getValue("net.fabricmc:fabric-loader") },
+        "fabric_kotlin_version" to clientVersions.map { it.getValue("net.fabricmc:fabric-language-kotlin") },
     )
-    inputs.properties(properties)
-    filesMatching("fabric.mod.json") { expand(properties) }
+    properties.forEach { (key, value) -> inputs.property(key, value) }
+    filesMatching("fabric.mod.json") { expand(properties.mapValues { it.value.get() }) }
 }
 
 java {

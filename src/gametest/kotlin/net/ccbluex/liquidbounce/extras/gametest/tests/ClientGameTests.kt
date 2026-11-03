@@ -146,6 +146,17 @@ class HudGameTest : PaperGameTest({
         ClickCounter.left == 0 && ClickCounter.right == 0
     }
 
+    // AutoClicker's clicks on a held button count as well, one press by hand plus its own
+    val autoClicker = client { ModuleManager["AutoClicker"]!! }
+    client { autoClicker.enabled = true }
+    input.holdMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    ticks(20)
+    val autoClicks = client { ClickCounter.left }
+    input.releaseMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    client { autoClicker.enabled = false }
+    check(autoClicks > 2) { "counted $autoClicks left clicks with AutoClicker on" }
+    awaitClient("the auto clicks to leave the one second window", timeout = 40) { ClickCounter.left == 0 }
+
     input.holdKey { it.keyUp }
     ticks(20)
     screenshot("Hud")

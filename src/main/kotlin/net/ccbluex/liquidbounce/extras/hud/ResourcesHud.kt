@@ -8,6 +8,7 @@ import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.minecraft.network.chat.Component
+import net.minecraft.util.ARGB
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import java.util.EnumMap
@@ -77,7 +78,8 @@ object ResourcesHud : TextHudComponent(
 
     private fun pulse(): Int {
         val phase = (sin(System.currentTimeMillis() / PULSE_MILLIS * 2 * PI) + 1) / 2
-        return lowColor.interpolateTo(lowColor.darker(), phase).argb and 0xFFFFFF
+        // Not Color4b.interpolateTo: 0.42.0 only takes a Double, 0.42.1 only a Float
+        return ARGB.srgbLerp(phase.toFloat(), lowColor.argb, lowColor.darker().argb) and 0xFFFFFF
     }
 
     enum class Resource(val label: String, val limit: Int, vararg val items: Item) {
