@@ -4,7 +4,8 @@
   "package": "net.ccbluex.liquidbounce.extras.mixins",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "MixinMinecraft"
+    "MixinMinecraft",
+    "MixinMinecraftAttack"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -25,6 +25,7 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorAura
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.extras.util.WorldJournal
@@ -60,6 +61,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleBlastCover,
             ModuleAnchorAura,
             ModuleAnchorMacro,
+            ModuleSwingRedirect,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)

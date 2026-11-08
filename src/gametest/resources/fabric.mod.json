@@ -40,6 +40,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.BlastCoverGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.AnchorAuraGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.AnchorMacroGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.SwingRedirectGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

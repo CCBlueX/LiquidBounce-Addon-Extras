@@ -201,5 +201,14 @@
   "liquidbounce.module.anchorMacro.value.guard.description": "Ignore your own clicks on anchors while it works.",
   "liquidbounce.module.anchorMacro.value.doubleAnchor.description": "Right after the blast, place and charge a second anchor in the same spot.",
   "liquidbounce.module.anchorMacro.value.doubleAnchor.value.hurtTime.description": "Set the second one off once the target's hurt time is down to this.",
-  "liquidbounce.module.anchorMacro.value.doubleAnchor.value.timeout.description": "How long the second anchor waits at most."
+  "liquidbounce.module.anchorMacro.value.doubleAnchor.value.timeout.description": "How long the second anchor waits at most.",
+  "liquidbounce.module.swingRedirect.description": "Turns a swing at the air onto the closest target near the crosshair.",
+  "liquidbounce.module.swingRedirect.value.range.description": "How close a target has to be.",
+  "liquidbounce.module.swingRedirect.value.maxYaw.description": "How far left or right of the crosshair a target may be.",
+  "liquidbounce.module.swingRedirect.value.maxPitch.description": "How far above or below the crosshair a target may be.",
+  "liquidbounce.module.swingRedirect.value.heights.description": "Body heights to aim at; the one closest to the crosshair wins.",
+  "liquidbounce.module.swingRedirect.value.blockClicks.description": "Also redirect clicks at a block.",
+  "liquidbounce.module.swingRedirect.value.dot.description": "Mark the spot a missed swing would hit.",
+  "liquidbounce.module.swingRedirect.value.dotColor.description": "Colour of the mark.",
+  "liquidbounce.module.swingRedirect.value.continuousTracking.description": "Keep the server-side rotation on the target the whole time, not only for the swing."
 }
