@@ -229,5 +229,18 @@
   "liquidbounce.module.crossbowLoader.messages.noAmmo": "There is nothing to load the crossbow with.",
 
   "liquidbounce.module.shieldSwap.description": "Blocks with a shield from the hotbar or inventory while enabled, best on a key.",
-  "liquidbounce.module.shieldSwap.messages.noShield": "There is no shield in your inventory."
+  "liquidbounce.module.shieldSwap.messages.noShield": "There is no shield in your inventory.",
+
+  "liquidbounce.module.shieldGuard.description": "Raises a shield when a close enemy can swing or runs at you.",
+  "liquidbounce.module.shieldGuard.value.range.description": "How close enemies are watched.",
+  "liquidbounce.module.shieldGuard.value.reach.description": "How close an enemy can hit you from.",
+  "liquidbounce.module.shieldGuard.value.cooldown.description": "Block when an enemy in reach can swing again.",
+  "liquidbounce.module.shieldGuard.value.rush.description": "Block when an enemy runs at you.",
+  "liquidbounce.module.shieldGuard.value.rushSpeed.description": "How fast an enemy has to come at you to count as running.",
+  "liquidbounce.module.shieldGuard.value.crits.description": "Lower the shield while falling onto a target, for a critical hit.",
+  "liquidbounce.module.shieldGuard.value.sword.description": "Hold a sword while the shield is disabled.",
+  "liquidbounce.module.shieldGuard.value.rising.description": "Block an enemy in reach on the way up of a jump, where no hit of yours could be critical.",
+  "liquidbounce.module.shieldGuard.value.weaponsOnly.description": "Ignore enemies holding no sword, axe or mace.",
+  "liquidbounce.module.shieldGuard.value.lowerForAxes.description": "Keep the shield down against an enemy holding an axe, which would disable it.",
+  "liquidbounce.module.shieldGuard.value.holdAttacks.description": "Send no attacks while the shield is up."
 }
