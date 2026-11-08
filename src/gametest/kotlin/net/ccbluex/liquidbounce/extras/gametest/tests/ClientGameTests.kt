@@ -9,6 +9,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.command
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
+import net.ccbluex.liquidbounce.extras.hud.ClockHud
 import net.ccbluex.liquidbounce.extras.hud.SpeedometerHud
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
 import net.ccbluex.liquidbounce.features.module.ModuleCategories
@@ -22,6 +23,8 @@ import net.ccbluex.liquidbounce.lang.LanguageManager
 import net.ccbluex.liquidbounce.utils.render.Alignment
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import com.mojang.blaze3d.platform.InputConstants
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 /**
  * Plain vanilla movement has to pass, or no other verdict means anything. Then the negative control: a
@@ -132,6 +135,48 @@ class HudGameTest : PaperGameTest({
     screenshot("Hud")
     input.releaseKey { it.keyUp }
     client { extrasHudComponents.forEach { it.enabled = false } }
+})
+
+class ClockGameTest : PaperGameTest({
+    client { check(HudComponentManager.addComponent(ClockHud.id.toString()) === ClockHud) }
+    val full = client { ClockHud.text.string }
+    check(Regex("""(Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d{2}:\d{2}:\d{2}""").matches(full)) { "the clock reads '$full'" }
+
+    val short = client {
+        ClockHud.setting<Boolean>("Weekday").set(false)
+        ClockHud.setting<Boolean>("Seconds").set(false)
+        ClockHud.text.string
+    }
+    check(Regex("""\d{2}:\d{2}""").matches(short)) { "without weekday and seconds the clock reads '$short'" }
+    client {
+        ClockHud.setting<Boolean>("Weekday").set(true)
+        ClockHud.setting<Boolean>("Seconds").set(true)
+    }
+
+    client {
+        val odd = LocalDateTime.of(2026, 11, 9, 10, 20, 31)
+        check(ClockHud.format(odd) == "Mon 10:20:31") { "a steady colon reads '${ClockHud.format(odd)}'" }
+        ClockHud.setting<Boolean>("BlinkingColon").set(true)
+        check(ClockHud.format(odd) == "Mon 10 20 31") { "the colon is still on: '${ClockHud.format(odd)}'" }
+        check(ClockHud.format(odd.withSecond(30)) == "Mon 10:20:30") { "the colon stays off in even seconds" }
+
+        val plain = ClockHud.guiScaledHeight
+        ClockHud.setting<Boolean>("MinuteBar").set(true)
+        check(ClockHud.guiScaledHeight > plain) { "the minute bar takes no room" }
+
+        check(ClockHud.minuteProgress(LocalTime.of(10, 20, 30)) == 0.5f)
+        check(ClockHud.minuteProgress(LocalTime.of(10, 20, 0)) == 0f)
+        val now = LocalTime.now()
+        val ahead = (ClockHud.minuteProgress * 60 - now.second + 60) % 60
+        check(ahead < 2) { "the bar is at ${ClockHud.minuteProgress} at second ${now.second}" }
+    }
+    screenshot("Clock")
+
+    client {
+        ClockHud.setting<Boolean>("BlinkingColon").set(false)
+        ClockHud.setting<Boolean>("MinuteBar").set(false)
+        ClockHud.enabled = false
+    }
 })
 
 class WhereGameTest : PaperGameTest({

@@ -41,11 +41,30 @@ abstract class TextHudComponent(
 
     protected open fun drawIcon(context: GuiGraphicsExtractor, x: Int, y: Int) {}
 
+    /** Height of what is drawn under the text, 0 for nothing. */
+    protected open val footerHeight get() = 0f
+
+    /** The narrowest the footer may be; it spans the text when that is wider. */
+    protected open val footerWidth get() = 0f
+
+    protected open fun drawFooter(context: GuiGraphicsExtractor, x: Float, y: Float, width: Float) {}
+
     val text: Component get() = Component.literal(prefix).append(value()).append(suffix)
 
-    override val guiScaledWidth get() = iconWidth + FontManager.FONT_RENDERER.getStringWidth(text) + padding * 2
+    /** What the width is measured on, for a value whose width should not jump. */
+    protected open fun widestValue(): Component = value()
 
-    override val guiScaledHeight get() = TEXT_HEIGHT + padding * 2
+    private val contentWidth get() = maxOf(
+        iconWidth + FontManager.FONT_RENDERER.getStringWidth(
+            Component.literal(prefix).append(widestValue()).append(suffix),
+        ),
+        footerWidth,
+    )
+
+    override val guiScaledWidth get() = contentWidth + padding * 2
+
+    override val guiScaledHeight get() =
+        TEXT_HEIGHT + (if (footerHeight > 0f) FOOTER_GAP + footerHeight else 0f) + padding * 2
 
     private var sizeInEditor = 0f to 0f
 
@@ -73,10 +92,14 @@ abstract class TextHudComponent(
         val y = bounds.yMin + padding
         drawIcon(event.context, x.toInt(), y.toInt())
         FontManager.FONT_RENDERER.draw(event.context, text, x + iconWidth, y, textColor, shadow)
+        if (footerHeight > 0f) {
+            drawFooter(event.context, x, y + TEXT_HEIGHT + FOOTER_GAP, contentWidth)
+        }
     }
 
     private companion object {
         const val TEXT_HEIGHT = 9f
+        const val FOOTER_GAP = 1f
     }
 
 }

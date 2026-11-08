@@ -1,16 +1,21 @@
 package net.ccbluex.liquidbounce.extras.hud
 
 import net.ccbluex.liquidbounce.config.types.list.Tagged
+import net.ccbluex.liquidbounce.render.drawQuad
+import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.ServerObserver
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Util
 import net.minecraft.world.phys.Vec3
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 val extrasHudComponents: List<TextHudComponent> =
-    [FpsHud, TpsHud, PingHud, PlayerHud, CpsHud, BiomeHud, CoordinatesHud, SpeedometerHud]
+    [FpsHud, TpsHud, PingHud, PlayerHud, CpsHud, BiomeHud, CoordinatesHud, SpeedometerHud, ClockHud]
 
 private const val UNAVAILABLE = "N/A"
 
@@ -87,6 +92,46 @@ object SpeedometerHud : TextHudComponent("Speedometer", "Your horizontal speed."
     private enum class SpeedUnit(override val tag: String, val perTick: Double, val label: String) : Tagged {
         BLOCKS_PER_TICK("BlocksPerTick", 1.0, "b/t"),
         BLOCKS_PER_SECOND("BlocksPerSecond", 20.0, "b/s"),
+    }
+
+}
+
+object ClockHud : TextHudComponent("Clock", "The time on your computer.", "", row = 8) {
+
+    private const val BAR_HEIGHT = 2f
+
+    private val weekday by boolean("Weekday", true)
+    private val seconds by boolean("Seconds", true)
+    private val blinkingColon by boolean("BlinkingColon", false)
+    private val minuteBar by boolean("MinuteBar", false)
+    private val barColor by color("BarColor", Color4b.WHITE)
+
+    // By weekday, then seconds
+    private val formats = listOf("HH:mm", "HH:mm:ss", "EEE HH:mm", "EEE HH:mm:ss")
+        .map { DateTimeFormatter.ofPattern(it, Locale.ENGLISH) }
+    private val pattern get() = formats[(if (weekday) 2 else 0) + if (seconds) 1 else 0]
+
+    /** How far the current minute has run, 0 to 1. */
+    val minuteProgress get() = minuteProgress(LocalTime.now())
+
+    fun minuteProgress(time: LocalTime) = (time.second + time.nano / 1e9f) / 60f
+
+    /** The clock at [time]; a blinking colon is off in odd seconds. */
+    fun format(time: LocalDateTime): String {
+        val text = time.format(pattern)
+        return if (blinkingColon && time.second % 2 == 1) text.replace(':', ' ') else text
+    }
+
+    override fun value(): Component = Component.literal(format(LocalDateTime.now()))
+
+    // Measured with the colons, so the box keeps its size while they blink
+    override fun widestValue(): Component = Component.literal(LocalDateTime.now().format(pattern))
+
+    override val footerHeight get() = if (minuteBar) BAR_HEIGHT else 0f
+
+    override fun drawFooter(context: GuiGraphicsExtractor, x: Float, y: Float, width: Float) {
+        context.drawQuad(x, y, x + width, y + BAR_HEIGHT, barColor.alpha(barColor.a / 3))
+        context.drawQuad(x, y, x + width * minuteProgress, y + BAR_HEIGHT, barColor)
     }
 
 }
