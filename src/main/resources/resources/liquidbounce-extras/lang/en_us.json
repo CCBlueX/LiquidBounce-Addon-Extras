@@ -274,5 +274,18 @@
   "liquidbounce.module.misplayGuard.value.enderChest.description": "No opening an ender chest while you hold a combat item.",
   "liquidbounce.module.misplayGuard.value.combatItems.description": "Items that keep the ender chest shut.",
   "liquidbounce.module.misplayGuard.value.groundFirework.description": "No firework from the ground, unless a crossbow is in your offhand.",
-  "liquidbounce.module.misplayGuard.value.shieldHit.description": "No sword hits on a player whose shield is up."
+  "liquidbounce.module.misplayGuard.value.shieldHit.description": "No sword hits on a player whose shield is up.",
+
+  "liquidbounce.module.totemSwitch.description": "Holds a hotbar totem while the next hit could kill you, then gives your slot back.",
+  "liquidbounce.module.totemSwitch.value.margin.description": "Health to keep on top of the worst hit.",
+  "liquidbounce.module.totemSwitch.value.range.description": "How far around you explosions count.",
+  "liquidbounce.module.totemSwitch.value.crystals.description": "Count end crystals.",
+  "liquidbounce.module.totemSwitch.value.anchors.description": "Count charged respawn anchors where they explode.",
+  "liquidbounce.module.totemSwitch.value.placements.description": "Count obsidian and bedrock an enemy could put a crystal on.",
+  "liquidbounce.module.totemSwitch.value.enemyReach.description": "How far an enemy reaches.",
+  "liquidbounce.module.totemSwitch.value.mace.description": "Count enemies falling on you with a mace.",
+  "liquidbounce.module.totemSwitch.value.sword.description": "Count sword hits while your health is low.",
+  "liquidbounce.module.totemSwitch.value.lowHealth.description": "Health from which sword hits count.",
+  "liquidbounce.module.totemSwitch.value.pearl.description": "Hold the totem while your own ender pearl is in the air.",
+  "liquidbounce.module.totemSwitch.value.returnDelay.description": "How long it has to be safe before your slot comes back."
 }

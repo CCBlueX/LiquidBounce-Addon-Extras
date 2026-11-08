@@ -15,6 +15,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleTotemSwitch
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.core.BlockPos
@@ -241,6 +242,73 @@ class MisplayGuardGameTest : PaperGameTest({
     aim(anchor)
     rightClick()
     awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=3]")
+})
+
+class TotemSwitchGameTest : PaperGameTest({
+    run("difficulty normal")
+    run("gamerule minecraft:natural_health_regeneration false")
+    run("item replace entity $playerName hotbar.0 with minecraft:stick")
+    run("item replace entity $playerName hotbar.5 with minecraft:totem_of_undying")
+    awaitClient("the totem") { it.player!!.inventory.getItem(5).`is`(Items.TOTEM_OF_UNDYING) }
+    enable(ModuleTotemSwitch)
+
+    // Your own ender pearl in the air
+    client { ModuleTotemSwitch.setting<Boolean>("Pearl").set(true) }
+    run("item replace entity $playerName hotbar.1 with minecraft:ender_pearl")
+    awaitClient("the pearl") { it.player!!.inventory.getItem(1).`is`(Items.ENDER_PEARL) }
+    input.pressKey { it.keyHotbarSlots[1] }
+    input.lookAt(0f, -90f)
+    ticks(2)
+    rightClick()
+    awaitSlot(5)
+    awaitSlot(1)
+    input.pressKey { it.keyHotbarSlots[0] }
+    awaitSlot(0)
+    // The landing hurt; the threats below expect full health
+    run("effect give $playerName minecraft:instant_health 1 4 true")
+
+    // A crystal two blocks away
+    summon("minecraft:end_crystal", origin.south(2), "{ShowBottom:0b}")
+    awaitSlot(5)
+    run("kill @e[type=minecraft:end_crystal]")
+    awaitSlot(0)
+
+    // An enemy on its own is harmless; with obsidian in its reach it could crystal you
+    summon("minecraft:husk", origin.south(4), "{NoAI:1b,PersistenceRequired:1b}")
+    awaitClient("the husk") { husks(it.level!!) == 1 }
+    ticks(30)
+    awaitSlot(0)
+    setBlock(origin.offset(0, -1, 2), "minecraft:obsidian")
+    awaitSlot(5)
+    run("kill @e[type=minecraft:husk]")
+    awaitSlot(0)
+    setBlock(origin.offset(0, -1, 2), "minecraft:grass_block")
+
+    // An enemy coming down with a mace
+    summon(
+        "minecraft:husk", origin.offset(2, 12, 2),
+        "{PersistenceRequired:1b,equipment:{mainhand:{id:\"minecraft:mace\",count:1}}}",
+    )
+    awaitSlot(5, timeout = 60)
+    run("kill @e[type=minecraft:husk]")
+    awaitSlot(0)
+
+    // A sword only counts at low health
+    summon(
+        "minecraft:husk", origin.south(2),
+        "{NoAI:1b,PersistenceRequired:1b,equipment:{mainhand:{id:\"minecraft:diamond_sword\",count:1}}}",
+    )
+    awaitClient("the husk") { husks(it.level!!) == 1 }
+    ticks(30)
+    awaitSlot(0)
+    run("damage $playerName 14")
+    awaitSlot(5)
+
+    // Disabling gives the slot back
+    disable(ModuleTotemSwitch)
+    awaitSlot(0)
+    check(client { ModuleTotemSwitch.previousSlot == null }) { "the previous slot survived disabling" }
+    run("kill @e[type=minecraft:husk]")
 })
 
 private val AABB_AROUND = AABB(-16.0, -80.0, -16.0, 16.0, -40.0, 16.0)

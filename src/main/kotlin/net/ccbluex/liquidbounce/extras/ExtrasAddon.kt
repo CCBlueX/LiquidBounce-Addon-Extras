@@ -34,6 +34,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleTotemSwitch
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.extras.util.WorldJournal
@@ -66,6 +67,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleCrystalMacro,
             ModuleBucketSteal,
             ModuleMisplayGuard,
+            ModuleTotemSwitch,
             ModuleMessageAura.INSTANCE,
             ModulePacketCanceller,
             ModuleIntruderAlert,
