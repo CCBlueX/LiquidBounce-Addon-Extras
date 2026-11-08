@@ -210,5 +210,12 @@
   "liquidbounce.module.swingRedirect.value.blockClicks.description": "Also redirect clicks at a block.",
   "liquidbounce.module.swingRedirect.value.dot.description": "Mark the spot a missed swing would hit.",
   "liquidbounce.module.swingRedirect.value.dotColor.description": "Colour of the mark.",
-  "liquidbounce.module.swingRedirect.value.continuousTracking.description": "Keep the server-side rotation on the target the whole time, not only for the swing."
+  "liquidbounce.module.swingRedirect.value.continuousTracking.description": "Keep the server-side rotation on the target the whole time, not only for the swing.",
+
+  "liquidbounce.module.hitFlick.description": "Turns away for a tick before each hit, then back onto the target.",
+  "liquidbounce.module.hitFlick.value.angle.description": "How far to turn away.",
+  "liquidbounce.module.hitFlick.value.direction.description": "Which way to turn away.",
+  "liquidbounce.module.hitFlick.value.requireSprint.description": "Only flick hits made while sprinting.",
+  "liquidbounce.module.hitFlick.value.playersOnly.description": "Only flick hits on players.",
+  "liquidbounce.module.hitFlick.value.jitter.description": "Random offset added to the turn away and to the turn back."
 }
