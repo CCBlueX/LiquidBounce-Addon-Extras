@@ -6,17 +6,21 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
 import net.ccbluex.liquidbounce.extras.gametest.harness.aim
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
+import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
 import net.ccbluex.liquidbounce.extras.gametest.harness.query
+import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBreachSwap
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleInstantLunge
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.monster.zombie.Drowned
 import net.minecraft.world.entity.monster.zombie.Husk
+import net.minecraft.world.item.Items
 import net.minecraft.world.phys.EntityHitResult
 import com.mojang.blaze3d.platform.InputConstants
 
@@ -107,6 +111,28 @@ class ShieldDrainGameTest : PaperGameTest({
     check(client { !ModuleShieldDrain.draining && !SilentHotbar.isSlotModifiedBy(ModuleShieldDrain) }) {
         "disabling left a target or the mace selected"
     }
+})
+
+class InstantLungeGameTest : PaperGameTest({
+    hotbar(0, "minecraft:iron_sword")
+    hotbar(2, "minecraft:iron_spear[enchantments={'minecraft:lunge':3}]")
+    awaitClient("the spear") { it.player!!.inventory.getItem(2).`is`(Items.IRON_SPEAR) }
+    ticks(20)
+
+    enable(ModuleInstantLunge)
+    awaitClient("the module to turn itself off") { !ModuleInstantLunge.enabled }
+    check(!client { it.chatContains("lunge") || it.chatContains("Lunge") }) { "the module refused to lunge" }
+    awaitServer("items entity $playerName hotbar.2 minecraft:iron_spear[damage=1]")
+    val z = query("data get entity $playerName Pos[2]", Regex("entity data: ([-\\d.]+)d")).groupValues[1].toDouble()
+    check(z > 1.5) { "the server did not see the lunge, z is $z" }
+    awaitAnswer("data get entity $playerName SelectedItemSlot", "entity data: 0")
+    screenshot("InstantLunge")
+
+    // No Lunge spear: a note, nothing else
+    run("clear $playerName minecraft:iron_spear")
+    awaitClient("the spear to go") { !it.player!!.inventory.getItem(2).`is`(Items.IRON_SPEAR) }
+    enable(ModuleInstantLunge)
+    awaitClient("the note") { it.chatContains("No spear with Lunge") && !ModuleInstantLunge.enabled }
 })
 
 private fun GameTestScope.hotbar(slot: Int, item: String) =

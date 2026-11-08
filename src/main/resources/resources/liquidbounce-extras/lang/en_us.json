@@ -387,5 +387,11 @@
   "liquidbounce.module.shieldDrain.value.mace.description": "Hit with a mace from the hotbar.",
   "liquidbounce.module.shieldDrain.value.minFall.description": "Only drain once you have fallen this far.",
   "liquidbounce.module.shieldDrain.value.pauseOnGround.description": "Only drain while you are in the air.",
-  "liquidbounce.module.shieldDrain.value.crosshairOnly.description": "Only drain the enemy under your crosshair."
+  "liquidbounce.module.shieldDrain.value.crosshairOnly.description": "Only drain the enemy under your crosshair.",
+
+  "liquidbounce.module.instantLunge.description": "Lunges once with a Lunge spear from the hotbar and turns itself off.",
+  "liquidbounce.module.instantLunge.value.switchBack.description": "Wait before your slot comes back.",
+  "liquidbounce.module.instantLunge.messages.noSpear": "No spear with Lunge in the hotbar.",
+  "liquidbounce.module.instantLunge.messages.hungry": "Too hungry to lunge.",
+  "liquidbounce.module.instantLunge.messages.blocked": "No lunge while gliding, swimming or riding."
 }
