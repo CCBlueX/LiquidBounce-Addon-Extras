@@ -242,5 +242,16 @@
   "liquidbounce.module.shieldGuard.value.rising.description": "Block an enemy in reach on the way up of a jump, where no hit of yours could be critical.",
   "liquidbounce.module.shieldGuard.value.weaponsOnly.description": "Ignore enemies holding no sword, axe or mace.",
   "liquidbounce.module.shieldGuard.value.lowerForAxes.description": "Keep the shield down against an enemy holding an axe, which would disable it.",
-  "liquidbounce.module.shieldGuard.value.holdAttacks.description": "Send no attacks while the shield is up."
+  "liquidbounce.module.shieldGuard.value.holdAttacks.description": "Send no attacks while the shield is up.",
+  "liquidbounce.module.crystalMacro.description": "Places obsidian where you look if it needs to, then a crystal on it, and blows the crystal up.",
+  "liquidbounce.module.crystalMacro.value.key.description": "Press it to crystal the block you look at.",
+  "liquidbounce.module.crystalMacro.value.onSwordHit.description": "Also crystal after you hit an enemy with a sword.",
+  "liquidbounce.module.crystalMacro.value.breaks.description": "Hit the crystal once, twice, or until it is gone.",
+  "liquidbounce.module.crystalMacro.value.hurtTimeSync.description": "Hold the hit until the nearest enemy can take damage again.",
+  "liquidbounce.module.crystalMacro.value.groundOnly.description": "Do nothing while you are in the air.",
+  "liquidbounce.module.crystalMacro.value.lootPause.description": "After an enemy dies, leave its armor, totems, apples and crystals alone this long. 0 never waits.",
+  "liquidbounce.module.crystalMacro.value.range.description": "How far you reach.",
+  "liquidbounce.module.crystalMacro.value.slotResetDelay.description": "How long the crystal or obsidian stays selected after a click.",
+  "liquidbounce.module.crystalMacro.value.swing.description": "Who sees your hand swing.",
+  "liquidbounce.module.crystalMacro.value.rotationMode.description": "How to aim at the block and the crystal."
 }

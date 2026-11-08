@@ -46,6 +46,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.CrossbowLoaderGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.ShieldSwapGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.ShieldGuardGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.CrystalMacroGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },
