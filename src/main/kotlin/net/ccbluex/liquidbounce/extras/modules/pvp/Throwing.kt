@@ -4,6 +4,7 @@ import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.event.tickUntil
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationTarget
+import net.ccbluex.liquidbounce.utils.aiming.RotationsValueGroup
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.utils.RotationUtil
 import net.ccbluex.liquidbounce.utils.client.player
@@ -23,6 +24,14 @@ internal const val FEET_PITCH = 90f
 internal fun hotbarSlotOf(item: Item) = Slots.OffhandWithHotbar.findSlot(item)
 
 internal fun isReady(slot: HotbarItemSlot) = !player.cooldowns.isOnCooldown(slot.itemStack)
+
+/** The rotation group's target, let go of the tick after it was last asked for. */
+internal fun RotationsValueGroup.briefTarget(rotation: Rotation): RotationTarget {
+    val target = toRotationTarget(rotation)
+    return RotationTarget(
+        target.rotation, null, target.processors, 1, target.resetThreshold, false, target.movementCorrection,
+    )
+}
 
 /** Keeps turning towards [target] until the rotation the server has is settled on it, at most [AIM_TIMEOUT] ticks. */
 @IgnorableReturnValue

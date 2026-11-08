@@ -445,5 +445,10 @@
   "liquidbounce.module.macePrediction.value.ringColor.description": "Color of the reach ring.",
   "liquidbounce.module.pearlLaunch.description": "Throws a pearl where you look and a wind charge at your feet the moment it lands you.",
   "liquidbounce.module.pearlLaunch.value.jump.description": "Jump right after the wind charge, so both lift you.",
-  "liquidbounce.module.pearlLaunch.messages.missing": "Needs ender pearls and wind charges in the hotbar or offhand."
+  "liquidbounce.module.pearlLaunch.messages.missing": "Needs ender pearls and wind charges in the hotbar or offhand.",
+  "liquidbounce.module.windGlide.description": "Glides with an elytra and throws wind charges down whenever the ground comes close. Stops once you wear a chestplate again.",
+  "liquidbounce.module.windGlide.value.height.description": "How close the ground may come.",
+  "liquidbounce.module.windGlide.value.speedFactor.description": "Lowers that height by your speed, which carries you further.",
+  "liquidbounce.module.windGlide.value.pitch.description": "How steeply the wind charge is thrown down, picked anew for each throw.",
+  "liquidbounce.module.windGlide.messages.noElytra": "Needs an elytra in the hotbar or offhand."
 }

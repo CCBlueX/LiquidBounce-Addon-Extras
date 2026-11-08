@@ -50,6 +50,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSpearAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleTotemSwitch
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleWindGlide
 import net.ccbluex.liquidbounce.extras.modules.pvp.OwnCarts
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleNoItemBounce
@@ -113,6 +114,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleInstantLunge,
             ModuleMacePrediction,
             ModulePearlLaunch,
+            ModuleWindGlide,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
