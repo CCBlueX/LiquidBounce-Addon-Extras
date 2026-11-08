@@ -174,5 +174,21 @@
   "liquidbounce.module.blastCover.value.maxDamage.description": "Skip blasts that would hurt you more than this, cover or not.",
   "liquidbounce.module.blastCover.value.limit.description": "Most covers per anchor, 0 for no limit.",
   "liquidbounce.module.blastCover.value.reach.description": "How far away a cover may go.",
-  "liquidbounce.module.blastCover.value.timeout.description": "How long a detonation waits for its cover."
+  "liquidbounce.module.blastCover.value.timeout.description": "How long a detonation waits for its cover.",
+
+  "liquidbounce.module.anchorAura.description": "Places, covers, charges and sets off respawn anchors next to targets.",
+  "liquidbounce.module.anchorAura.value.reach.description": "How far away an anchor may go.",
+  "liquidbounce.module.anchorAura.value.minDamage.description": "Least damage the blast has to do to the target.",
+  "liquidbounce.module.anchorAura.value.maxSelfDamage.description": "Most damage the blast may do to you.",
+  "liquidbounce.module.anchorAura.value.antiSuicide.description": "Never set off a blast that would kill you.",
+  "liquidbounce.module.anchorAura.value.cover.description": "Put obsidian or glowstone between you and the anchor when the blast would hurt too much.",
+  "liquidbounce.module.anchorAura.value.onlyExisting.description": "Never place anchors, only charge and set off ones already standing in reach.",
+  "liquidbounce.module.anchorAura.value.placeDelay.description": "Pause after placing an anchor or its cover, picked at random.",
+  "liquidbounce.module.anchorAura.value.chargeDelay.description": "Pause after charging, picked at random.",
+  "liquidbounce.module.anchorAura.value.detonateDelay.description": "Pause after a blast, picked at random.",
+  "liquidbounce.module.anchorAura.value.guard.description": "Ignore your own clicks on anchors while it works.",
+  "liquidbounce.module.anchorAura.value.color.description": "Colour of the planned anchor and cover.",
+  "liquidbounce.module.anchorAura.value.pearlPunish.description": "Wait with a charged anchor where an enemy ender pearl lands.",
+  "liquidbounce.module.anchorAura.value.pearlPunish.value.color.description": "Colour of the landing spot and its flight time.",
+  "liquidbounce.module.anchorAura.messages.landing": "%ss"
 }

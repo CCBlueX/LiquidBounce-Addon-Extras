@@ -38,6 +38,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.PacketCancellerGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.IntruderAlertGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.BlastCoverGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.AnchorAuraGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },
