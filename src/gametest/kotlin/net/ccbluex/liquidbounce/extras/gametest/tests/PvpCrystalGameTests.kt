@@ -3,6 +3,7 @@ package net.ccbluex.liquidbounce.extras.gametest.tests
 import com.mojang.blaze3d.platform.InputConstants
 import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.aim
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
@@ -13,7 +14,9 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.monster.zombie.Husk
@@ -21,6 +24,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 
 class CrystalMacroGameTest : PaperGameTest({
@@ -154,6 +158,91 @@ class BucketStealGameTest : PaperGameTest({
     awaitServer("block ${water.command} minecraft:water", 20)
 })
 
+class MisplayGuardGameTest : PaperGameTest({
+    run("difficulty normal")
+    val anchor = origin.offset(0, 0, 2)
+    val stone = origin.offset(-1, 0, 2)
+    val chest = origin.offset(1, 0, 2)
+    setBlock(anchor, "minecraft:respawn_anchor[charges=1]")
+    setBlock(stone, "minecraft:stone")
+    setBlock(chest, "minecraft:ender_chest")
+    run("item replace entity $playerName hotbar.0 with minecraft:glowstone 8")
+    run("item replace entity $playerName hotbar.1 with minecraft:end_crystal")
+    run("item replace entity $playerName hotbar.2 with minecraft:firework_rocket 4")
+    run("item replace entity $playerName hotbar.3 with minecraft:diamond_sword")
+    for (objective in listOf("enderchest minecraft.custom:minecraft.open_enderchest",
+        "rockets minecraft.used:minecraft.firework_rocket")) {
+        run("scoreboard objectives add $objective")
+        run("scoreboard players set $playerName ${objective.substringBefore(' ')} 0")
+    }
+    awaitClient("the blocks and the items") { minecraft ->
+        minecraft.player!!.inventory.getItem(3).`is`(Items.DIAMOND_SWORD) &&
+            minecraft.level!!.getBlockState(chest).`is`(Blocks.ENDER_CHEST)
+    }
+    enable(ModuleMisplayGuard)
+
+    // A charged anchor gets no second charge
+    aim(anchor)
+    rightClick()
+    ticks(20)
+    awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=1]", 20)
+    client { ModuleMisplayGuard.setting<Boolean>("ChargedAnchor").set(false) }
+    rightClick()
+    awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=2]")
+
+    // Glowstone goes into anchors only
+    aim(stone)
+    val face = client { (it.hitResult as BlockHitResult).let { hit -> hit.blockPos.relative(hit.direction) } }
+    rightClick()
+    ticks(20)
+    awaitServer("block ${face.command} minecraft:air", 20)
+    client { ModuleMisplayGuard.setting<Boolean>("StrayGlowstone").set(false) }
+    rightClick()
+    awaitServer("block ${face.command} minecraft:glowstone")
+
+    // The ender chest stays shut while a crystal is in hand
+    input.pressKey { it.keyHotbarSlots[1] }
+    aim(chest)
+    rightClick()
+    ticks(20)
+    check(client { it.gui.screen() == null }) { "the ender chest opened" }
+    awaitScore("enderchest", 0)
+    client { ModuleMisplayGuard.setting<Boolean>("EnderChest").set(false) }
+    rightClick()
+    awaitClient("the ender chest to open") { it.gui.screen() is ContainerScreen }
+    awaitScore("enderchest", 1)
+    input.pressKey(InputConstants.KEY_ESCAPE)
+    awaitClient("the ender chest to close") { it.gui.screen() == null }
+
+    // No rockets from the ground, unless a crossbow in the offhand wants them
+    input.pressKey { it.keyHotbarSlots[2] }
+    aim(origin.offset(0, -1, 1))
+    rightClick()
+    ticks(20)
+    awaitScore("rockets", 0)
+    run("item replace entity $playerName weapon.offhand with minecraft:crossbow")
+    awaitClient("the crossbow") { it.player!!.offhandItem.`is`(Items.CROSSBOW) }
+    rightClick()
+    awaitScore("rockets", 1)
+
+    // Hits on anything without a raised shield still land
+    val husk = origin.offset(1, 0, 1)
+    summon("minecraft:husk", husk, "{NoAI:1b,PersistenceRequired:1b}")
+    awaitClient("the husk") { husks(it.level!!) == 1 }
+    input.pressKey { it.keyHotbarSlots[3] }
+    aim(husk)
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    awaitAnswer("execute unless entity @e[type=minecraft:husk,nbt={Health:20.0f}]", "Test passed")
+
+    // Switched off, nothing is held back
+    client { ModuleMisplayGuard.setting<Boolean>("ChargedAnchor").set(true) }
+    disable(ModuleMisplayGuard)
+    input.pressKey { it.keyHotbarSlots[0] }
+    aim(anchor)
+    rightClick()
+    awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=3]")
+})
+
 private val AABB_AROUND = AABB(-16.0, -80.0, -16.0, 16.0, -40.0, 16.0)
 
 private val BlockPos.command get() = "$x $y $z"
@@ -169,6 +258,8 @@ private fun GameTestScope.lookAt(point: Vec3) {
     input.lookAt(rotation.yaw, rotation.pitch)
     ticks(2)
 }
+
+private fun GameTestScope.rightClick() = input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
 
 private fun GameTestScope.awaitSlot(slot: Int, timeout: Int = 200) =
     awaitAnswer("data get entity $playerName SelectedItemSlot", "entity data: $slot", timeout)

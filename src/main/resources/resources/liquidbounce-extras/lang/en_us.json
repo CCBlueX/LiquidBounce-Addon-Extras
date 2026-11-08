@@ -266,5 +266,13 @@
   "liquidbounce.module.bucketSteal.value.delay.description": "Pause after each source, picked at random.",
   "liquidbounce.module.bucketSteal.value.slotResetDelay.description": "How long the bucket or cobweb stays selected after a click.",
   "liquidbounce.module.bucketSteal.value.swing.description": "Who sees your hand swing.",
-  "liquidbounce.module.bucketSteal.value.rotationMode.description": "Aim on your own, or with None only take what your crosshair is on."
+  "liquidbounce.module.bucketSteal.value.rotationMode.description": "Aim on your own, or with None only take what your crosshair is on.",
+
+  "liquidbounce.module.misplayGuard.description": "Drops clicks of yours that lose fights.",
+  "liquidbounce.module.misplayGuard.value.chargedAnchor.description": "No glowstone into an anchor that is already charged.",
+  "liquidbounce.module.misplayGuard.value.strayGlowstone.description": "No glowstone on anything but an anchor.",
+  "liquidbounce.module.misplayGuard.value.enderChest.description": "No opening an ender chest while you hold a combat item.",
+  "liquidbounce.module.misplayGuard.value.combatItems.description": "Items that keep the ender chest shut.",
+  "liquidbounce.module.misplayGuard.value.groundFirework.description": "No firework from the ground, unless a crossbow is in your offhand.",
+  "liquidbounce.module.misplayGuard.value.shieldHit.description": "No sword hits on a player whose shield is up."
 }
