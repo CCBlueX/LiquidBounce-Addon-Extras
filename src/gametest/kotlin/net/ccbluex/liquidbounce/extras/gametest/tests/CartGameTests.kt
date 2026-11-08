@@ -14,6 +14,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.liquidbounce.extras.hud.CartKitHud
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBreaker
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartCover
@@ -255,6 +256,19 @@ class CartCoverGameTest : PaperGameTest({
     check(health >= 15f) { "the blast took us down to $health" }
     disable(ModuleCartCover)
     check(client { ModuleCartCover.predictedDamage == 0f }) { "the prediction survived disabling" }
+})
+
+class CartKitHudGameTest : PaperGameTest({
+    kit(FLAME_BOW)
+    client { CartKitHud.enabled = true }
+    val text = client { CartKitHud.text.string }
+    check("Rails 16" in text && "Carts 3" in text && "Bow" in text) { "the kit reads '$text'" }
+    input.pressKey { it.keyHotbarSlots[3] }
+    input.holdMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    ticks(12)
+    screenshot("CartKit")
+    input.releaseMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    client { CartKitHud.enabled = false }
 })
 
 /** Monsters need more than peaceful; resistance keeps us out of our own blasts, obsidian keeps the floor. */

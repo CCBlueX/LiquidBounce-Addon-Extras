@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 val extrasHudComponents: List<TextHudComponent> =
-    [FpsHud, TpsHud, PingHud, PlayerHud, CpsHud, BiomeHud, CoordinatesHud, SpeedometerHud, ClockHud]
+    [FpsHud, TpsHud, PingHud, PlayerHud, CpsHud, BiomeHud, CoordinatesHud, SpeedometerHud, ClockHud, CartKitHud]
 
 private const val UNAVAILABLE = "N/A"
 
