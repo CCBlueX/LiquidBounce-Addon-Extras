@@ -376,5 +376,8 @@
   "liquidbounce.module.cartCover.value.blocks.description": "Blocks to cover with.",
   "liquidbounce.module.cartCover.value.unlit.description": "Also cover against carts that are not lit yet, except your own.",
   "liquidbounce.module.cartCover.value.protect.description": "Whose carts to cover against: your own, others' or both.",
-  "liquidbounce.module.cartCover.value.maxBlocks.description": "Most blocks to place against one cart."
+  "liquidbounce.module.cartCover.value.maxBlocks.description": "Most blocks to place against one cart.",
+
+  "liquidbounce.module.breachSwap.description": "Now and then swings your Breach mace instead of your sword.",
+  "liquidbounce.module.breachSwap.value.chance.description": "How many sword hits become mace hits."
 }

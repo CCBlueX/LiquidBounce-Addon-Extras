@@ -28,6 +28,7 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleOreSimulation
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorAura
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBreachSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBreaker
@@ -97,6 +98,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModulePearlCart,
             ModuleCartBreaker,
             ModuleCartCover,
+            ModuleBreachSwap,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
