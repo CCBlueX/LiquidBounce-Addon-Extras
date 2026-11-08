@@ -1,5 +1,6 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
+import net.ccbluex.liquidbounce.config.types.group.ValueGroup
 import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
@@ -13,13 +14,17 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorAura
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
+import net.ccbluex.liquidbounce.utils.input.InputBind
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.RespawnAnchorBlock
 import net.minecraft.world.phys.Vec3
 import com.mojang.blaze3d.platform.InputConstants
 
@@ -204,6 +209,70 @@ class AnchorAuraGameTest : PaperGameTest({
     awaitHealthBelow(TARGET, before)
     awaitAnswer("execute unless ${block(existing, "minecraft:respawn_anchor")}", "Test passed")
     check(client { it.player!!.inventory.getItem(1).count } == anchors) { "OnlyExisting placed an anchor" }
+})
+
+class AnchorMacroGameTest : PaperGameTest({
+    arena()
+    run("item replace entity $playerName hotbar.1 with minecraft:respawn_anchor 8")
+    run("item replace entity $playerName hotbar.2 with minecraft:glowstone 16")
+    run("item replace entity $playerName hotbar.3 with minecraft:obsidian 16")
+    summonTarget(origin.south(4))
+    val spot = origin.south(3)
+    val module = ModuleAnchorMacro
+    val key = InputConstants.KEY_V
+    client {
+        module.bindValue.set(InputBind(InputConstants.Type.KEYBOARD, key, InputBind.BindAction.HOLD))
+        module.setting<Any>("Switch").setByString("Visible")
+        module.setting<IntRange>("Delay").set(4..4)
+        (module.containedValues.first { it.name == "DoubleAnchor" } as ValueGroup).setting<Boolean>("Enabled").set(true)
+    }
+    // Glowstone breaks in the blast, so the spot is in reach again for the second anchor
+    client { ModuleBlastCover.setting<Any>("Block").setByString("Glowstone") }
+    enable(ModuleBlastCover)
+
+    // OnlyOwn: someone else's anchor stays as it is
+    chargedAnchor(spot)
+    lookAtTop(spot)
+    input.holdKeyFor(key, 30)
+    awaitServer(block(spot, "minecraft:respawn_anchor[charges=1]"))
+    awaitServer("items entity $playerName hotbar.2 minecraft:glowstone[count=16]")
+    setBlock(spot, "minecraft:air")
+
+    // Place where you look, cover, charge, blast, and the second one once the target can be hurt again
+    lookAt(Vec3(spot.x + 0.5, spot.y.toDouble(), spot.z + 0.5))
+    input.holdKey(key)
+    awaitClient("the first blast to hit") { target(it).hurtTime > 0 }
+    awaitClient("the target to recover") { target(it).hurtTime == 0 }
+    awaitClient("the second blast to hit") { target(it).hurtTime > 0 }
+    input.releaseKey(key)
+    awaitClient("the macro to let go") { !module.enabled }
+    awaitServer("items entity $playerName hotbar.1 minecraft:respawn_anchor[count=6]")
+    // Two charges, two covers
+    awaitServer("items entity $playerName hotbar.2 minecraft:glowstone[count=12]")
+    check(health(TARGET) < TARGET_HEALTH) { "the target took no damage" }
+    check(health(playerName) >= PLAYER_HEALTH - 4) { "the covered blasts hurt too much" }
+    check(client { it.player!!.inventory.selectedSlot } == 0) { "the visible switch did not go back" }
+
+    // BlastCover's Before charge timing: the cover stands before the first glowstone goes in
+    clearArena()
+    awaitClient("the arena to be clear") { it.level!!.getBlockState(spot).isAir }
+    client { ModuleBlastCover.setting<Any>("Timing").setByString("BeforeCharge") }
+    lookAt(Vec3(spot.x + 0.5, spot.y.toDouble(), spot.z + 0.5))
+    var coveredAtCharge = false
+    input.holdKey(key)
+    awaitClient("the first charge") { minecraft ->
+        val level = minecraft.level!!
+        val state = level.getBlockState(spot)
+        val charged = state.`is`(Blocks.RESPAWN_ANCHOR) && state.getValue(RespawnAnchorBlock.CHARGE) > 0
+        if (charged) {
+            coveredAtCharge = Direction.entries.filter { it != Direction.DOWN }
+                .any { level.getBlockState(spot.relative(it)).`is`(Blocks.GLOWSTONE) }
+        }
+        charged
+    }
+    input.releaseKey(key)
+    awaitClient("the macro to let go") { !module.enabled }
+    check(coveredAtCharge) { "the anchor was charged before its cover went up" }
 })
 
 private fun GameTestScope.arena() {

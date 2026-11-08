@@ -190,5 +190,16 @@
   "liquidbounce.module.anchorAura.value.color.description": "Colour of the planned anchor and cover.",
   "liquidbounce.module.anchorAura.value.pearlPunish.description": "Wait with a charged anchor where an enemy ender pearl lands.",
   "liquidbounce.module.anchorAura.value.pearlPunish.value.color.description": "Colour of the landing spot and its flight time.",
-  "liquidbounce.module.anchorAura.messages.landing": "%ss"
+  "liquidbounce.module.anchorAura.messages.landing": "%ss",
+
+  "liquidbounce.module.anchorMacro.description": "While its bind is held, places an anchor where you look, charges it and sets it off.",
+  "liquidbounce.module.anchorMacro.value.switch.description": "Switch slots only for the server, or like a number key; either way back right after.",
+  "liquidbounce.module.anchorMacro.value.onlyOwn.description": "Only set off anchors you placed.",
+  "liquidbounce.module.anchorMacro.value.antiSuicide.description": "Never set off a blast that would kill you.",
+  "liquidbounce.module.anchorMacro.value.reach.description": "How far away an anchor may go.",
+  "liquidbounce.module.anchorMacro.value.delay.description": "Pause after each step, picked at random.",
+  "liquidbounce.module.anchorMacro.value.guard.description": "Ignore your own clicks on anchors while it works.",
+  "liquidbounce.module.anchorMacro.value.doubleAnchor.description": "Right after the blast, place and charge a second anchor in the same spot.",
+  "liquidbounce.module.anchorMacro.value.doubleAnchor.value.hurtTime.description": "Set the second one off once the target's hurt time is down to this.",
+  "liquidbounce.module.anchorMacro.value.doubleAnchor.value.timeout.description": "How long the second anchor waits at most."
 }
