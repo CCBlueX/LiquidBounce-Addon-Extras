@@ -12,8 +12,7 @@
     "MixinStringSplitter",
     "MixinAbstractClientPlayer",
     "MixinPlayerInfo",
-    "MixinEntityRenderer",
-    "MixinMinecraftSpearReach"
+    "MixinEntityRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

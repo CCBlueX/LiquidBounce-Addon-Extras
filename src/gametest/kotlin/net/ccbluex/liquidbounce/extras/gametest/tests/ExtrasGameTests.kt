@@ -2,25 +2,28 @@ package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import com.mojang.authlib.GameProfile
 import com.mojang.blaze3d.platform.InputConstants
-import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
+import net.ccbluex.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
-import net.ccbluex.liquidbounce.extras.gametest.harness.aim
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
-import net.ccbluex.liquidbounce.extras.gametest.harness.chat
-import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
-import net.ccbluex.liquidbounce.extras.gametest.harness.disable
-import net.ccbluex.liquidbounce.extras.gametest.harness.enable
-import net.ccbluex.liquidbounce.extras.gametest.harness.hangItemFrame
+import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
+import net.ccbluex.gametest.harness.TestWorld
+import net.ccbluex.gametest.harness.action.aim
+import net.ccbluex.gametest.harness.action.awaitAnswer
+import net.ccbluex.gametest.harness.action.awaitServer
+import net.ccbluex.gametest.harness.action.chat
+import net.ccbluex.gametest.harness.action.chatContains
+import net.ccbluex.liquidbounce.gametest.harness.disable
+import net.ccbluex.liquidbounce.gametest.harness.enable
+import net.ccbluex.gametest.harness.action.hangItemFrame
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
-import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
-import net.ccbluex.liquidbounce.extras.gametest.harness.setting
-import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.gametest.harness.action.setBlock
+import net.ccbluex.liquidbounce.gametest.harness.setting
+import net.ccbluex.gametest.harness.action.summon
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleAntiTrap
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleDisguise
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleIntruderAlert
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleMessageAura
 import net.ccbluex.liquidbounce.extras.modules.extras.ModulePacketCanceller
+import net.ccbluex.liquidbounce.extras.util.coordinates
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
@@ -39,6 +42,10 @@ import net.minecraft.world.entity.vehicle.boat.AbstractBoat
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.SignBlock
 import net.minecraft.world.phys.Vec3
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.util.UUID
 
 class MessageAuraGameTest : PaperGameTest({
@@ -58,15 +65,19 @@ class MessageAuraGameTest : PaperGameTest({
     client { FriendManager.remove("ExtrasFriend") }
 })
 
-class IntruderAlertGameTest : PaperGameTest({
+class IntruderAlertGameTest : PaperGameTest(TestWorld.SURFACE, {
     client { FriendManager.add(FriendManager.Friend("ExtrasVisitor", null)) }
-    val visitor = showPlayer("ExtrasVisitor", origin.east(6))
+    // Looking north, at faces the sun lights; client-only players face south
+    travel(origin, yaw = 180f)
+    val pos = origin.offset(2, 0, -7)
+    val visitor = showPlayer("ExtrasVisitor", pos)
     enable(ModuleIntruderAlert)
-    ticks(20)
+    // Long enough for the "Enabled" toast to go, so the screenshot catches the alert's notification
+    ticks(100)
     check(chat().none { "ExtrasVisitor is nearby" in it }) { "reported a friend" }
 
     client { FriendManager.remove("ExtrasVisitor") }
-    awaitClient("the intruder report") { it.chatContains("ExtrasVisitor is nearby at 6 -60 0") }
+    awaitClient("the intruder report") { it.chatContains("ExtrasVisitor is nearby at ${pos.coordinates}") }
     ticks(20)
     check(chat().count { "ExtrasVisitor is nearby" in it } == 1) { "reported the same intruder twice" }
     screenshot("IntruderAlert")
@@ -153,10 +164,11 @@ class AntiTrapGameTest : PaperGameTest({
     disable(ModuleAntiTrap)
 })
 
-class DisguiseGameTest : PaperGameTest({
+class DisguiseGameTest : PaperGameTest(TestWorld.SURFACE, {
     client { FriendManager.add(FriendManager.Friend("ExtrasFriend", null)) }
-    val friend = showPlayer("ExtrasFriend", origin.south(4).west(2))
-    val stranger = showPlayer("ExtrasStranger", origin.south(6).east(1))
+    travel(origin, yaw = 180f)
+    val friend = showPlayer("ExtrasFriend", origin.north(4).east(2))
+    val stranger = showPlayer("ExtrasStranger", origin.north(6).west(1))
     enable(ModuleDisguise)
     awaitClient("the stranger in disguise, not the nearer friend") { ModuleDisguise.target?.name == "ExtrasStranger" }
     client {
@@ -179,7 +191,14 @@ class DisguiseGameTest : PaperGameTest({
         val line = shown(Component.literal("<ExtrasStranger> hi"))
         check(line == "<Notch [Admin]> hi") { "the tier reached chat: '$line'" }
     }
-    awaitClient("the skin from Mojang", timeout = 600) { skinChanged(it, stranger) }
+    try {
+        awaitClient("the skin from Mojang", timeout = 1200) { skinChanged(it, stranger) }
+    } catch (timeout: AssertionError) {
+        // Mojang turns a busy CI address away for minutes; that says nothing about the module
+        if (!mojangRefuses()) {
+            throw timeout
+        }
+    }
     check(client { !skinChanged(it, friend) }) { "the friend got the skin" }
     run("""tellraw $playerName "ExtrasStranger wants to trade"""")
     awaitClient("the server's line") { it.chatContains("ExtrasStranger wants to trade") }
@@ -217,6 +236,14 @@ private fun nameTag(minecraft: Minecraft, id: Int): Component? {
     val entity = minecraft.level!!.getEntity(id)!!
     return minecraft.entityRenderDispatcher.getRenderer(entity).createRenderState(entity, 1f).nameTag
 }
+
+private fun mojangRefuses(): Boolean {
+    val request = HttpRequest.newBuilder(URI("https://api.mojang.com/users/profiles/minecraft/Notch")).build()
+    val status = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.discarding()).statusCode()
+    return status == HTTP_TOO_MANY_REQUESTS
+}
+
+private const val HTTP_TOO_MANY_REQUESTS = 429
 
 private fun skinChanged(minecraft: Minecraft, id: Int): Boolean {
     val player = minecraft.level!!.getEntity(id) as AbstractClientPlayer

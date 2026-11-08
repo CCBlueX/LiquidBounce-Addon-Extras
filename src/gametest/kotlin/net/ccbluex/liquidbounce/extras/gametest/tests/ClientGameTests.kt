@@ -1,11 +1,6 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.config.ConfigSystem
-import net.ccbluex.liquidbounce.event.EventListener
-import net.ccbluex.liquidbounce.event.EventManager
-import net.ccbluex.liquidbounce.event.events.NotificationEvent
-import net.ccbluex.liquidbounce.event.events.PacketEvent
-import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
@@ -15,12 +10,6 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
 import net.ccbluex.liquidbounce.extras.hud.ClockHud
-import net.ccbluex.liquidbounce.extras.hud.FpsHud
-import net.ccbluex.liquidbounce.extras.hud.MetricHudComponent
-import net.ccbluex.liquidbounce.extras.hud.PingHud
-import net.ccbluex.liquidbounce.extras.hud.ResourcesHud
-import net.ccbluex.liquidbounce.extras.hud.ResourcesHud.Resource
-import net.ccbluex.liquidbounce.extras.hud.TpsHud
 import net.ccbluex.liquidbounce.extras.hud.SpeedometerHud
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
 import net.ccbluex.liquidbounce.features.module.ModuleCategories
@@ -31,16 +20,11 @@ import net.ccbluex.liquidbounce.integration.screen.impl.CustomStandaloneMinecraf
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
 import net.ccbluex.liquidbounce.lang.LanguageManager
-import net.ccbluex.liquidbounce.render.engine.type.Color4b
-import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention
 import net.ccbluex.liquidbounce.utils.render.Alignment
-import net.minecraft.network.chat.Component
-import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import com.mojang.blaze3d.platform.InputConstants
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.util.Collections
 
 /**
  * Plain vanilla movement has to pass, or no other verdict means anything. Then the negative control: a
@@ -68,7 +52,7 @@ class HarnessGameTest : PaperGameTest({
 class AddonGameTest : PaperGameTest({
     client {
         val modules = ModuleManager.filter { it.category in ExtrasCategories.all }
-        check(modules.size == 51) { "expected 51 add-on modules, found ${modules.map { it.name }}" }
+        check(modules.size == 21) { "expected 21 add-on modules, found ${modules.map { it.name }}" }
         check(ExtrasCategories.all.all { ModuleCategories.byName(it.tag) === it }) { "a category is missing" }
         for (module in modules) {
             check(LanguageManager.hasFallbackTranslation(module.descriptionKey!!)) {
@@ -146,132 +130,12 @@ class HudGameTest : PaperGameTest({
         ClickCounter.left == 0 && ClickCounter.right == 0
     }
 
-    // AutoClicker's clicks on a held button count as well, one press by hand plus its own
-    val autoClicker = client { ModuleManager["AutoClicker"]!! }
-    client { autoClicker.enabled = true }
-    input.holdMouse(InputConstants.MOUSE_BUTTON_LEFT)
-    ticks(20)
-    val autoClicks = client { ClickCounter.left }
-    input.releaseMouse(InputConstants.MOUSE_BUTTON_LEFT)
-    client { autoClicker.enabled = false }
-    check(autoClicks > 2) { "counted $autoClicks left clicks with AutoClicker on" }
-    awaitClient("the auto clicks to leave the one second window", timeout = 40) { ClickCounter.left == 0 }
-
     input.holdKey { it.keyUp }
     ticks(20)
     screenshot("Hud")
     input.releaseKey { it.keyUp }
     client { extrasHudComponents.forEach { it.enabled = false } }
 })
-
-class HudGraphGameTest : PaperGameTest({
-    val metrics = listOf(FpsHud, TpsHud, PingHud)
-    client {
-        for (metric in metrics) {
-            check(HudComponentManager.addComponent(metric.id.toString()) === metric)
-            val withGraph = metric.guiScaledHeight
-            metric.setting<Boolean>("Graph").set(false)
-            check(metric.guiScaledHeight < withGraph) { "${metric.name}'s graph takes no room" }
-            metric.setting<Boolean>("Graph").set(true)
-        }
-    }
-
-    awaitClient("the first samples") { metrics.all { it.history.size >= 2 } }
-    // The server's tick rate needs two time updates before TPS has a reading
-    awaitClient("a full graph", timeout = MetricHudComponent.SAMPLES * (MetricHudComponent.SAMPLE_TICKS + 1) + 100) {
-        metrics.all { it.history.size == MetricHudComponent.SAMPLES }
-    }
-    ticks(MetricHudComponent.SAMPLE_TICKS * 2)
-    client {
-        check(metrics.all { it.history.size == MetricHudComponent.SAMPLES }) { "the graph outgrew its samples" }
-        check(FpsHud.reading > 0) { "the FPS read ${FpsHud.reading}" }
-        // On the same machine the latency is far below the good limit
-        check(PingHud.text.valueColor() == PingHud.colorSetting("GoodColor")) { "the ping is not graded good" }
-    }
-    screenshot("HudGraphs")
-
-    TimeUpdateBlocker().use {
-        awaitClient("TPS to go stale", timeout = 100) { TpsHud.stale }
-        client {
-            check(TpsHud.text.string == "TPS: 0.00") { "a silent server reads '${TpsHud.text.string}'" }
-            check(TpsHud.text.valueColor() == TpsHud.colorSetting("BadColor")) { "a silent server is not graded bad" }
-        }
-        awaitClient("a stale sample", timeout = 40) { TpsHud.history.last() == 0.0 }
-    }
-    awaitClient("TPS to recover", timeout = 60) { !TpsHud.stale && TpsHud.reading!! > 0 }
-
-    client {
-        metrics.forEach { it.enabled = false }
-        check(metrics.all { it.history.isEmpty() }) { "disabling kept the graphs" }
-    }
-})
-
-private fun Component.valueColor() = siblings.first().style.color?.value
-
-private fun MetricHudComponent.colorSetting(name: String) = setting<Color4b>(name).get().argb and 0xFFFFFF
-
-/** Drops the server's time updates while it is open, as if the server stopped ticking. */
-private class TimeUpdateBlocker : EventListener, AutoCloseable {
-
-    @Suppress("unused")
-    private val packetHandler = handler<PacketEvent>(priority = EventPriorityConvention.FIRST_PRIORITY) { event ->
-        if (event.packet is ClientboundSetTimePacket) {
-            event.cancelEvent()
-        }
-    }
-
-    override fun close() = EventManager.unregisterEventHandler(this)
-
-}
-
-class ResourcesGameTest : PaperGameTest({
-    client { check(HudComponentManager.addComponent(ResourcesHud.id.toString()) === ResourcesHud) }
-    run("give $playerName minecraft:totem_of_undying 3")
-    run("give $playerName minecraft:golden_apple 4")
-    run("give $playerName minecraft:enchanted_golden_apple 2")
-    run("give $playerName minecraft:experience_bottle 64")
-    run("give $playerName minecraft:experience_bottle 10")
-    val stocked = mapOf(Resource.TOTEMS to 3, Resource.GAPPLES to 6, Resource.CRYSTALS to 0, Resource.BOTTLES to 74)
-    awaitClient("the counts") { ResourcesHud.counts == stocked }
-    client { check(ResourcesHud.low == setOf(Resource.CRYSTALS)) { "low are ${ResourcesHud.low}" } }
-
-    NotificationLog().use { log ->
-        run("clear $playerName minecraft:totem_of_undying 2")
-        awaitClient("the totems to run low") { Resource.TOTEMS in ResourcesHud.low }
-        ticks(5)
-        check(log.messages.size == 1 && "Totems low: 1 / 2" in log.messages.single()) { "notified ${log.messages}" }
-        client {
-            val entries = ResourcesHud.text.siblings.first().siblings
-            check(entries.first { it.string.startsWith("Totems") }.style.color != null) { "the low totems are not red" }
-            check(entries.first { it.string.startsWith("Gapples") }.style.color == null) { "the gapples are red" }
-        }
-        screenshot("Resources")
-
-        run("clear $playerName minecraft:totem_of_undying 1")
-        awaitClient("the last totem gone") { ResourcesHud.counts[Resource.TOTEMS] == 0 }
-        run("give $playerName minecraft:end_crystal 64")
-        awaitClient("the crystals") { ResourcesHud.counts[Resource.CRYSTALS] == 64 }
-        ticks(5)
-        check(log.messages.size == 1) { "staying low or restocking notified again: ${log.messages}" }
-    }
-
-    client {
-        ResourcesHud.enabled = false
-        check(ResourcesHud.counts.isEmpty()) { "disabling kept the counts" }
-    }
-})
-
-/** Notifications shown while it is open. */
-private class NotificationLog : EventListener, AutoCloseable {
-
-    val messages: MutableList<String> = Collections.synchronizedList(mutableListOf())
-
-    @Suppress("unused")
-    private val notificationHandler = handler<NotificationEvent> { messages += it.message }
-
-    override fun close() = EventManager.unregisterEventHandler(this)
-
-}
 
 class ClockGameTest : PaperGameTest({
     client { check(HudComponentManager.addComponent(ClockHud.id.toString()) === ClockHud) }
