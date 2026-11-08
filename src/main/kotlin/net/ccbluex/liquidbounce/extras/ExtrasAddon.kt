@@ -36,6 +36,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleTotemSwitch
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
+import net.ccbluex.liquidbounce.extras.modules.qol.ModuleNoItemBounce
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
@@ -80,6 +81,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleCrossbowLoader,
             ModuleShieldSwap,
             ModuleShieldGuard,
+            ModuleNoItemBounce,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)

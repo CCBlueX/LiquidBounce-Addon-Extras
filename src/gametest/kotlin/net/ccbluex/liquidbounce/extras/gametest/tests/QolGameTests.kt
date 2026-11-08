@@ -4,14 +4,18 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.command
+import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
 import net.ccbluex.liquidbounce.extras.gametest.harness.fill
+import net.ccbluex.liquidbounce.extras.gametest.harness.give
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay.Spawn
+import net.ccbluex.liquidbounce.extras.modules.qol.ModuleNoItemBounce
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.minecraft.core.BlockPos
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 
 class LightOverlayGameTest : PaperGameTest({
@@ -25,6 +29,20 @@ class LightOverlayGameTest : PaperGameTest({
         ModuleLightOverlay.spots[origin.offset(-4, 1, -4)] == Spawn.ALWAYS
     }
     screenshot("LightOverlay")
+})
+
+class NoItemBounceGameTest : PaperGameTest({
+    enable(ModuleNoItemBounce)
+    give("minecraft:cobblestone", 16)
+    awaitClient("the stack to arrive") { it.player!!.inventory.getItem(0).`is`(Items.COBBLESTONE) }
+    awaitClient("the bounce to be left out") { ModuleNoItemBounce.flattenedFrames > 0 }
+
+    disable(ModuleNoItemBounce)
+    check(client { ModuleNoItemBounce.flattenedFrames } == 0) { "disabling kept the count" }
+    give("minecraft:cobblestone", 16)
+    awaitClient("the stack to grow") { it.player!!.inventory.getItem(0).count == 32 }
+    ticks(10)
+    check(client { ModuleNoItemBounce.flattenedFrames } == 0) { "a bounce was left out while disabled" }
 })
 
 class WaypointsGameTest : PaperGameTest({

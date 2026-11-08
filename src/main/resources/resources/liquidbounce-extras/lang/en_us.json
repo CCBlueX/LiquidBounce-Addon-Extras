@@ -287,5 +287,7 @@
   "liquidbounce.module.totemSwitch.value.sword.description": "Count sword hits while your health is low.",
   "liquidbounce.module.totemSwitch.value.lowHealth.description": "Health from which sword hits count.",
   "liquidbounce.module.totemSwitch.value.pearl.description": "Hold the totem while your own ender pearl is in the air.",
-  "liquidbounce.module.totemSwitch.value.returnDelay.description": "How long it has to be safe before your slot comes back."
+  "liquidbounce.module.totemSwitch.value.returnDelay.description": "How long it has to be safe before your slot comes back.",
+
+  "liquidbounce.module.noItemBounce.description": "Stops hotbar items from bouncing when they change."
 }

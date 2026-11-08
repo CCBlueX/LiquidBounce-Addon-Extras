@@ -6,7 +6,8 @@
   "client": [
     "MixinMinecraft",
     "MixinMinecraftAttack",
-    "MinecraftMisplayGuardMixin"
+    "MinecraftMisplayGuardMixin",
+    "MixinHud"
   ],
   "injectors": {
     "defaultRequire": 1
