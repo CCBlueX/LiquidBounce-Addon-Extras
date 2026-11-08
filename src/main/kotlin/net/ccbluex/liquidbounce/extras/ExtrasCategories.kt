@@ -19,9 +19,12 @@ object ExtrasCategories {
     val QOL = category("QoL", "qol")
 
     @JvmField
+    val PVP = category("PvP", "pvp")
+
+    @JvmField
     val EXTRAS = category("Extras", "extras")
 
-    val all = listOf(BASE_HUNTING, GRINDING, QOL, EXTRAS)
+    val all = listOf(BASE_HUNTING, GRINDING, QOL, PVP, EXTRAS)
 
     private fun category(name: String, icon: String) =
         ModuleCategory(name, Identifier.fromNamespaceAndPath("liquidbounce-extras", "clickgui/$icon.svg"))

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.ccbluex.liquidbounce.extras.mixins",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "MixinMinecraft"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

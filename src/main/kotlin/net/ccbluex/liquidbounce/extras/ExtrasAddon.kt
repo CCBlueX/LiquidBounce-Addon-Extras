@@ -22,6 +22,7 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.extras.util.WorldJournal
@@ -54,6 +55,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleMessageAura.INSTANCE,
             ModulePacketCanceller,
             ModuleIntruderAlert,
+            ModuleBlastCover,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)

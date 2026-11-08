@@ -164,5 +164,15 @@
   "liquidbounce.module.intruderAlert.description": "Reports players who are not your friends as they come near.",
   "liquidbounce.module.intruderAlert.value.radius.description": "How near counts.",
   "liquidbounce.module.intruderAlert.value.notify.description": "Show a notification as well.",
-  "liquidbounce.module.intruderAlert.messages.entered": "%s is nearby at %s."
+  "liquidbounce.module.intruderAlert.messages.entered": "%s is nearby at %s.",
+
+  "liquidbounce.module.blastCover.description": "Puts obsidian or glowstone between you and a charged anchor before it goes off.",
+  "liquidbounce.module.blastCover.value.mode.description": "Rotate turns there silently, Crosshair waits until you look at a spot the cover goes to.",
+  "liquidbounce.module.blastCover.value.block.description": "Cover block to use first; the other one is the fallback.",
+  "liquidbounce.module.blastCover.value.timing.description": "Put the cover up before the anchor is charged, or only before it goes off.",
+  "liquidbounce.module.blastCover.value.minDamage.description": "Cover only blasts that would hurt you at least this much.",
+  "liquidbounce.module.blastCover.value.maxDamage.description": "Skip blasts that would hurt you more than this, cover or not.",
+  "liquidbounce.module.blastCover.value.limit.description": "Most covers per anchor, 0 for no limit.",
+  "liquidbounce.module.blastCover.value.reach.description": "How far away a cover may go.",
+  "liquidbounce.module.blastCover.value.timeout.description": "How long a detonation waits for its cover."
 }
