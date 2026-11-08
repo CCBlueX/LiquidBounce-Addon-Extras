@@ -253,5 +253,18 @@
   "liquidbounce.module.crystalMacro.value.range.description": "How far you reach.",
   "liquidbounce.module.crystalMacro.value.slotResetDelay.description": "How long the crystal or obsidian stays selected after a click.",
   "liquidbounce.module.crystalMacro.value.swing.description": "Who sees your hand swing.",
-  "liquidbounce.module.crystalMacro.value.rotationMode.description": "How to aim at the block and the crystal."
+  "liquidbounce.module.crystalMacro.value.rotationMode.description": "How to aim at the block and the crystal.",
+
+  "liquidbounce.module.bucketSteal.description": "Scoops water and lava next to your enemy with an empty bucket, or plugs it with a cobweb.",
+  "liquidbounce.module.bucketSteal.value.water.description": "Take water.",
+  "liquidbounce.module.bucketSteal.value.lava.description": "Take lava.",
+  "liquidbounce.module.bucketSteal.value.radius.description": "How close to the enemy a source has to be.",
+  "liquidbounce.module.bucketSteal.value.enemyRange.description": "How close an enemy has to be.",
+  "liquidbounce.module.bucketSteal.value.range.description": "How far you reach.",
+  "liquidbounce.module.bucketSteal.value.cobwebs.description": "Plug the source with a cobweb when you have no empty bucket.",
+  "liquidbounce.module.bucketSteal.value.onWeb.description": "Only take sources next to a cobweb.",
+  "liquidbounce.module.bucketSteal.value.delay.description": "Pause after each source, picked at random.",
+  "liquidbounce.module.bucketSteal.value.slotResetDelay.description": "How long the bucket or cobweb stays selected after a click.",
+  "liquidbounce.module.bucketSteal.value.swing.description": "Who sees your hand swing.",
+  "liquidbounce.module.bucketSteal.value.rotationMode.description": "Aim on your own, or with None only take what your crosshair is on."
 }

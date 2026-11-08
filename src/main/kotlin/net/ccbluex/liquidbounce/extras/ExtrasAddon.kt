@@ -25,6 +25,7 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorAura
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
@@ -62,6 +63,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleLightOverlay,
             ModuleWaypoints,
             ModuleCrystalMacro,
+            ModuleBucketSteal,
             ModuleMessageAura.INSTANCE,
             ModulePacketCanceller,
             ModuleIntruderAlert,
