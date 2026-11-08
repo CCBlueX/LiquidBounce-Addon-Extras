@@ -442,5 +442,8 @@
   "liquidbounce.module.macePrediction.value.walkTicks.description": "How far ahead to follow a walking enemy.",
   "liquidbounce.module.macePrediction.value.marker.description": "Draw the end marker filled, outlined or both.",
   "liquidbounce.module.macePrediction.value.pathColor.description": "Color of the path and the landing marker.",
-  "liquidbounce.module.macePrediction.value.ringColor.description": "Color of the reach ring."
+  "liquidbounce.module.macePrediction.value.ringColor.description": "Color of the reach ring.",
+  "liquidbounce.module.pearlLaunch.description": "Throws a pearl where you look and a wind charge at your feet the moment it lands you.",
+  "liquidbounce.module.pearlLaunch.value.jump.description": "Jump right after the wind charge, so both lift you.",
+  "liquidbounce.module.pearlLaunch.messages.missing": "Needs ender pearls and wind charges in the hotbar or offhand."
 }
