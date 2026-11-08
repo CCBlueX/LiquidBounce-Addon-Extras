@@ -43,6 +43,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.SwingRedirectGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.HitFlickGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.CrossbowLoaderGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.ShieldSwapGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

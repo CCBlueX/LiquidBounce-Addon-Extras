@@ -222,5 +222,8 @@
   "liquidbounce.module.crossbowLoader.description": "Loads a crossbow from the hotbar or inventory, then switches itself off.",
   "liquidbounce.module.crossbowLoader.value.keepInHand.description": "Hold the loaded crossbow so the next click fires it; back to the old slot after the shot.",
   "liquidbounce.module.crossbowLoader.messages.noCrossbow": "There is no unloaded crossbow in your inventory.",
-  "liquidbounce.module.crossbowLoader.messages.noAmmo": "There is nothing to load the crossbow with."
+  "liquidbounce.module.crossbowLoader.messages.noAmmo": "There is nothing to load the crossbow with.",
+
+  "liquidbounce.module.shieldSwap.description": "Blocks with a shield from the hotbar or inventory while enabled, best on a key.",
+  "liquidbounce.module.shieldSwap.messages.noShield": "There is no shield in your inventory."
 }

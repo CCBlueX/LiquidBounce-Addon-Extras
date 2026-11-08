@@ -17,8 +17,10 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
+import net.ccbluex.liquidbounce.utils.input.InputBind
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
@@ -156,6 +158,36 @@ class CrossbowLoaderGameTest : PaperGameTest({
     check(client { it.player!!.inventory.selectedSlot == 3 }) { "the slot changed back after putting it away" }
 })
 
+class ShieldSwapGameTest : PaperGameTest({
+    standIn(origin.south(2))
+    run("item replace entity $playerName hotbar.0 with minecraft:stone_sword")
+    run("item replace entity $playerName container.20 with minecraft:shield")
+    awaitClient("the shield") { it.player!!.inventory.getItem(20).`is`(Items.SHIELD) }
+    val key = InputConstants.KEY_V
+    client { ModuleShieldSwap.bindValue.set(InputBind(InputConstants.Type.KEYBOARD, key, InputBind.BindAction.TOGGLE)) }
+
+    input.pressKey(key)
+    awaitClient("the shield up") { it.player!!.isBlocking }
+    awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:1}]")
+    hitPlayer()
+    awaitServer("items entity $playerName hotbar.1 minecraft:shield[minecraft:damage~{damage:{min:1}}]")
+    awaitServer("entity @a[name=$playerName,nbt={Health:20.0f}]")
+
+    input.pressKey(key)
+    awaitClient("the shield down") { !it.player!!.isUsingItem && !ModuleShieldSwap.enabled }
+    check(client { ModuleShieldSwap.shield } == null) { "the shield slot survived disabling" }
+    awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:0}]")
+    hitPlayer()
+    awaitServer("entity @a[name=$playerName,nbt=!{Health:20.0f}]")
+
+    client { ModuleShieldSwap.bindValue.set(InputBind(InputConstants.Type.KEYBOARD, key, InputBind.BindAction.HOLD)) }
+    input.holdKey(key)
+    awaitClient("the shield up while held") { it.player!!.isBlocking }
+    input.releaseKey(key)
+    awaitClient("the shield down on release") { !it.player!!.isUsingItem && !ModuleShieldSwap.enabled }
+    awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:0}]")
+})
+
 private const val STAND_IN = "standin"
 
 /**
@@ -172,6 +204,10 @@ private fun GameTestScope.standIn(pos: BlockPos) {
 }
 
 private fun Minecraft.standIn() = level!!.entitiesForRendering().firstOrNull { it is Husk } as Husk?
+
+/** A blockable hit from the stand-in, which the player faces; easy difficulty makes 4 of it. */
+private fun GameTestScope.hitPlayer() =
+    run("damage $playerName 6 minecraft:mob_attack by @e[tag=$STAND_IN,limit=1]")
 
 /** Yaws of the movement packets sent while it is open. */
 private class SentYaws : EventListener, AutoCloseable {
