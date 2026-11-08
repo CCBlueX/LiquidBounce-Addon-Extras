@@ -354,5 +354,13 @@
   "liquidbounce.module.cartBomb.value.overload.value.key.description": "Press to overload the block you look at.",
   "liquidbounce.module.cartBomb.value.overload.value.carts.description": "TNT minecarts to put down.",
   "liquidbounce.module.cartBomb.value.overload.value.delay.description": "Time between two carts.",
-  "liquidbounce.module.cartBomb.value.overload.value.hotbarOnly.description": "Only use carts from the hotbar instead of taking more from the inventory."
+  "liquidbounce.module.cartBomb.value.overload.value.hotbarOnly.description": "Only use carts from the hotbar instead of taking more from the inventory.",
+
+  "liquidbounce.module.pearlCart.description": "Lays a TNT minecart where an enemy's ender pearl comes down and shoots it as they arrive.",
+  "liquidbounce.module.pearlCart.value.range.description": "How close to you the pearl has to land.",
+  "liquidbounce.module.pearlCart.value.carts.description": "TNT minecarts to stack on the rail.",
+  "liquidbounce.module.pearlCart.value.charge.description": "Shortest draw of the bow.",
+  "liquidbounce.module.pearlCart.value.delay.description": "How long after the arrival the arrow should hit.",
+  "liquidbounce.module.pearlCart.value.minEnemyDamage.description": "Least damage the blast has to deal to the thrower where they arrive.",
+  "liquidbounce.module.pearlCart.value.maxSelfDamage.description": "Most damage the blast may deal to you."
 }

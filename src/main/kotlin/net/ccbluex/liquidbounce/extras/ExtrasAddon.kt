@@ -35,6 +35,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitHold
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
@@ -90,6 +91,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleNoItemBounce,
             ModuleOreSimulation,
             ModuleCartBomb,
+            ModulePearlCart,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)

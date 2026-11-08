@@ -13,15 +13,19 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.monster.zombie.Zombie
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl
+import net.minecraft.world.entity.vehicle.minecart.MinecartTNT
 import net.minecraft.world.item.Items
 import net.minecraft.world.phys.Vec3
 
 private const val STAND_IN = "standin"
 private const val FLAME_BOW = "minecraft:bow[enchantments={'minecraft:flame':1}]"
 private const val INVENTORY_0 = 9
+private val ARMOR = mapOf("head" to "helmet", "chest" to "chestplate", "legs" to "leggings", "feet" to "boots")
 
 class CartBombGameTest : PaperGameTest({
     arena()
@@ -121,6 +125,56 @@ class CartBombGameTest : PaperGameTest({
     awaitStandInHurt()
     disable(module)
     check(client { module.shotRail == null }) { "the predicted landing survived disabling" }
+})
+
+class PearlCartGameTest : PaperGameTest({
+    arena()
+    kit(FLAME_BOW)
+    // Far enough that a blast at the landing spot cannot reach it there
+    summon("minecraft:zombie", origin.south(40), standInNbt(",UUID:[I;1,2,3,4]"))
+    awaitClient("the thrower") { minecraft -> minecraft.level!!.entitiesForRendering().any { it is Zombie } }
+    enable(ModulePearlCart)
+
+    // A blast that netherite keeps below 40 for it, then one that would hurt us at all: no cart for either
+    for (piece in listOf("head", "chest", "legs", "feet")) {
+        run("item replace entity @e[tag=$STAND_IN] armor.$piece with minecraft:netherite_${ARMOR[piece]}")
+    }
+    run("effect clear $playerName minecraft:resistance")
+    for ((name, value) in listOf("MinEnemyDamage" to 40f, "MaxSelfDamage" to 0f)) {
+        client {
+            ModulePearlCart.setting<Float>("MinEnemyDamage").set(0f)
+            ModulePearlCart.setting<Float>("MaxSelfDamage").set(40f)
+            ModulePearlCart.setting<Float>(name).set(value)
+        }
+        // The effect packets first
+        ticks(5)
+        summon("minecraft:ender_pearl", origin.south(4).above(10), "{Owner:[I;1,2,3,4],Motion:[0.0d,0.2d,0.0d]}")
+        awaitClient("the pearl") { minecraft ->
+            minecraft.level!!.entitiesForRendering().any { it is ThrownEnderpearl }
+        }
+        awaitAnswer("execute unless entity @e[type=minecraft:ender_pearl]", "Test passed", 100)
+        ticks(20)
+        awaitCarts(3)
+        run("tp @e[tag=$STAND_IN] 0 -60 40")
+        run("data merge entity @e[tag=$STAND_IN,limit=1] {Health:1000f}")
+    }
+    run("effect give $playerName minecraft:resistance infinite 4 true")
+    for (piece in listOf("chest", "legs", "feet")) {
+        run("item replace entity @e[tag=$STAND_IN] armor.$piece with minecraft:air")
+    }
+    run("item replace entity @e[tag=$STAND_IN] armor.head with minecraft:iron_helmet")
+    client {
+        ModulePearlCart.setting<Float>("MinEnemyDamage").set(0f)
+        ModulePearlCart.setting<Float>("MaxSelfDamage").set(40f)
+    }
+
+    summon("minecraft:ender_pearl", origin.south(4).above(10), "{Owner:[I;1,2,3,4],Motion:[0.0d,0.2d,0.0d]}")
+    // Only a blast at the landing spot reaches it, and it keeps the place the pearl took it to
+    awaitStandInHurt()
+    awaitServer("entity @e[tag=$STAND_IN,x=0,y=-60,z=0,distance=..20]")
+    awaitCarts(2)
+    disable(ModulePearlCart)
+    check(client { ModulePearlCart.pearls.isEmpty() }) { "met pearls survived disabling" }
 })
 
 /** Monsters need more than peaceful; resistance keeps us out of our own blasts, obsidian keeps the floor. */
