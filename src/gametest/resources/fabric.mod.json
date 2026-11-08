@@ -60,6 +60,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.CartCoverGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.CartKitHudGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.BreachSwapGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.ShieldDrainGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

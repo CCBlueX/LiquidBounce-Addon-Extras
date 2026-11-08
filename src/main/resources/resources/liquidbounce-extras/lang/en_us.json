@@ -379,5 +379,13 @@
   "liquidbounce.module.cartCover.value.maxBlocks.description": "Most blocks to place against one cart.",
 
   "liquidbounce.module.breachSwap.description": "Now and then swings your Breach mace instead of your sword.",
-  "liquidbounce.module.breachSwap.value.chance.description": "How many sword hits become mace hits."
+  "liquidbounce.module.breachSwap.value.chance.description": "How many sword hits become mace hits.",
+
+  "liquidbounce.module.shieldDrain.description": "Hits an enemy who holds up a shield several times a tick.",
+  "liquidbounce.module.shieldDrain.value.range.description": "How close the enemy has to be.",
+  "liquidbounce.module.shieldDrain.value.hits.description": "Hits per tick.",
+  "liquidbounce.module.shieldDrain.value.mace.description": "Hit with a mace from the hotbar.",
+  "liquidbounce.module.shieldDrain.value.minFall.description": "Only drain once you have fallen this far.",
+  "liquidbounce.module.shieldDrain.value.pauseOnGround.description": "Only drain while you are in the air.",
+  "liquidbounce.module.shieldDrain.value.crosshairOnly.description": "Only drain the enemy under your crosshair."
 }
