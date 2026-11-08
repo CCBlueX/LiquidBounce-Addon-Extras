@@ -30,6 +30,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBreaker
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
@@ -40,6 +41,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleTotemSwitch
+import net.ccbluex.liquidbounce.extras.modules.pvp.OwnCarts
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleNoItemBounce
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
@@ -92,11 +94,13 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleOreSimulation,
             ModuleCartBomb,
             ModulePearlCart,
+            ModuleCartBreaker,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
         registerCommand(CommandFindings)
         registerListeners(ClickCounter, WorldJournal)
+        registerListeners(OwnCarts)
         // The client does not persist native HUD components, so their settings live in the add-on's config
         config("extras-hud", extrasHudComponents.toMutableList())
     }

@@ -13,7 +13,9 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBreaker
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
+import net.ccbluex.liquidbounce.extras.modules.pvp.OwnCarts
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.monster.zombie.Zombie
@@ -175,6 +177,36 @@ class PearlCartGameTest : PaperGameTest({
     awaitCarts(2)
     disable(ModulePearlCart)
     check(client { ModulePearlCart.pearls.isEmpty() }) { "met pearls survived disabling" }
+})
+
+class CartBreakerGameTest : PaperGameTest({
+    run("item replace entity $playerName hotbar.0 with minecraft:tnt_minecart")
+    run("item replace entity $playerName hotbar.4 with minecraft:iron_sword")
+    val own = origin.south(2)
+    setBlock(own, "minecraft:rail")
+    awaitClient("the rail and the cart") { minecraft ->
+        minecraft.level!!.getBlockState(own).`is`(net.minecraft.world.level.block.Blocks.RAIL) &&
+            minecraft.player!!.inventory.getItem(0).`is`(Items.TNT_MINECART)
+    }
+    lookAt(Vec3(0.5, own.y + 0.05, own.z + 0.5))
+    input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    awaitServer("entity @e[type=minecraft:tnt_minecart]")
+    awaitClient("the cart to count as ours") { OwnCarts.ids.size == 1 }
+
+    enable(ModuleCartBreaker)
+    ticks(60)
+    awaitServer("entity @e[type=minecraft:tnt_minecart]")
+
+    // Someone else's behind us is out of view, the one ahead is not
+    summon("minecraft:tnt_minecart", origin.north(2))
+    ticks(60)
+    awaitAnswer("execute if entity @e[type=minecraft:tnt_minecart]", "Count: 2")
+    summon("minecraft:tnt_minecart", origin.south(2).east(2))
+    awaitClient("the breaker to pick the cart") { ModuleCartBreaker.target != null }
+    awaitServer("entity @e[type=minecraft:item,nbt={Item:{id:'minecraft:tnt_minecart'}}]")
+    awaitAnswer("execute if entity @e[type=minecraft:tnt_minecart]", "Count: 2")
+    disable(ModuleCartBreaker)
+    check(client { ModuleCartBreaker.target == null }) { "the target survived disabling" }
 })
 
 /** Monsters need more than peaceful; resistance keeps us out of our own blasts, obsidian keeps the floor. */
