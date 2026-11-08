@@ -43,6 +43,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMaceAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMacePrediction
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlHop
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlLaunch
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldGuard
@@ -115,6 +116,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleMacePrediction,
             ModulePearlLaunch,
             ModuleWindGlide,
+            ModulePearlHop,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)

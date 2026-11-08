@@ -66,8 +66,8 @@ object ModulePearlLaunch : ClientModule("PearlLaunch", ExtrasCategories.PVP, dis
             val down = Rotation(player.yRot, FEET_PITCH)
             val charge = hotbarSlotOf(Items.WIND_CHARGE)
             if (teleported && charge != null && throwFrom(charge) { rotations.toRotationTarget(down) } && jump) {
-                // A tick later the jump and the burst below add up, as the client's AutoWindCharge times it
-                waitTicks(1)
+                // The throw returns a tick later, when the jump and the burst below add up, as the client's
+                // AutoWindCharge times it
                 jumping = true
                 waitTicks(1)
                 jumping = false

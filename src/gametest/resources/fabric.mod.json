@@ -68,6 +68,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.MacePredictionGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.PearlLaunchGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.WindGlideGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.PearlHopGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

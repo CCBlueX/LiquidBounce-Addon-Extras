@@ -450,5 +450,14 @@
   "liquidbounce.module.windGlide.value.height.description": "How close the ground may come.",
   "liquidbounce.module.windGlide.value.speedFactor.description": "Lowers that height by your speed, which carries you further.",
   "liquidbounce.module.windGlide.value.pitch.description": "How steeply the wind charge is thrown down, picked anew for each throw.",
-  "liquidbounce.module.windGlide.messages.noElytra": "Needs an elytra in the hotbar or offhand."
+  "liquidbounce.module.windGlide.messages.noElytra": "Needs an elytra in the hotbar or offhand.",
+  "liquidbounce.module.pearlHop.description": "Throws a pearl at your feet for a short hop, once or whenever you are hit.",
+  "liquidbounce.module.pearlHop.value.mode.description": "Legit switches and looks down visibly, Silent changes neither your slot nor your view.",
+  "liquidbounce.module.pearlHop.value.pitch.description": "How steeply the pearl is thrown.",
+  "liquidbounce.module.pearlHop.value.delay.description": "Pause between the steps.",
+  "liquidbounce.module.pearlHop.value.turnSpeed.description": "How fast Legit turns your view, per tick.",
+  "liquidbounce.module.pearlHop.value.auto.description": "Stay on and hop each time you are hit.",
+  "liquidbounce.module.pearlHop.value.auto.value.delay.description": "Wait after the hit.",
+  "liquidbounce.module.pearlHop.value.auto.value.trigger.description": "PlayerMelee hops only when a player hits you in melee, Any on every hit that has a source, such as mobs, arrows and explosions.",
+  "liquidbounce.module.pearlHop.messages.missing": "Needs ender pearls in the hotbar or offhand."
 }
