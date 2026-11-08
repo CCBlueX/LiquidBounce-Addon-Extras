@@ -217,5 +217,10 @@
   "liquidbounce.module.hitFlick.value.direction.description": "Which way to turn away.",
   "liquidbounce.module.hitFlick.value.requireSprint.description": "Only flick hits made while sprinting.",
   "liquidbounce.module.hitFlick.value.playersOnly.description": "Only flick hits on players.",
-  "liquidbounce.module.hitFlick.value.jitter.description": "Random offset added to the turn away and to the turn back."
+  "liquidbounce.module.hitFlick.value.jitter.description": "Random offset added to the turn away and to the turn back.",
+
+  "liquidbounce.module.crossbowLoader.description": "Loads a crossbow from the hotbar or inventory, then switches itself off.",
+  "liquidbounce.module.crossbowLoader.value.keepInHand.description": "Hold the loaded crossbow so the next click fires it; back to the old slot after the shot.",
+  "liquidbounce.module.crossbowLoader.messages.noCrossbow": "There is no unloaded crossbow in your inventory.",
+  "liquidbounce.module.crossbowLoader.messages.noAmmo": "There is nothing to load the crossbow with."
 }

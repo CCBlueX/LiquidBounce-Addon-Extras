@@ -7,12 +7,15 @@ import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
 import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
+import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
@@ -21,6 +24,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.monster.zombie.Husk
+import net.minecraft.world.item.Items
 import java.util.Collections
 import kotlin.math.abs
 
@@ -105,6 +109,52 @@ private fun GameTestScope.hitStandIn(health: Float, sent: SentYaws): Float {
     awaitClient("the flick over") { ModuleHitFlick.flicking == null }
     return synchronized(sent.yaws) { sent.yaws.map { Mth.wrapDegrees(it) } }.maxByOrNull { abs(it) } ?: 0f
 }
+
+class CrossbowLoaderGameTest : PaperGameTest({
+    run("item replace entity $playerName hotbar.0 with minecraft:stone_sword")
+    run("item replace entity $playerName container.20 with minecraft:crossbow")
+    awaitClient("the crossbow") { it.player!!.inventory.getItem(20).`is`(Items.CROSSBOW) }
+
+    // Nothing to load it with
+    enable(ModuleCrossbowLoader)
+    awaitClient("the complaint") { it.chatContains("nothing to load") && !ModuleCrossbowLoader.enabled }
+    awaitServer("items entity $playerName container.20 minecraft:crossbow")
+
+    run("item replace entity $playerName container.21 with minecraft:arrow 8")
+    awaitClient("the arrows") { it.player!!.inventory.getItem(21).`is`(Items.ARROW) }
+    enable(ModuleCrossbowLoader)
+    awaitClient("the loader done", timeout = 200) { !ModuleCrossbowLoader.enabled }
+    awaitAnswer("data get entity $playerName Inventory", "charged_projectiles")
+    awaitServer("items entity $playerName container.21 minecraft:arrow[count=7]")
+    awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:0}]")
+    check(client { !it.player!!.isUsingItem }) { "still using the crossbow" }
+
+    // KeepInHand: the loaded crossbow stays in hand for the next click, then the sword comes back
+    client { ModuleCrossbowLoader.setting<Boolean>("KeepInHand").set(true) }
+    run("item replace entity $playerName hotbar.2 with minecraft:crossbow")
+    awaitClient("the second crossbow") { it.player!!.inventory.getItem(2).`is`(Items.CROSSBOW) }
+    enable(ModuleCrossbowLoader)
+    awaitServer("items entity $playerName container.21 minecraft:arrow[count=6]", timeout = 200)
+    awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:2}]")
+    awaitClient("the loaded crossbow in hand") {
+        it.player!!.inventory.selectedSlot == 2 && !it.player!!.isUsingItem && ModuleCrossbowLoader.enabled
+    }
+    input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    awaitServer("entity @e[type=minecraft:arrow]")
+    awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:0}]")
+    awaitClient("the loader done") { !ModuleCrossbowLoader.enabled }
+
+    // Put away by hand: the other slot stays
+    enable(ModuleCrossbowLoader)
+    awaitServer("items entity $playerName container.21 minecraft:arrow[count=5]", timeout = 200)
+    awaitClient("the loaded crossbow in hand") {
+        it.player!!.inventory.selectedSlot == 2 && !it.player!!.isUsingItem && ModuleCrossbowLoader.enabled
+    }
+    input.pressKey { it.keyHotbarSlots[3] }
+    awaitClient("the loader done") { !ModuleCrossbowLoader.enabled }
+    awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:3}]")
+    check(client { it.player!!.inventory.selectedSlot == 3 }) { "the slot changed back after putting it away" }
+})
 
 private const val STAND_IN = "standin"
 
