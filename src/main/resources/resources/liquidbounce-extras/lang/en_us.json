@@ -288,6 +288,17 @@
   "liquidbounce.module.totemSwitch.value.lowHealth.description": "Health from which sword hits count.",
   "liquidbounce.module.totemSwitch.value.pearl.description": "Hold the totem while your own ender pearl is in the air.",
   "liquidbounce.module.totemSwitch.value.returnDelay.description": "How long it has to be safe before your slot comes back.",
+  "liquidbounce.module.antiTrap.description": "Keeps bait entities near you out of your world and refuses sign editors you did not open.",
+  "liquidbounce.module.antiTrap.value.range.description": "How near an entity has to be to be kept out.",
+  "liquidbounce.module.antiTrap.value.armorStands.description": "Keep out armor stands.",
+  "liquidbounce.module.antiTrap.value.minecarts.description": "Keep out minecarts of every kind.",
+  "liquidbounce.module.antiTrap.value.itemFrames.description": "Keep out item frames and glow item frames.",
+  "liquidbounce.module.antiTrap.value.boats.description": "Keep out boats and rafts, with or without a chest.",
+  "liquidbounce.module.antiTrap.value.endCrystals.description": "Keep out end crystals.",
+  "liquidbounce.module.antiTrap.value.removeLoaded.description": "Also remove the ones already there.",
+  "liquidbounce.module.antiTrap.value.refuseSignEditors.description": "Refuse a sign editor the server opens without you placing or clicking that sign, and close one already open.",
+  "liquidbounce.module.antiTrap.messages.refusedEditor": "Refused the sign editor the server opened at %s.",
+  "liquidbounce.module.antiTrap.messages.closedEditor": "Closed the sign editor at %s you did not open.",
 
   "liquidbounce.module.noItemBounce.description": "Stops hotbar items from bouncing when they change."
 }

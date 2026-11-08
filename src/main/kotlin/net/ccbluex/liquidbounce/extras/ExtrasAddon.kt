@@ -13,6 +13,8 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSoundLocator
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
+import net.ccbluex.liquidbounce.extras.modules.extras.ModuleAntiTrap
+import net.ccbluex.liquidbounce.extras.modules.extras.ModuleDisguise
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleIntruderAlert
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleMessageAura
 import net.ccbluex.liquidbounce.extras.modules.extras.ModulePacketCanceller
@@ -81,6 +83,8 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleCrossbowLoader,
             ModuleShieldSwap,
             ModuleShieldGuard,
+            ModuleAntiTrap,
+            ModuleDisguise,
             ModuleNoItemBounce,
         )
         registerCommand(CommandWhere.INSTANCE)

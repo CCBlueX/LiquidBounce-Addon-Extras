@@ -5,6 +5,10 @@ import ac.grim.grimac.api.event.events.FlagEvent;
 import ac.grim.grimac.api.event.events.GrimPlayerSetbackEvent;
 import io.papermc.paper.event.player.PlayerFailMoveEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -54,6 +58,23 @@ public final class ExtrasProbe extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         report("QUIT", event.getPlayer().getName(), event.getReason());
+    }
+
+    /** `opensign <player> <x> <y> <z>`: opens a sign's editor out of the blue, the way trap plugins do. */
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        var player = args.length == 4 ? getServer().getPlayerExact(args[0]) : null;
+        if (player == null) {
+            return false;
+        }
+        var block = player.getWorld().getBlockAt(
+            Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+        if (!(block.getState() instanceof Sign sign)) {
+            return false;
+        }
+        player.openSign(sign, Side.FRONT);
+        report("OPENSIGN", player.getName(), args[1], args[2], args[3]);
+        return true;
     }
 
     private void report(Object... fields) {

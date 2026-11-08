@@ -50,6 +50,8 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.BucketStealGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.MisplayGuardGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.TotemSwitchGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.AntiTrapGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.DisguiseGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.NoItemBounceGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.ClockGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
