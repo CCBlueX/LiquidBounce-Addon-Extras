@@ -368,5 +368,13 @@
   "liquidbounce.module.cartBreaker.value.range.description": "How close a cart has to be.",
   "liquidbounce.module.cartBreaker.value.fOV.description": "How far off your view a cart may be.",
   "liquidbounce.module.cartBreaker.value.reaction.description": "Wait after spotting a cart.",
-  "liquidbounce.module.cartBreaker.value.switchToSword.description": "Hit with a sword from the hotbar."
+  "liquidbounce.module.cartBreaker.value.switchToSword.description": "Hit with a sword from the hotbar.",
+
+  "liquidbounce.module.cartCover.description": "Places blocks between you and a lit TNT minecart until it can no longer hurt you much.",
+  "liquidbounce.module.cartCover.value.triggerDamage.description": "Predicted damage from which to start covering.",
+  "liquidbounce.module.cartCover.value.safeDamage.description": "Keep placing until the prediction is below this.",
+  "liquidbounce.module.cartCover.value.blocks.description": "Blocks to cover with.",
+  "liquidbounce.module.cartCover.value.unlit.description": "Also cover against carts that are not lit yet, except your own.",
+  "liquidbounce.module.cartCover.value.protect.description": "Whose carts to cover against: your own, others' or both.",
+  "liquidbounce.module.cartCover.value.maxBlocks.description": "Most blocks to place against one cart."
 }

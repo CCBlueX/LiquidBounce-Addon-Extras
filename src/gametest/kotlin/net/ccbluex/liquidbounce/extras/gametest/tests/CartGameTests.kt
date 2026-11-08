@@ -9,11 +9,14 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
 import net.ccbluex.liquidbounce.extras.gametest.harness.fill
+import net.ccbluex.liquidbounce.extras.gametest.harness.query
+import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBreaker
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartCover
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
 import net.ccbluex.liquidbounce.extras.modules.pvp.OwnCarts
 import net.ccbluex.liquidbounce.utils.aiming.data.Rotation
@@ -207,6 +210,51 @@ class CartBreakerGameTest : PaperGameTest({
     awaitAnswer("execute if entity @e[type=minecraft:tnt_minecart]", "Count: 2")
     disable(ModuleCartBreaker)
     check(client { ModuleCartBreaker.target == null }) { "the target survived disabling" }
+})
+
+class CartCoverGameTest : PaperGameTest({
+    run("difficulty normal")
+    fill(origin.offset(-6, -1, -6), origin.offset(6, -1, 8), "minecraft:obsidian")
+    run("item replace entity $playerName hotbar.2 with minecraft:cobblestone 16")
+    val rail = origin.south(4)
+    setBlock(rail, "minecraft:activator_rail")
+    summon("minecraft:tnt_minecart", rail)
+    awaitClient("the cart") { minecraft -> minecraft.level!!.entitiesForRendering().any { it is MinecartTNT } }
+    enable(ModuleCartCover)
+
+    // Unlit, so nothing to fear
+    ticks(40)
+    awaitServer("items entity $playerName hotbar.2 minecraft:cobblestone[count=16]")
+
+    // Powering the activator rail lights it; four blocks away its blast would kill. Someone else's cart is
+    // nothing to cover against while only our own count
+    client {
+        ModuleCartCover.setting<Any>("Protect").setByString("Own")
+        ModuleCartCover.setting<Int>("MaxBlocks").set(1)
+    }
+    setBlock(rail.below(), "minecraft:redstone_block")
+    awaitClient("the lit cart") { minecraft ->
+        minecraft.level!!.entitiesForRendering().any { it is MinecartTNT && it.isPrimed }
+    }
+    ticks(10)
+    awaitServer("items entity $playerName hotbar.2 minecraft:cobblestone[count=16]")
+    // Then one block against it, no more
+    client { ModuleCartCover.setting<Any>("Protect").setByString("Both") }
+    awaitServer("items entity $playerName hotbar.2 minecraft:cobblestone[count=15]")
+    ticks(10)
+    awaitServer("items entity $playerName hotbar.2 minecraft:cobblestone[count=15]")
+    client { ModuleCartCover.setting<Int>("MaxBlocks").set(26) }
+    awaitClient("the covered player") { ModuleCartCover.predictedDamage in 0.1f..4f }
+    input.lookAt(0f, 35f)
+    ticks(2)
+    screenshot("CartCover")
+    awaitAnswer("execute unless entity @e[type=minecraft:tnt_minecart]", "Test passed", 200)
+    ticks(20)
+    check(server.console.none { playerName in it.message && "blown up" in it.message }) { "the blast killed us" }
+    val health = query("data get entity $playerName Health", Regex("""([\d.]+)f""")).groupValues[1].toFloat()
+    check(health >= 15f) { "the blast took us down to $health" }
+    disable(ModuleCartCover)
+    check(client { ModuleCartCover.predictedDamage == 0f }) { "the prediction survived disabling" }
 })
 
 /** Monsters need more than peaceful; resistance keeps us out of our own blasts, obsidian keeps the floor. */

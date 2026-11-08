@@ -57,6 +57,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.CartBombGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.PearlCartGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.CartBreakerGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.CartCoverGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
   },

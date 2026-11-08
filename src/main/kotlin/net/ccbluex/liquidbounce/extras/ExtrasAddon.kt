@@ -31,6 +31,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBreaker
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartCover
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
@@ -95,6 +96,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleCartBomb,
             ModulePearlCart,
             ModuleCartBreaker,
+            ModuleCartCover,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
