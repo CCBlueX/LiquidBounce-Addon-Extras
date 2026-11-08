@@ -212,6 +212,10 @@
   "liquidbounce.module.swingRedirect.value.dotColor.description": "Colour of the mark.",
   "liquidbounce.module.swingRedirect.value.continuousTracking.description": "Keep the server-side rotation on the target the whole time, not only for the swing.",
 
+  "liquidbounce.module.hitHold.description": "Holds a swing at a target that cannot take it yet and lands it as soon as it can.",
+  "liquidbounce.module.hitHold.value.hurt.description": "Wait while the target is still hurt from the last hit.",
+  "liquidbounce.module.hitHold.value.airborne.description": "Wait while the target is in the air.",
+
   "liquidbounce.module.hitFlick.description": "Turns away for a tick before each hit, then back onto the target.",
   "liquidbounce.module.hitFlick.value.angle.description": "How far to turn away.",
   "liquidbounce.module.hitFlick.value.direction.description": "Which way to turn away.",

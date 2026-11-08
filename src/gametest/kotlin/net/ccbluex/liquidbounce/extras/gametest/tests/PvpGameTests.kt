@@ -17,6 +17,7 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitHold
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
@@ -62,6 +63,38 @@ class SwingRedirectGameTest : PaperGameTest({
 
     disable(ModuleSwingRedirect)
     check(client { ModuleSwingRedirect.aim } == null) { "the aim survived disabling" }
+})
+
+class HitHoldGameTest : PaperGameTest({
+    standIn(origin.south(2))
+    enable(ModuleHitHold)
+
+    // The second click comes while the stand-in is still hurt, where it would do nothing
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    awaitClient("the stand-in hurt") { it.standIn()!!.hurtTime > 0 }
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    awaitClient("the swing held") { ModuleHitHold.held != null }
+    awaitServer("entity @e[tag=$STAND_IN,nbt={Health:18.0f}]")
+    awaitClient("the swing landed") { ModuleHitHold.held == null }
+
+    // In the air for good: held for a second, then given up. A mob without AI never falls, and one summoned in
+    // the air never touched the ground, on either side
+    run("kill @e[tag=$STAND_IN]")
+    awaitClient("the stand-in gone") { it.standIn() == null }
+    summon("minecraft:husk", origin.south(2).above(), """{NoAI:1b,Silent:1b,Tags:["$STAND_IN"]}""")
+    awaitClient("the stand-in in the air") { it.standIn()?.onGround() == false }
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    awaitClient("the swing held") { ModuleHitHold.held != null }
+    awaitClient("the swing given up", timeout = 40) { ModuleHitHold.held == null }
+    ticks(10)
+    awaitServer("entity @e[tag=$STAND_IN,nbt={Health:20.0f}]")
+
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    awaitClient("the swing held") { ModuleHitHold.held != null }
+    disable(ModuleHitHold)
+    check(client { ModuleHitHold.held } == null) { "the held swing survived disabling" }
+    ticks(30)
+    awaitServer("entity @e[tag=$STAND_IN,nbt={Health:20.0f}]")
 })
 
 class HitFlickGameTest : PaperGameTest({

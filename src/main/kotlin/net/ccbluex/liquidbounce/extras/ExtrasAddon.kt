@@ -27,6 +27,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitHold
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
@@ -65,6 +66,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleAnchorAura,
             ModuleAnchorMacro,
             ModuleSwingRedirect,
+            ModuleHitHold,
             ModuleHitFlick,
             ModuleCrossbowLoader,
             ModuleShieldSwap,
