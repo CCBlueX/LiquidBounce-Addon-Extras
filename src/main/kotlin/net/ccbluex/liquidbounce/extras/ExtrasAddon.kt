@@ -24,10 +24,12 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoShearer
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSign
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
+import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleOreSimulation
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorAura
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
@@ -86,6 +88,8 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleAntiTrap,
             ModuleDisguise,
             ModuleNoItemBounce,
+            ModuleOreSimulation,
+            ModuleCartBomb,
         )
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
