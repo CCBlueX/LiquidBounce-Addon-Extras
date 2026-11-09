@@ -15,7 +15,7 @@ import net.ccbluex.liquidbounce.utils.aiming.NormalRotationMode
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.utils.raytraceBox
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
-import net.ccbluex.liquidbounce.utils.entity.interactEntity
+import net.ccbluex.liquidbounce.utils.entity.interactEntityLikeVanilla
 import net.ccbluex.liquidbounce.utils.inventory.Slots
 import net.ccbluex.liquidbounce.utils.raytracing.isLookingAtEntity
 import net.minecraft.core.BlockPos
@@ -34,6 +34,10 @@ import kotlin.math.min
 object ModuleAutoBreed : ClientModule("AutoBreed", ExtrasCategories.GRINDING) {
 
     private const val AIM_TIMEOUT = 20
+
+    // The rotation that reaches the server is snapped to the mouse sensitivity. Aiming at the edge of the hitbox
+    // would make it miss, so the aim stays this far inside.
+    private const val AIM_MARGIN = 0.1
 
     // How far the breed goal looks for a partner
     private const val PARTNER_RANGE = 8.0
@@ -70,7 +74,7 @@ object ModuleAutoBreed : ClientModule("AutoBreed", ExtrasCategories.GRINDING) {
         val (animal, food) = nearby.asSequence()
             .filter { it.uuid !in skipped && hasPartner(it, nearby) }
             .sortedBy { it.distanceToSqr(player) }
-            .filter { raytraceBox(player.eyePosition, it.boundingBox, reach, 0.0) != null }
+            .filter { aimAt(it, reach) != null }
             .firstNotNullOfOrNull { animal ->
                 Slots.OffhandWithHotbar.findSlot { BreedingRules.isFood(animal, it) }?.let { animal to it }
             } ?: return@tickHandler
@@ -80,14 +84,14 @@ object ModuleAutoBreed : ClientModule("AutoBreed", ExtrasCategories.GRINDING) {
             if (animal.uuid in skipped) {
                 return@tickConditional true
             }
-            val (rotation, _) = raytraceBox(player.eyePosition, animal.boundingBox, reach, 0.0)
-                ?: return@tickConditional true
+            val (rotation, _) = aimAt(animal, reach) ?: return@tickConditional true
             rotationMode.activeMode.rotate(rotation, isFinished = { aimedAt(animal, reach) != null }) {
                 val hit = aimedAt(animal, reach) ?: return@rotate
                 if (!food.isOffHand) {
                     SilentHotbar.selectSlotSilently(this@ModuleAutoBreed, food, delay + 1)
                 }
-                interactEntity(animal, hit, food.useHand)
+                // Like a click: the main hand first, which Grim expects even when only the offhand can feed
+                interactEntityLikeVanilla(animal, hit)
                 skip(animal.uuid, RETRY)
                 fed = true
             }
@@ -139,6 +143,9 @@ object ModuleAutoBreed : ClientModule("AutoBreed", ExtrasCategories.GRINDING) {
         return BlockPos.betweenClosed(pos.offset(-7, 0, -7), pos.offset(7, 2, 7))
             .any { world.getBlockState(it).`is`(Blocks.BAMBOO) }
     }
+
+    private fun aimAt(animal: Animal, reach: Double) =
+        raytraceBox(player.eyePosition, animal.boundingBox.deflate(AIM_MARGIN), reach, 0.0)
 
     private fun aimedAt(animal: Animal, reach: Double) = isLookingAtEntity(
         toEntity = animal,
