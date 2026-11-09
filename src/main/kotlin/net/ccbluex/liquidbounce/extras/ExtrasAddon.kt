@@ -38,6 +38,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitHold
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleInstantLunge
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMaceAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
@@ -100,6 +101,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModulePearlCart,
             ModuleCartBreaker,
             ModuleCartCover,
+            ModuleMaceAssist,
             ModuleBreachSwap,
             ModuleShieldDrain,
             ModuleInstantLunge,

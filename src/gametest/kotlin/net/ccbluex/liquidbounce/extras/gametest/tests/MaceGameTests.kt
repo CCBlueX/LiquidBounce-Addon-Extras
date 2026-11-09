@@ -13,16 +13,21 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.query
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
+import net.ccbluex.liquidbounce.extras.gametest.harness.teleport
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBreachSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleInstantLunge
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMaceAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.monster.zombie.Drowned
 import net.minecraft.world.entity.monster.zombie.Husk
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.EntityHitResult
 import com.mojang.blaze3d.platform.InputConstants
+import kotlin.math.abs
+import kotlin.math.max
 
 // A husk stands in for the enemy: hostile, so LiquidBounce's target settings pick it, and it does not burn
 private const val ENEMY = "{NoAI:1b,PersistenceRequired:1b,Silent:1b," +
@@ -30,6 +35,132 @@ private const val ENEMY = "{NoAI:1b,PersistenceRequired:1b,Silent:1b," +
 private const val FULL_HEALTH = 500f
 
 private const val BREACH_MACE = "minecraft:mace[enchantments={'minecraft:breach':4}]"
+private const val DENSITY_MACE = "minecraft:mace[enchantments={'minecraft:density':5}]"
+
+class MaceAssistGameTest : PaperGameTest({
+    run("gamerule minecraft:fall_damage false")
+    hotbar(0, "minecraft:iron_sword")
+    hotbar(1, BREACH_MACE)
+    hotbar(2, DENSITY_MACE)
+    hotbar(3, "minecraft:diamond_chestplate")
+    run("item replace entity $playerName armor.chest with minecraft:elytra")
+    summonEnemy(0.5, 1.5)
+    client {
+        ModuleMaceAssist.setting<Any>("AutoHit").setByString("Aim")
+        ModuleMaceAssist.setting<Float>("MinFall").set(2f)
+    }
+    enable(ModuleMaceAssist)
+
+    // Nobody below: the sword stays
+    teleport(origin.west(10).above(6))
+    awaitClient("the fall") { !it.player!!.onGround() }
+    awaitLanding()
+    awaitServer("items entity $playerName hotbar.1 minecraft:mace[damage=0]")
+    check(selectedSlot() == 0) { "the slot changed without an enemy below" }
+    travel(origin)
+
+    // A short fall takes the Breach mace
+    teleport(origin.above(6), pitch = 60f)
+    awaitServer("items entity $playerName hotbar.1 minecraft:mace[damage=1]")
+    awaitLanding()
+    check(health() < FULL_HEALTH) { "the smash did not land" }
+    awaitAnswer("data get entity $playerName SelectedItemSlot", "entity data: 0")
+
+    // A glide straight down: the chestplate goes on before the impact, then the Density mace hits
+    travel(origin)
+    val before = health()
+    teleport(origin.above(16), pitch = 90f)
+    awaitClient("the fall") { !it.player!!.onGround() && it.player!!.fallDistance > 1.0 }
+    input.holdKeyFor({ it.keyJump }, 2)
+    awaitClient("the glide") { it.player!!.isFallFlying }
+    awaitServer("items entity $playerName hotbar.2 minecraft:mace[damage=1]")
+    awaitServer("items entity $playerName armor.chest minecraft:diamond_chestplate")
+    awaitServer("items entity $playerName hotbar.3 minecraft:elytra")
+    awaitLanding()
+    check(health() < before) { "the dive did not land" }
+    awaitAnswer("data get entity $playerName SelectedItemSlot", "entity data: 0")
+
+    // Aim leaves an enemy behind a cobweb alone; the fall reports the chance a stun would get on the way
+    travel(origin)
+    val web = origin.south().above()
+    setBlock(web, "minecraft:cobweb")
+    awaitClient("the cobweb") { it.level!!.getBlockState(web).`is`(Blocks.COBWEB) }
+    client {
+        ModuleMaceAssist.StunSlam.setting<Int>("Chance").set(100)
+        ModuleMaceAssist.StunSlam.setting<Boolean>("ScaleWithFall").set(true)
+    }
+    val unhurt = health()
+    teleport(origin.above(6), pitch = 60f)
+    awaitClient("a chance that grows with the fall") {
+        val fallen = it.player!!.fallDistance
+        fallen > 1.0 && abs(ModuleMaceAssist.StunSlam.chanceNow - fallen.toFloat() / 8f * 100f) < 0.01f
+    }
+    awaitLanding()
+    ticks(5)
+    check(health() == unhurt) { "the mace swung through the cobweb" }
+    run("kill @e[type=minecraft:husk]")
+    setBlock(web, "minecraft:air")
+    client { ModuleMaceAssist.StunSlam.setting<Boolean>("ScaleWithFall").set(false) }
+
+    // StunSlam against a drowned with a raised trident. Paper lets the trident take no hit, but neither does it wear
+    // the weapon then; the stun shows in the slot sent before the hit and in what the smash still deals.
+    hotbar(4, IRON_AXE)
+    summonBlocker(0.5, 1.5)
+
+    // Chance, and the chance is nil: the mace smashes without the axe first
+    client {
+        ModuleMaceAssist.StunSlam.setting<Any>("Trigger").setByString("Chance")
+        ModuleMaceAssist.StunSlam.setting<Int>("Chance").set(0)
+    }
+    var health = health("drowned")
+    check(slam() == 0) { "the axe came out at a chance of 0" }
+    check(health - health("drowned") > SMASH) { "the mace did not smash" }
+
+    // Key, held, while ShieldDrain drains the same trident: the stun is left to it
+    client {
+        ModuleMaceAssist.StunSlam.setting<Any>("Trigger").setByString("Key")
+        ModuleMaceAssist.StunSlam.setting<InputConstants.Key>("Key")
+            .set(InputConstants.Type.KEYBOARD.getOrCreate(STUN_KEY))
+        ModuleShieldDrain.setting<Boolean>("CrosshairOnly").set(false)
+    }
+    input.holdKey(STUN_KEY)
+    enable(ModuleShieldDrain)
+    awaitClient("the drain") { ModuleShieldDrain.draining }
+    check(slam() == 0) { "the axe came out while ShieldDrain drained" }
+    disable(ModuleShieldDrain)
+
+    // Key, held: the axe goes first, every time the mace would hit the raised trident, so no smash gets through
+    awaitClient("the trident to be raised again", condition = raisedTrident)
+    ticks(20)
+    health = health("drowned")
+    check(slam() > 0) { "no axe with the key held" }
+    check(health - health("drowned") in 0f..SMASH) { "the mace smashed into the raised trident" }
+
+    // A cooldown lets the mace follow the axe, and keeps the next fall from another stun
+    client { ModuleMaceAssist.StunSlam.setting<Int>("Cooldown").set(5000) }
+    ticks(20)
+    health = health("drowned")
+    check(slam() > 0) { "no axe before the cooldown" }
+    check(health - health("drowned") > SMASH) { "the mace did not follow the axe" }
+    check(slam() == 0) { "a second stun within the cooldown" }
+
+    // AxeHold: the axe stays selected for its ticks before it swings
+    ticks(100)
+    client { ModuleMaceAssist.StunSlam.setting<Int>("AxeHold").set(2) }
+    val held = slam()
+    check(held >= 2) { "the axe was held for $held tick(s) only" }
+    input.releaseKey(STUN_KEY)
+    client {
+        ModuleMaceAssist.StunSlam.setting<Any>("Trigger").setByString("Always")
+        ModuleMaceAssist.StunSlam.setting<Int>("AxeHold").set(0)
+        ModuleMaceAssist.StunSlam.setting<Int>("Cooldown").set(0)
+    }
+
+    disable(ModuleMaceAssist)
+    check(client { ModuleMaceAssist.target == null && !SilentHotbar.isSlotModifiedBy(ModuleMaceAssist) }) {
+        "disabling left a target or a held mace"
+    }
+})
 
 class BreachSwapGameTest : PaperGameTest({
     hotbar(0, "minecraft:iron_sword")
@@ -147,9 +278,14 @@ private fun GameTestScope.summonEnemy(x: Double, z: Double) {
     awaitClient("the husk") { minecraft -> husks(minecraft).any { it.z == z } }
 }
 
+private fun GameTestScope.awaitLanding() = awaitClient("the landing", timeout = 400) { it.player!!.onGround() }
+
 private fun GameTestScope.health(type: String = "husk") =
     query("data get entity @e[type=minecraft:$type,limit=1] Health", Regex("entity data: ([\\d.]+)f"))
         .groupValues[1].toFloat()
+
+private fun GameTestScope.selectedSlot() =
+    query("data get entity $playerName SelectedItemSlot", Regex("entity data: (\\d+)")).groupValues[1].toInt()
 
 // A drowned keeps its trident raised for as long as it has a target, facing north at you. Paper lets no mob block,
 // so every hit lands and wears the weapon; the client still sees a raised shield and acts on it.
@@ -157,6 +293,12 @@ private const val BLOCKER = "{PersistenceRequired:1b,Silent:1b,Health:500f,Rotat
     "{id:'minecraft:max_health',base:500d},{id:'minecraft:movement_speed',base:0d}," +
     "{id:'minecraft:knockback_resistance',base:1d}],equipment:{mainhand:{id:'minecraft:trident',count:1," +
     "components:{'minecraft:blocks_attacks':{}}}}}"
+
+private const val IRON_AXE = "minecraft:iron_axe"
+
+// Less than a six block smash deals to the drowned
+private const val SMASH = 8f
+private const val STUN_KEY = InputConstants.KEY_NUMPAD9
 
 private fun GameTestScope.summonBlocker(x: Double, z: Double) {
     run("difficulty easy")
@@ -181,4 +323,22 @@ private fun GameTestScope.heldBack(why: String) {
     disable(ModuleShieldDrain)
     awaitServer("items entity $playerName hotbar.1 minecraft:mace[damage=0]")
     check(health("drowned") == FULL_HEALTH) { "drained $why" }
+}
+
+/** Falls onto the drowned and returns the longest run of ticks the axe was the slot sent to the server. */
+private fun GameTestScope.slam(): Int {
+    var run = 0
+    var longest = 0
+    teleport(origin.above(6), pitch = 60f)
+    awaitClient("the fall") { !it.player!!.onGround() }
+    var waited = 0
+    var landed = 0
+    // Ten more ticks after the landing: a held axe may still swing
+    while (landed < 10 && waited++ < 400) {
+        run = if (client { SilentHotbar.serversideSlot } == 4) run + 1 else 0
+        longest = max(longest, run)
+        if (client { it.player!!.onGround() }) landed++
+        ticks(1)
+    }
+    return longest
 }
