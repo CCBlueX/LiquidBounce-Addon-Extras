@@ -3,6 +3,7 @@ package net.ccbluex.liquidbounce.extras.gametest.tests
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.event.EventManager
+import net.ccbluex.liquidbounce.event.events.NotificationEvent
 import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
@@ -17,6 +18,8 @@ import net.ccbluex.liquidbounce.extras.hud.ClockHud
 import net.ccbluex.liquidbounce.extras.hud.FpsHud
 import net.ccbluex.liquidbounce.extras.hud.MetricHudComponent
 import net.ccbluex.liquidbounce.extras.hud.PingHud
+import net.ccbluex.liquidbounce.extras.hud.ResourcesHud
+import net.ccbluex.liquidbounce.extras.hud.ResourcesHud.Resource
 import net.ccbluex.liquidbounce.extras.hud.TpsHud
 import net.ccbluex.liquidbounce.extras.hud.SpeedometerHud
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
@@ -37,6 +40,7 @@ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import com.mojang.blaze3d.platform.InputConstants
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.util.Collections
 
 /**
  * Plain vanilla movement has to pass, or no other verdict means anything. Then the negative control: a
@@ -204,6 +208,55 @@ private class TimeUpdateBlocker : EventListener, AutoCloseable {
             event.cancelEvent()
         }
     }
+
+    override fun close() = EventManager.unregisterEventHandler(this)
+
+}
+
+class ResourcesGameTest : PaperGameTest({
+    client { check(HudComponentManager.addComponent(ResourcesHud.id.toString()) === ResourcesHud) }
+    run("give $playerName minecraft:totem_of_undying 3")
+    run("give $playerName minecraft:golden_apple 4")
+    run("give $playerName minecraft:enchanted_golden_apple 2")
+    run("give $playerName minecraft:experience_bottle 64")
+    run("give $playerName minecraft:experience_bottle 10")
+    val stocked = mapOf(Resource.TOTEMS to 3, Resource.GAPPLES to 6, Resource.CRYSTALS to 0, Resource.BOTTLES to 74)
+    awaitClient("the counts") { ResourcesHud.counts == stocked }
+    client { check(ResourcesHud.low == setOf(Resource.CRYSTALS)) { "low are ${ResourcesHud.low}" } }
+
+    NotificationLog().use { log ->
+        run("clear $playerName minecraft:totem_of_undying 2")
+        awaitClient("the totems to run low") { Resource.TOTEMS in ResourcesHud.low }
+        ticks(5)
+        check(log.messages.size == 1 && "Totems low: 1 / 2" in log.messages.single()) { "notified ${log.messages}" }
+        client {
+            val entries = ResourcesHud.text.siblings.first().siblings
+            check(entries.first { it.string.startsWith("Totems") }.style.color != null) { "the low totems are not red" }
+            check(entries.first { it.string.startsWith("Gapples") }.style.color == null) { "the gapples are red" }
+        }
+        screenshot("Resources")
+
+        run("clear $playerName minecraft:totem_of_undying 1")
+        awaitClient("the last totem gone") { ResourcesHud.counts[Resource.TOTEMS] == 0 }
+        run("give $playerName minecraft:end_crystal 64")
+        awaitClient("the crystals") { ResourcesHud.counts[Resource.CRYSTALS] == 64 }
+        ticks(5)
+        check(log.messages.size == 1) { "staying low or restocking notified again: ${log.messages}" }
+    }
+
+    client {
+        ResourcesHud.enabled = false
+        check(ResourcesHud.counts.isEmpty()) { "disabling kept the counts" }
+    }
+})
+
+/** Notifications shown while it is open. */
+private class NotificationLog : EventListener, AutoCloseable {
+
+    val messages: MutableList<String> = Collections.synchronizedList(mutableListOf())
+
+    @Suppress("unused")
+    private val notificationHandler = handler<NotificationEvent> { messages += it.message }
 
     override fun close() = EventManager.unregisterEventHandler(this)
 

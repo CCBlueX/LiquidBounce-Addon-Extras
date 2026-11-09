@@ -158,6 +158,8 @@ the HUD editor. Each has its own prefix, suffix, colour, shadow, padding and bac
 **Ping** colour their value good, ok or bad and draw a graph of the last twelve seconds under it; TPS drops to 0
 once the server has not sent the time for three seconds. **Clock** can blink its colon and show how far the minute
 has run. **CartKit** shows rails, TNT minecarts, a bow or loaded crossbow, its draw and the live carts nearby.
+**Resources** counts totems, golden apples, end crystals and experience bottles; one below its limit pulses red,
+and falling below it once sends a notification.
 
 ![HUD](docs/hud.png)
 ![CartKit](docs/cartkit.png)

@@ -25,8 +25,10 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
-val extrasHudComponents: List<TextHudComponent> =
-    [FpsHud, TpsHud, PingHud, PlayerHud, CpsHud, BiomeHud, CoordinatesHud, SpeedometerHud, ClockHud, CartKitHud]
+val extrasHudComponents: List<TextHudComponent> = [
+    FpsHud, TpsHud, PingHud, PlayerHud, CpsHud, BiomeHud, CoordinatesHud, SpeedometerHud, ClockHud, CartKitHud,
+    ResourcesHud,
+]
 
 internal const val UNAVAILABLE = "N/A"
 
