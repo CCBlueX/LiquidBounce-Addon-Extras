@@ -20,10 +20,12 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBreachSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleElytraDive
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleInstantLunge
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMaceAssist
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMacePrediction
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSpearAssist
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.minecraft.client.Minecraft
+import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.monster.zombie.Drowned
 import net.minecraft.world.entity.monster.zombie.Husk
@@ -426,6 +428,62 @@ class InstantLungeGameTest : PaperGameTest({
     awaitClient("the spear to go") { !it.player!!.inventory.getItem(2).`is`(Items.IRON_SPEAR) }
     enable(ModuleInstantLunge)
     awaitClient("the note") { it.chatContains("No spear with Lunge") && !ModuleInstantLunge.enabled }
+})
+
+class MacePredictionGameTest : PaperGameTest({
+    run("difficulty easy")
+    enable(ModuleMacePrediction)
+
+    // Standing enemies are no business of it
+    summonEnemy(0.5, 5.5)
+    ticks(20)
+    check(client { ModuleMacePrediction.prediction.isEmpty() }) { "a standing husk got a prediction" }
+    run("kill @e[type=minecraft:husk]")
+    awaitClient("the standing husk to go") { husks(it).isEmpty() }
+
+    // A husk thrown up comes down where the marker is
+    run("summon minecraft:husk 3.5 -60 9.5 {PersistenceRequired:1b,Silent:1b,Motion:[0.0d,1.3d,-0.15d]}")
+    awaitClient("a prediction", timeout = 40) { ModuleMacePrediction.prediction.size > 5 }
+    ticks(2)
+    screenshot("MacePrediction")
+    val landing = client { ModuleMacePrediction.prediction.last() }
+    awaitClient("the husk to land", timeout = 80) { minecraft -> husks(minecraft).any { it.y < origin.y + 0.01 } }
+    val husk = client { minecraft -> husks(minecraft).first().position() }
+    run("kill @e[type=minecraft:husk]")
+    check(husk.distanceTo(landing) < 2.5) { "the husk landed at $husk, predicted was $landing" }
+    awaitClient("the prediction to end") { ModuleMacePrediction.prediction.isEmpty() }
+
+    // A husk walking at you along a ledge: its path over the ground, up to the edge
+    fill(BlockPos(-1, -60, 9), BlockPos(1, -60, 18), "minecraft:stone")
+    client {
+        ModuleMacePrediction.setting<Int>("WalkTicks").set(100)
+        ModuleMacePrediction.setting<Any>("Marker").setByString("Outline")
+    }
+    run("summon minecraft:husk 0.5 -59 17.5 {PersistenceRequired:1b,Silent:1b}")
+    awaitClient("a walk", timeout = 200) { minecraft ->
+        ModuleMacePrediction.walks && ModuleMacePrediction.prediction.size > 3 && husks(minecraft).any { it.z > 12.0 }
+    }
+    val walk = client { ModuleMacePrediction.prediction.toList() }
+    screenshot("MacePredictionWalk")
+    check(walk.all { it.y == walk.first().y }) { "the walk left the ground: $walk" }
+    // The ledge spans x -1..2 and z 9..19; without the edge rule a hundred ticks of walking would leave it
+    check(walk.size > 2 && walk.all { it.x in -1.3..2.3 && it.z in 8.7..19.3 }) { "the walk left the ledge: $walk" }
+    val end = walk.last()
+    check(minOf(abs(end.x + 1.0), abs(end.x - 2.0), abs(end.z - 9.0), abs(end.z - 19.0)) < 0.6) {
+        "the walk stopped short of the edge, at $end"
+    }
+    client { ModuleMacePrediction.setting<Boolean>("Walking").set(false) }
+    ticks(2)
+    check(client { ModuleMacePrediction.prediction.isEmpty() }) { "a walk with Walking off" }
+    run("kill @e[type=minecraft:husk]")
+    client {
+        ModuleMacePrediction.setting<Boolean>("Walking").set(true)
+        ModuleMacePrediction.setting<Int>("WalkTicks").set(20)
+        ModuleMacePrediction.setting<Any>("Marker").setByString("Both")
+    }
+
+    disable(ModuleMacePrediction)
+    check(client { ModuleMacePrediction.target == null }) { "disabling left a target" }
 })
 
 private fun GameTestScope.hotbar(slot: Int, item: String) =

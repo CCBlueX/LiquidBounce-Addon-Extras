@@ -433,5 +433,14 @@
   "liquidbounce.module.instantLunge.value.switchBack.description": "Wait before your slot comes back.",
   "liquidbounce.module.instantLunge.messages.noSpear": "No spear with Lunge in the hotbar.",
   "liquidbounce.module.instantLunge.messages.hungry": "Too hungry to lunge.",
-  "liquidbounce.module.instantLunge.messages.blocked": "No lunge while gliding, swimming or riding."
+  "liquidbounce.module.instantLunge.messages.blocked": "No lunge while gliding, swimming or riding.",
+
+  "liquidbounce.module.macePrediction.description": "Shows where the nearest enemy in the air comes down, or where a walking one goes, with your reach around it.",
+  "liquidbounce.module.macePrediction.value.range.description": "How close the enemy has to be.",
+  "liquidbounce.module.macePrediction.value.path.description": "Draw the fall arc, or the track over the ground.",
+  "liquidbounce.module.macePrediction.value.walking.description": "Also show the path of an enemy walking on the ground, up to the next edge.",
+  "liquidbounce.module.macePrediction.value.walkTicks.description": "How far ahead to follow a walking enemy.",
+  "liquidbounce.module.macePrediction.value.marker.description": "Draw the end marker filled, outlined or both.",
+  "liquidbounce.module.macePrediction.value.pathColor.description": "Color of the path and the landing marker.",
+  "liquidbounce.module.macePrediction.value.ringColor.description": "Color of the reach ring."
 }
