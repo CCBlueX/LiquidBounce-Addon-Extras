@@ -1,42 +1,112 @@
 package net.ccbluex.liquidbounce.extras.hud
 
 import net.ccbluex.liquidbounce.config.types.list.Tagged
+import net.ccbluex.liquidbounce.event.EventListener
+import net.ccbluex.liquidbounce.event.events.DisconnectEvent
+import net.ccbluex.liquidbounce.event.events.GameTickEvent
+import net.ccbluex.liquidbounce.event.events.PacketEvent
+import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.render.drawQuad
 import net.ccbluex.liquidbounce.render.engine.type.Color4b
 import net.ccbluex.liquidbounce.utils.client.ServerObserver
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.util.Util
 import net.minecraft.world.phys.Vec3
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 val extrasHudComponents: List<TextHudComponent> =
     [FpsHud, TpsHud, PingHud, PlayerHud, CpsHud, BiomeHud, CoordinatesHud, SpeedometerHud, ClockHud, CartKitHud]
 
-private const val UNAVAILABLE = "N/A"
+internal const val UNAVAILABLE = "N/A"
 
 private fun decimal(value: Double, digits: Int = 2) = "%.${digits}f".format(Locale.ROOT, value)
 
-object FpsHud : TextHudComponent("FPS", "Frames rendered per second.", "FPS: ", row = 0) {
-    override fun value(): Component = Component.literal(mc.fps.toString())
-}
-
-object TpsHud : TextHudComponent(
-    "TPS", "Server ticks per second, estimated from time updates.", "TPS: ", row = 1,
+object FpsHud : MetricHudComponent(
+    "FPS", "Frames rendered per second.", "FPS: ", row = 0, good = 50.0, ok = 30.0,
 ) {
-    override fun value(): Component =
-        Component.literal(ServerObserver.tps.takeIf { it.isFinite() }?.let(::decimal) ?: UNAVAILABLE)
+
+    private const val SMOOTHING = 0.2
+
+    private var smoothed = Double.NaN
+
+    override val reading get() = smoothed.takeUnless { it.isNaN() } ?: mc.fps.toDouble()
+
+    // The counter jumps once a second, this eases into each new count
+    @Suppress("unused")
+    private val smoothingHandler = handler<GameTickEvent> {
+        smoothed = reading + (mc.fps - reading) * SMOOTHING
+    }
+
+    override fun onDisabled() {
+        super.onDisabled()
+        smoothed = Double.NaN
+    }
+
+    override fun format(reading: Double) = reading.roundToInt().toString()
+
+    override fun scale(peak: Double) = maxOf(peak, 60.0)
+
 }
 
-object PingHud : TextHudComponent("Ping", "Your latency to the server.", "Ping: ", " ms", row = 2) {
-    override fun value(): Component {
-        val latency = mc.player?.let { mc.connection?.getPlayerInfo(it.uuid)?.latency }
-        return Component.literal(latency?.toString() ?: UNAVAILABLE)
+object TpsHud : MetricHudComponent(
+    "TPS", "Server ticks per second, estimated from time updates.", "TPS: ", row = 1, good = 18.0, ok = 15.0,
+) {
+
+    private val staleAfter = 3.seconds
+
+    /** Whether the server stopped sending the time, which it does every second while it ticks. */
+    val stale get() = ServerTimeUpdates.sinceLast?.let { it > staleAfter } == true
+
+    override val reading get() = if (stale) 0.0 else ServerObserver.tps.takeIf { it.isFinite() }
+
+    override fun format(reading: Double) = decimal(reading)
+
+    override fun scale(peak: Double) = 20.0
+
+}
+
+/** When the server last sent the time. */
+object ServerTimeUpdates : EventListener {
+
+    @Volatile
+    private var last: TimeMark? = null
+
+    val sinceLast: Duration? get() = last?.elapsedNow()
+
+    // Netty thread
+    @Suppress("unused")
+    private val packetHandler = handler<PacketEvent> { event ->
+        if (event.packet is ClientboundSetTimePacket && !event.isCancelled) {
+            last = TimeSource.Monotonic.markNow()
+        }
     }
+
+    @Suppress("unused")
+    private val disconnectHandler = handler<DisconnectEvent> { last = null }
+
+}
+
+object PingHud : MetricHudComponent(
+    "Ping", "Your latency to the server.", "Ping: ", " ms", row = 2, good = 80.0, ok = 150.0,
+) {
+
+    override val reading get() = mc.player?.let { mc.connection?.getPlayerInfo(it.uuid)?.latency?.toDouble() }
+
+    override fun format(reading: Double) = reading.roundToInt().toString()
+
+    override fun scale(peak: Double) = maxOf(peak, 100.0)
+
 }
 
 object PlayerHud : TextHudComponent("Player", "Your username and skin.", "", row = 3) {

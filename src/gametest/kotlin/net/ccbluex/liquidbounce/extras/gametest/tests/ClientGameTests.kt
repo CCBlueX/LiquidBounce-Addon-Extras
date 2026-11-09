@@ -1,6 +1,10 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.config.ConfigSystem
+import net.ccbluex.liquidbounce.event.EventListener
+import net.ccbluex.liquidbounce.event.EventManager
+import net.ccbluex.liquidbounce.event.events.PacketEvent
+import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
 import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
@@ -10,6 +14,10 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
 import net.ccbluex.liquidbounce.extras.hud.ClockHud
+import net.ccbluex.liquidbounce.extras.hud.FpsHud
+import net.ccbluex.liquidbounce.extras.hud.MetricHudComponent
+import net.ccbluex.liquidbounce.extras.hud.PingHud
+import net.ccbluex.liquidbounce.extras.hud.TpsHud
 import net.ccbluex.liquidbounce.extras.hud.SpeedometerHud
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
 import net.ccbluex.liquidbounce.features.module.ModuleCategories
@@ -20,7 +28,11 @@ import net.ccbluex.liquidbounce.integration.screen.impl.CustomStandaloneMinecraf
 import net.ccbluex.liquidbounce.integration.theme.ThemeManager
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
 import net.ccbluex.liquidbounce.lang.LanguageManager
+import net.ccbluex.liquidbounce.render.engine.type.Color4b
+import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention
 import net.ccbluex.liquidbounce.utils.render.Alignment
+import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import com.mojang.blaze3d.platform.InputConstants
 import java.time.LocalDateTime
@@ -136,6 +148,66 @@ class HudGameTest : PaperGameTest({
     input.releaseKey { it.keyUp }
     client { extrasHudComponents.forEach { it.enabled = false } }
 })
+
+class HudGraphGameTest : PaperGameTest({
+    val metrics = listOf(FpsHud, TpsHud, PingHud)
+    client {
+        for (metric in metrics) {
+            check(HudComponentManager.addComponent(metric.id.toString()) === metric)
+            val withGraph = metric.guiScaledHeight
+            metric.setting<Boolean>("Graph").set(false)
+            check(metric.guiScaledHeight < withGraph) { "${metric.name}'s graph takes no room" }
+            metric.setting<Boolean>("Graph").set(true)
+        }
+    }
+
+    awaitClient("the first samples") { metrics.all { it.history.size >= 2 } }
+    // The server's tick rate needs two time updates before TPS has a reading
+    awaitClient("a full graph", timeout = MetricHudComponent.SAMPLES * (MetricHudComponent.SAMPLE_TICKS + 1) + 100) {
+        metrics.all { it.history.size == MetricHudComponent.SAMPLES }
+    }
+    ticks(MetricHudComponent.SAMPLE_TICKS * 2)
+    client {
+        check(metrics.all { it.history.size == MetricHudComponent.SAMPLES }) { "the graph outgrew its samples" }
+        check(FpsHud.reading > 0) { "the FPS read ${FpsHud.reading}" }
+        // On the same machine the latency is far below the good limit
+        check(PingHud.text.valueColor() == PingHud.colorSetting("GoodColor")) { "the ping is not graded good" }
+    }
+    screenshot("HudGraphs")
+
+    TimeUpdateBlocker().use {
+        awaitClient("TPS to go stale", timeout = 100) { TpsHud.stale }
+        client {
+            check(TpsHud.text.string == "TPS: 0.00") { "a silent server reads '${TpsHud.text.string}'" }
+            check(TpsHud.text.valueColor() == TpsHud.colorSetting("BadColor")) { "a silent server is not graded bad" }
+        }
+        awaitClient("a stale sample", timeout = 40) { TpsHud.history.last() == 0.0 }
+    }
+    awaitClient("TPS to recover", timeout = 60) { !TpsHud.stale && TpsHud.reading!! > 0 }
+
+    client {
+        metrics.forEach { it.enabled = false }
+        check(metrics.all { it.history.isEmpty() }) { "disabling kept the graphs" }
+    }
+})
+
+private fun Component.valueColor() = siblings.first().style.color?.value
+
+private fun MetricHudComponent.colorSetting(name: String) = setting<Color4b>(name).get().argb and 0xFFFFFF
+
+/** Drops the server's time updates while it is open, as if the server stopped ticking. */
+private class TimeUpdateBlocker : EventListener, AutoCloseable {
+
+    @Suppress("unused")
+    private val packetHandler = handler<PacketEvent>(priority = EventPriorityConvention.FIRST_PRIORITY) { event ->
+        if (event.packet is ClientboundSetTimePacket) {
+            event.cancelEvent()
+        }
+    }
+
+    override fun close() = EventManager.unregisterEventHandler(this)
+
+}
 
 class ClockGameTest : PaperGameTest({
     client { check(HudComponentManager.addComponent(ClockHud.id.toString()) === ClockHud) }

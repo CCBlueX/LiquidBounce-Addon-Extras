@@ -4,6 +4,7 @@ import net.ccbluex.liquidbounce.extras.commands.CommandFindings
 import net.ccbluex.liquidbounce.extras.commands.CommandWaypoint
 import net.ccbluex.liquidbounce.extras.commands.CommandWhere
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
+import net.ccbluex.liquidbounce.extras.hud.ServerTimeUpdates
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCaveDisturbanceDetector
@@ -125,7 +126,7 @@ class ExtrasAddon : LiquidBounceAddon() {
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
         registerCommand(CommandFindings)
-        registerListeners(ClickCounter, WorldJournal, OwnCarts)
+        registerListeners(ClickCounter, ServerTimeUpdates, WorldJournal, OwnCarts)
         // The client does not persist native HUD components, so their settings live in the add-on's config
         config("extras-hud", extrasHudComponents.toMutableList())
     }
