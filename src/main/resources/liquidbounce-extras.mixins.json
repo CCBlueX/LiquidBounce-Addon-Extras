@@ -7,7 +7,13 @@
     "MixinMinecraft",
     "MixinMinecraftAttack",
     "MinecraftMisplayGuardMixin",
-    "MixinHud"
+    "MixinHud",
+    "MixinFont",
+    "MixinStringSplitter",
+    "MixinAbstractClientPlayer",
+    "MixinPlayerInfo",
+    "MixinEntityRenderer",
+    "MixinMinecraftSpearReach"
   ],
   "injectors": {
     "defaultRequire": 1

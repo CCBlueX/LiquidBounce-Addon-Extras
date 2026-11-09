@@ -9,16 +9,19 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
 import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
 import net.ccbluex.liquidbounce.extras.gametest.harness.disable
 import net.ccbluex.liquidbounce.extras.gametest.harness.enable
+import net.ccbluex.liquidbounce.extras.gametest.harness.fill
 import net.ccbluex.liquidbounce.extras.gametest.harness.query
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
+import net.ccbluex.liquidbounce.extras.gametest.harness.summon
 import net.ccbluex.liquidbounce.extras.gametest.harness.teleport
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBreachSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleElytraDive
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleInstantLunge
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMaceAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSpearAssist
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.EquipmentSlot
@@ -329,6 +332,80 @@ class ShieldDrainGameTest : PaperGameTest({
     }
 })
 
+class SpearAssistGameTest : PaperGameTest({
+    hotbar(0, "minecraft:iron_sword")
+    hotbar(1, "minecraft:iron_spear")
+    hotbar(2, "minecraft:iron_spear[enchantments={'minecraft:lunge':3}]")
+    summonEnemy(0.5, 4.5)
+    aim(origin.south(4).above())
+    enable(ModuleSpearAssist)
+
+    // Left to chance, and the chance is nil
+    client { ModuleSpearAssist.Reach.setting<Int>("Chance").set(0) }
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    ticks(20)
+    // A sword in hand, but only axe and mace may stand aside for the spear
+    client {
+        ModuleSpearAssist.Reach.setting<Int>("Chance").set(100)
+        reachWeapons().toggle(ModuleSpearAssist.Weapon.SWORD)
+    }
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    ticks(20)
+    awaitServer("items entity $playerName hotbar.1 minecraft:iron_spear[damage=0]")
+    check(health() == FULL_HEALTH) { "the spear stabbed" }
+    client { reachWeapons().toggle(ModuleSpearAssist.Weapon.SWORD) }
+
+    // Beyond the sword, within the spear: the plain spear stabs, the Lunge one stays put
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    awaitServer("items entity $playerName hotbar.1 minecraft:iron_spear[damage=1]")
+    awaitServer("items entity $playerName hotbar.2 minecraft:iron_spear[damage=0]")
+    check(health() < FULL_HEALTH) { "the stab did not land" }
+    awaitAnswer("data get entity $playerName SelectedItemSlot", "entity data: 0")
+
+    // Beyond the spear as well: a plain miss
+    run("kill @e[type=minecraft:husk]")
+    summonEnemy(0.5, 7.5)
+    ticks(20)
+    input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    ticks(20)
+    awaitServer("items entity $playerName hotbar.1 minecraft:iron_spear[damage=1]")
+
+    // Indicator: charging while running at the husk
+    run("kill @e[type=minecraft:husk]")
+    summonEnemy(0.5, 12.5)
+    hotbar(0, "minecraft:iron_spear")
+    awaitClient("the spear in hand") { it.player!!.mainHandItem.`is`(Items.IRON_SPEAR) }
+    input.holdMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    ticks(14)
+    input.holdKey { it.keyUp }
+    input.holdKey { it.keySprint }
+    awaitClient("a charge that hits", timeout = 60) { (ModuleSpearAssist.estimate ?: 0) > 0 }
+    screenshot("SpearAssist")
+    input.releaseKey { it.keySprint }
+    input.releaseKey { it.keyUp }
+    input.releaseMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    awaitClient("the estimate to go") { ModuleSpearAssist.estimate == null }
+
+    // DoubleTap: a charge hit while falling past a husk on a pillar is followed by the mace
+    run("gamerule minecraft:fall_damage false")
+    run("kill @e[type=minecraft:husk]")
+    travel(origin)
+    hotbar(2, DENSITY_MACE)
+    fill(origin.south(), origin.south().above(4), "minecraft:stone")
+    run("summon minecraft:husk 0.5 -55 1.5 $ENEMY")
+    awaitClient("the husk") { husks(it).isNotEmpty() }
+    teleport(origin.above(20), pitch = 75f)
+    input.holdMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    awaitServer("items entity $playerName hotbar.2 minecraft:mace[damage=1]")
+    input.releaseMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+    awaitLanding()
+
+    disable(ModuleSpearAssist)
+    check(client { ModuleSpearAssist.estimate == null && !SilentHotbar.isSlotModifiedBy(ModuleSpearAssist) }) {
+        "disabling left an estimate or a held weapon"
+    }
+})
+
 class InstantLungeGameTest : PaperGameTest({
     hotbar(0, "minecraft:iron_sword")
     hotbar(2, "minecraft:iron_spear[enchantments={'minecraft:lunge':3}]")
@@ -427,3 +504,7 @@ private fun GameTestScope.slam(): Int {
     }
     return longest
 }
+
+@Suppress("UNCHECKED_CAST")
+private fun reachWeapons() =
+    ModuleSpearAssist.Reach.setting<Any>("Weapons") as MultiChoiceListValue<ModuleSpearAssist.Weapon>

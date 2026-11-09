@@ -45,6 +45,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSpearAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleTotemSwitch
 import net.ccbluex.liquidbounce.extras.modules.pvp.OwnCarts
@@ -106,6 +107,7 @@ class ExtrasAddon : LiquidBounceAddon() {
             ModuleBreachSwap,
             ModuleElytraDive,
             ModuleShieldDrain,
+            ModuleSpearAssist,
             ModuleInstantLunge,
         )
         registerCommand(CommandWhere.INSTANCE)

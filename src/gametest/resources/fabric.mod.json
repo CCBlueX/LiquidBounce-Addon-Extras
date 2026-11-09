@@ -63,6 +63,7 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.BreachSwapGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.ElytraDiveGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.ShieldDrainGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.SpearAssistGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.InstantLungeGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
     ]
