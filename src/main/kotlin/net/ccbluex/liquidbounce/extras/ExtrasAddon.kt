@@ -43,6 +43,7 @@ import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMaceAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMacePrediction
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCatch
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlHop
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlLaunch
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
@@ -60,69 +61,71 @@ import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
 
+private val modules = arrayOf(
+    ModuleBaseFinder,
+    ModuleStashFinder,
+    ModuleSuspiciousBlockDetector,
+    ModuleCollectibleESP,
+    ModulePortalFinder,
+    ModuleCaveDisturbanceDetector,
+    ModuleTunnelTrailESP,
+    ModuleSoundLocator,
+    ModuleAutoJump.INSTANCE,
+    ModuleAutoShearer,
+    ModuleAutoSign.INSTANCE,
+    ModuleAutoAnvilRepair,
+    ModuleAutoSmelter,
+    ModuleAutoBreed,
+    ModuleOreSimulation,
+    ModuleLightOverlay,
+    ModuleWaypoints,
+    ModuleNoItemBounce,
+    ModuleBlastCover,
+    ModuleAnchorAura,
+    ModuleAnchorMacro,
+    ModuleCrystalMacro,
+    ModuleBucketSteal,
+    ModuleMisplayGuard,
+    ModuleTotemSwitch,
+    ModuleCartBomb,
+    ModulePearlCart,
+    ModuleCartBreaker,
+    ModuleCartCover,
+    ModuleSwingRedirect,
+    ModuleHitHold,
+    ModuleHitFlick,
+    ModuleCrossbowLoader,
+    ModuleShieldSwap,
+    ModuleShieldGuard,
+    ModuleMaceAssist,
+    ModuleBreachSwap,
+    ModuleElytraDive,
+    ModuleShieldDrain,
+    ModuleSpearAssist,
+    ModuleInstantLunge,
+    ModuleMacePrediction,
+    ModulePearlCatch,
+    ModulePearlLaunch,
+    ModuleWindGlide,
+    ModulePearlHop,
+    ModuleMessageAura.INSTANCE,
+    ModulePacketCanceller,
+    ModuleIntruderAlert,
+    ModuleAntiTrap,
+    ModuleDisguise,
+)
+
 /** Entry point, named under the `liquidbounce` entrypoint in `fabric.mod.json`. */
 class ExtrasAddon : LiquidBounceAddon() {
 
     override val categories = ExtrasCategories.all
 
     override fun onInitialize() {
-        registerModules(
-            ModuleBaseFinder,
-            ModuleStashFinder,
-            ModuleSuspiciousBlockDetector,
-            ModuleCollectibleESP,
-            ModulePortalFinder,
-            ModuleCaveDisturbanceDetector,
-            ModuleTunnelTrailESP,
-            ModuleSoundLocator,
-            ModuleAutoJump.INSTANCE,
-            ModuleAutoShearer,
-            ModuleAutoSign.INSTANCE,
-            ModuleAutoAnvilRepair,
-            ModuleAutoSmelter,
-            ModuleAutoBreed,
-            ModuleLightOverlay,
-            ModuleWaypoints,
-            ModuleCrystalMacro,
-            ModuleBucketSteal,
-            ModuleMisplayGuard,
-            ModuleTotemSwitch,
-            ModuleMessageAura.INSTANCE,
-            ModulePacketCanceller,
-            ModuleIntruderAlert,
-            ModuleBlastCover,
-            ModuleAnchorAura,
-            ModuleAnchorMacro,
-            ModuleSwingRedirect,
-            ModuleHitHold,
-            ModuleHitFlick,
-            ModuleCrossbowLoader,
-            ModuleShieldSwap,
-            ModuleShieldGuard,
-            ModuleAntiTrap,
-            ModuleDisguise,
-            ModuleNoItemBounce,
-            ModuleOreSimulation,
-            ModuleCartBomb,
-            ModulePearlCart,
-            ModuleCartBreaker,
-            ModuleCartCover,
-            ModuleMaceAssist,
-            ModuleBreachSwap,
-            ModuleElytraDive,
-            ModuleShieldDrain,
-            ModuleSpearAssist,
-            ModuleInstantLunge,
-            ModuleMacePrediction,
-            ModulePearlLaunch,
-            ModuleWindGlide,
-            ModulePearlHop,
-        )
+        registerModules(*modules)
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
         registerCommand(CommandFindings)
-        registerListeners(ClickCounter, WorldJournal)
-        registerListeners(OwnCarts)
+        registerListeners(ClickCounter, WorldJournal, OwnCarts)
         // The client does not persist native HUD components, so their settings live in the add-on's config
         config("extras-hud", extrasHudComponents.toMutableList())
     }

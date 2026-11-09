@@ -17,6 +17,7 @@ import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.ccbluex.liquidbounce.utils.kotlin.random
 import net.minecraft.world.item.Item
+import kotlin.math.sqrt
 
 /** Ticks a turn may take before the throw is given up. */
 internal const val AIM_TIMEOUT = 20
@@ -102,10 +103,10 @@ internal suspend fun lookAt(rotation: Rotation, speed: ClosedFloatingPointRange<
 
 private val sentRotation get() = RotationManager.currentRotation ?: player.rotation
 
-// Turn steps snap to the mouse's smallest step, anything below half of it stays where it is
+// Turn steps snap to the mouse's smallest step, anything below half of it stays where it is, on both axes
 private fun settledOn(rotation: Rotation) =
     RotationManager.serverRotation.isRotationDeltaCloseTo(sentRotation, SAME_ROTATION) &&
-        sentRotation.isRotationDeltaCloseTo(rotation, RotationUtil.gcd.toFloat() / 2f)
+        sentRotation.isRotationDeltaCloseTo(rotation, RotationUtil.gcd.toFloat() / sqrt(2f))
 
 private const val SAME_ROTATION = 1.0E-3f
 
