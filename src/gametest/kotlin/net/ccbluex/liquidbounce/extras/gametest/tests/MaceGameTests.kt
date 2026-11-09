@@ -15,11 +15,13 @@ import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
 import net.ccbluex.liquidbounce.extras.gametest.harness.setting
 import net.ccbluex.liquidbounce.extras.gametest.harness.teleport
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBreachSwap
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleElytraDive
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleInstantLunge
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMaceAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.minecraft.client.Minecraft
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.monster.zombie.Drowned
 import net.minecraft.world.entity.monster.zombie.Husk
 import net.minecraft.world.item.Items
@@ -184,6 +186,89 @@ class BreachSwapGameTest : PaperGameTest({
 
     disable(ModuleBreachSwap)
     check(client { !SilentHotbar.isSlotModifiedBy(ModuleBreachSwap) }) { "disabling left the mace selected" }
+})
+
+class ElytraDiveGameTest : PaperGameTest({
+    run("gamerule minecraft:fall_damage false")
+    run("item replace entity $playerName armor.chest with minecraft:diamond_chestplate")
+    // Neither on the hotbar: both come from the inventory, the elytra first, into the first empty slots
+    run("item replace entity $playerName container.20 with minecraft:elytra")
+    run("item replace entity $playerName container.21 with minecraft:firework_rocket 16")
+    awaitClient("the elytra and the rockets") { it.player!!.inventory.getItem(21).count == 16 }
+    travel(origin, pitch = -30f)
+
+    // The macro: elytra on, jump, glide, rocket, and the chestplate back after two seconds
+    client { ModuleElytraDive.setting<Int>("FlightTime").set(2) }
+    enable(ModuleElytraDive)
+    awaitServer("items entity $playerName armor.chest minecraft:elytra")
+    awaitServer("entity @a[name=$playerName,nbt={FallFlying:1b}]")
+    awaitServer("items entity $playerName hotbar.1 minecraft:firework_rocket[count=15]")
+    awaitClient("the glide") { it.player!!.isFallFlying }
+    input.holdKeyFor({ it.keyJump }, 3)
+    awaitServer("items entity $playerName hotbar.1 minecraft:firework_rocket[count=14]")
+    screenshot("ElytraDive")
+    awaitServer("items entity $playerName armor.chest minecraft:diamond_chestplate", timeout = 100)
+    // Pulled to the first slot, the elytra stays there once swapped back out
+    awaitServer("items entity $playerName hotbar.0 minecraft:elytra")
+    awaitLanding()
+    disable(ModuleElytraDive)
+    check(client { ModuleElytraDive.steerAt == null }) { "disabling left a steering point" }
+
+    // RequireLand: enabled in the air, it takes off only once it stood on the ground
+    travel(origin, pitch = -30f)
+    teleport(origin.above(4), pitch = -30f)
+    awaitClient("the fall") { !it.player!!.onGround() }
+    enable(ModuleElytraDive)
+    awaitClient("the landing", timeout = 60) {
+        val player = it.player!!
+        check(player.onGround() || !player.getItemBySlot(EquipmentSlot.CHEST).`is`(Items.ELYTRA)) {
+            "took off in the air"
+        }
+        player.onGround()
+    }
+    awaitServer("items entity $playerName armor.chest minecraft:elytra")
+    awaitServer("items entity $playerName hotbar.1 minecraft:firework_rocket[count=13]")
+    awaitServer("items entity $playerName armor.chest minecraft:diamond_chestplate", timeout = 100)
+    awaitLanding()
+    disable(ModuleElytraDive)
+
+    // A chestplate only in the inventory goes back on once landed; looking down, the glide ends soon
+    travel(origin, pitch = 10f)
+    run("item replace entity $playerName armor.chest with minecraft:elytra")
+    run("item replace entity $playerName hotbar.0 with minecraft:air")
+    run("item replace entity $playerName container.22 with minecraft:diamond_chestplate")
+    awaitClient("the chestplate") { it.player!!.inventory.getItem(22).`is`(Items.DIAMOND_CHESTPLATE) }
+    client { ModuleElytraDive.setting<Int>("FlightTime").set(1) }
+    enable(ModuleElytraDive)
+    awaitServer("entity @a[name=$playerName,nbt={FallFlying:1b}]")
+    awaitLanding()
+    awaitServer("items entity $playerName armor.chest minecraft:diamond_chestplate", timeout = 100)
+    awaitServer("items entity $playerName hotbar.0 minecraft:elytra")
+    disable(ModuleElytraDive)
+
+    // ReDive: after the first smash it takes off, climbs above the husk and dives onto it again
+    travel(origin)
+    hotbar(0, "minecraft:iron_sword")
+    hotbar(1, "minecraft:elytra")
+    hotbar(2, "minecraft:firework_rocket 16")
+    hotbar(3, DENSITY_MACE)
+    summonEnemy(0.5, 1.5)
+    client {
+        ModuleMaceAssist.setting<Any>("AutoHit").setByString("Aim")
+        ModuleMaceAssist.setting<Float>("MinFall").set(2f)
+        ModuleElytraDive.ReDive.setting<Boolean>("Enabled").set(true)
+        ModuleElytraDive.ReDive.setting<Float>("Height").set(10f)
+    }
+    enable(ModuleMaceAssist)
+    teleport(origin.above(7), pitch = 60f)
+    awaitClient("the fall") { !it.player!!.onGround() }
+    enable(ModuleElytraDive)
+    // The husk stands on the ground: after the first smash a second one needs another fall from above it
+    awaitClient("the climb above the husk") { it.player!!.isFallFlying && it.player!!.y > origin.y + 8 }
+    awaitServer("items entity $playerName hotbar.3 minecraft:mace[damage=2]", timeout = 400)
+    disable(ModuleElytraDive)
+    disable(ModuleMaceAssist)
+    awaitLanding()
 })
 
 class ShieldDrainGameTest : PaperGameTest({

@@ -398,6 +398,16 @@
   "liquidbounce.module.breachSwap.description": "Now and then swings your Breach mace instead of your sword.",
   "liquidbounce.module.breachSwap.value.chance.description": "How many sword hits become mace hits.",
 
+  "liquidbounce.module.elytraDive.description": "Takes off with your elytra, and with ReDive dives onto the enemy again after a mace hit.",
+  "liquidbounce.module.elytraDive.value.flightTime.description": "How long until the chestplate goes back on, 0 for never.",
+  "liquidbounce.module.elytraDive.value.rocketOnJump.description": "Fire a rocket when you press jump while gliding.",
+  "liquidbounce.module.elytraDive.value.rocketDelay.description": "Wait between two rockets.",
+  "liquidbounce.module.elytraDive.value.requireLand.description": "Enabled in the air, wait for the ground before taking off.",
+  "liquidbounce.module.elytraDive.value.reDive.description": "After a mace hit, take off, climb above the enemy and dive onto it again.",
+  "liquidbounce.module.elytraDive.value.reDive.value.height.description": "How high above the enemy to climb.",
+  "liquidbounce.module.elytraDive.value.reDive.value.releaseDistance.description": "How close to the enemy the chestplate goes on.",
+  "liquidbounce.module.elytraDive.value.reDive.value.rotations.description": "How the glide is steered.",
+
   "liquidbounce.module.shieldDrain.description": "Hits an enemy who holds up a shield several times a tick.",
   "liquidbounce.module.shieldDrain.value.range.description": "How close the enemy has to be.",
   "liquidbounce.module.shieldDrain.value.hits.description": "Hits per tick.",

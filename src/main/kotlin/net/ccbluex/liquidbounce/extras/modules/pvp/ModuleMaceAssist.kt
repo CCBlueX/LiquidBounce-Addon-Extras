@@ -219,7 +219,8 @@ object ModuleMaceAssist : ClientModule("MaceAssist", ExtrasCategories.PVP) {
     private fun horizontalDistance(entity: LivingEntity) =
         player.position().subtract(entity.position()).horizontalDistance()
 
-    private fun isDiving() = player.isFallFlying && wearsGlider && player.deltaMovement.y < DIVE_SPEED
+    private fun isDiving() = player.isFallFlying && wearsGlider && player.deltaMovement.y < DIVE_SPEED &&
+        !ModuleElytraDive.climbing
 
     private fun webBetween(enemy: LivingEntity): Boolean {
         val eyes = player.eyePosition
