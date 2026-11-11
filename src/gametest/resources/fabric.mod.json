@@ -6,10 +6,18 @@
   "license": "GPL-3.0-or-later",
   "environment": "client",
   "entrypoints": {
+    "gametest-setup": [
+      {
+        "adapter": "kotlin",
+        "value": "net.ccbluex.liquidbounce.extras.gametest.harness.ExtrasSetup"
+      }
+    ],
     "fabric-client-gametest": [
       "net.ccbluex.liquidbounce.extras.gametest.tests.HarnessGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.AddonGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.HudGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.ClockGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.HudGraphGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.WhereGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.StashFinderGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.BaseFinderGameTest",
@@ -50,17 +58,33 @@
       "net.ccbluex.liquidbounce.extras.gametest.tests.BucketStealGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.MisplayGuardGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.TotemSwitchGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.AntiTrapGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.DisguiseGameTest",
       "net.ccbluex.liquidbounce.extras.gametest.tests.NoItemBounceGameTest",
-      "net.ccbluex.liquidbounce.extras.gametest.tests.ClockGameTest",
-      "net.ccbluex.liquidbounce.extras.gametest.harness.ResultsGameTest"
+      "net.ccbluex.liquidbounce.extras.gametest.tests.ResourcesGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.CartBombGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.PearlCartGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.CartBreakerGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.CartCoverGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.CartKitHudGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.MaceAssistGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.BreachSwapGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.ElytraDiveGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.ShieldDrainGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.SpearAssistGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.InstantLungeGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.MacePredictionGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.PearlCatchGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.PearlLaunchGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.WindGlideGameTest",
+      "net.ccbluex.liquidbounce.extras.gametest.tests.PearlHopGameTest",
+      "net.ccbluex.gametest.harness.ResultsGameTest"
     ]
   },
-  "mixins": [
-    "liquidbounce-extras-gametest.mixins.json"
-  ],
   "depends": {
     "liquidbounce-extras": "*",
-    "fabric-client-gametest-api-v1": "*"
+    "fabric-client-gametest-api-v1": "*",
+    "liquidbounce-gametest-harness": "*",
+    "fabric-language-kotlin": "*"
   }
 }

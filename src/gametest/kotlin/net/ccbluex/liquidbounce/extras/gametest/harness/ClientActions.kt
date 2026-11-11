@@ -1,45 +1,52 @@
 package net.ccbluex.liquidbounce.extras.gametest.harness
 
-import net.ccbluex.liquidbounce.config.types.Value
-import net.ccbluex.liquidbounce.config.types.group.ValueGroup
-import net.ccbluex.liquidbounce.extras.gametest.mixin.ChatComponentAccessor
-import net.ccbluex.liquidbounce.features.command.CommandManager
-import net.ccbluex.liquidbounce.features.module.ClientModule
-import net.minecraft.ChatFormatting
-import net.minecraft.client.Minecraft
-import net.minecraft.core.BlockPos
+import net.ccbluex.gametest.harness.GameTestScope
+import net.ccbluex.liquidbounce.event.EventListener
+import net.ccbluex.liquidbounce.event.events.NotificationEvent
+import net.ccbluex.liquidbounce.event.handler
+import net.minecraft.core.UUIDUtil
+import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+import net.ccbluex.gametest.harness.action.screenshot as takeScreenshot
 
-/**
- * Turns towards [pos] and lets the new rotation reach the server before anything is done with it. A human
- * cannot turn and click within one tick, and Grim knows that.
- */
-fun GameTestScope.aim(pos: BlockPos) {
-    input.lookAt(pos)
-    ticks(2)
+/** The harness's screenshot, once the theme no longer shows an "Enabled" or "Disabled" toast. */
+fun GameTestScope.screenshot(name: String) {
+    awaitToggleToasts()
+    takeScreenshot(name)
 }
 
-fun GameTestScope.enable(module: ClientModule) = client { module.enabled = true }
+/** Waits until the theme no longer shows an "Enabled" or "Disabled" toast, before a scene a screenshot needs. */
+fun GameTestScope.awaitToggleToasts() {
+    while (ToggleToasts.showing) {
+        ticks(1)
+    }
+}
 
-fun GameTestScope.disable(module: ClientModule) = client { module.enabled = false }
+/** Whether the theme still shows an "Enabled" or "Disabled" toast, which no screenshot is about. */
+internal object ToggleToasts : EventListener {
 
-@Suppress("UNCHECKED_CAST")
-fun <T : Any> ValueGroup.setting(name: String) = containedValues.first { it.name == name } as Value<T>
+    // The theme keeps a toast for three seconds and slides it out in a fifth, and on llvmpipe the browser's
+    // picture reaches the screen a few slow frames later
+    private val lifetime = 4500.milliseconds
+    @Volatile
+    private var shown: TimeSource.Monotonic.ValueTimeMark? = null
 
-/** Runs a `.command` of the client; it never reaches the server. */
-fun GameTestScope.command(line: String) = client { CommandManager.execute(line) }
+    val showing get() = shown?.let { it.elapsedNow() < lifetime } == true
 
-/** Chat lines without formatting, newest first. Only readable on the client thread. */
-val Minecraft.chat: List<String>
-    get() = (gui.hud.chat as ChatComponentAccessor).allMessages.map {
-        ChatFormatting.stripFormatting(it.content().string).orEmpty()
+    fun reset() {
+        shown = null
     }
 
-fun Minecraft.chatContains(text: String) = chat.any { text in it }
+    @Suppress("unused")
+    private val notificationHandler = handler<NotificationEvent> {
+        if (it.severity == NotificationEvent.Severity.ENABLED || it.severity == NotificationEvent.Severity.DISABLED) {
+            shown = TimeSource.Monotonic.markNow()
+        }
+    }
 
-fun GameTestScope.chat() = client { it.chat }
-
-fun GameTestScope.screenshot(name: String) {
-    // Vanilla's notes on unsigned chat and social interactions would cover the corner
-    client { it.gui.toastManager().clear() }
-    context.takeScreenshot(name)
 }
+
+/** An entity UUID as NBT that no other session uses; the server finds some, like a pearl's owner, in any world. */
+fun GameTestScope.uniqueUuid(name: String): String =
+    UUIDUtil.uuidToIntArray(UUID.nameUUIDFromBytes(unique(name).toByteArray())).joinToString(",", "[I;", "]")

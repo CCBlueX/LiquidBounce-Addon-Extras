@@ -1,18 +1,22 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.config.types.group.ValueGroup
-import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
-import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
-import net.ccbluex.liquidbounce.extras.gametest.harness.disable
-import net.ccbluex.liquidbounce.extras.gametest.harness.enable
-import net.ccbluex.liquidbounce.extras.gametest.harness.fill
-import net.ccbluex.liquidbounce.extras.gametest.harness.query
+import net.ccbluex.gametest.harness.GameTestScope
+import net.ccbluex.gametest.harness.ServerGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.uniqueUuid
+import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
+import net.ccbluex.gametest.harness.TestWorld
+import net.ccbluex.gametest.harness.action.awaitAnswer
+import net.ccbluex.gametest.harness.action.awaitServer
+import net.ccbluex.liquidbounce.gametest.harness.configure
+import net.ccbluex.liquidbounce.gametest.harness.disable
+import net.ccbluex.liquidbounce.gametest.harness.enable
+import net.ccbluex.gametest.harness.action.fill
+import net.ccbluex.gametest.harness.action.query
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
-import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
-import net.ccbluex.liquidbounce.extras.gametest.harness.setting
-import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.gametest.harness.action.setBlock
+import net.ccbluex.liquidbounce.gametest.harness.setting
+import net.ccbluex.gametest.harness.action.summon
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorAura
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
@@ -33,9 +37,9 @@ private const val TARGET_HEALTH = 300f
 private const val PLAYER_HEALTH = 20f
 
 // What the zombie stand-in is called in an ender pearl's Owner
-private const val TARGET_UUID = "[I;1,2,3,4]"
+private val GameTestScope.targetUuid get() = uniqueUuid("target")
 
-class BlastCoverGameTest : PaperGameTest({
+class BlastCoverGameTest : ServerGameTest({
     arena()
     run("item replace entity $playerName hotbar.2 with minecraft:glowstone 4")
     run("item replace entity $playerName hotbar.3 with minecraft:obsidian 4")
@@ -132,7 +136,7 @@ class BlastCoverGameTest : PaperGameTest({
     check(client { ModuleBlastCover.pending } == null) { "disabling kept a pending cover" }
 })
 
-class AnchorAuraGameTest : PaperGameTest({
+class AnchorAuraGameTest : ServerGameTest(TestWorld.SURFACE, {
     arena()
     run("item replace entity $playerName hotbar.1 with minecraft:respawn_anchor 8")
     run("item replace entity $playerName hotbar.2 with minecraft:glowstone 16")
@@ -147,13 +151,13 @@ class AnchorAuraGameTest : PaperGameTest({
     }
 
     // Without a cover, every spot next to the target would hurt more than MaxSelfDamage
-    client { module.setting<Boolean>("Cover").set(false) }
+    configure(module, "Cover" to false)
     enable(module)
     ticks(40)
     awaitServer("items entity $playerName hotbar.1 minecraft:respawn_anchor[count=8]")
     check(client { module.plan } == null) { "planned a blast it cannot stand" }
 
-    client { module.setting<Boolean>("Cover").set(true) }
+    configure(module, "Cover" to true)
     awaitClient("the blast to hit", timeout = 400) { target(it).hurtTime > 0 }
     disable(module)
     val hit = awaitHealthBelow(TARGET, TARGET_HEALTH)
@@ -163,18 +167,19 @@ class AnchorAuraGameTest : PaperGameTest({
 
     // An enemy pearl: the anchor waits charged where it comes down
     clearArena()
-    run("tp $TARGET 0.5 -60 24.5")
+    // Out of reach, in the air above the pad; without AI it stays there
+    run("tp $TARGET ${origin.x + 0.5} ${origin.y + 20} ${origin.z + 14.5}")
     awaitClient("the target to leave") { minecraft ->
-        target(minecraft).z > 20
+        target(minecraft).z > origin.z + 10
     }
     enable(module)
-    ticks(20)
-    summon("minecraft:ender_pearl", origin.offset(0, 5, 3), "{Motion:[0.0d,1.8d,0.0d],Owner:$TARGET_UUID}")
+    // Long enough for the Enabled toast to fade, so the screenshot need not wait while the pearl flies
+    ticks(100)
+    // Eight seconds up and down, so the checks below are done before it lands even on a slow client
+    summon("minecraft:ender_pearl", origin.offset(0, 5, 3), "{Motion:[0.0d,3.0d,0.0d],Owner:$targetUuid}")
     awaitClient("a pearl landing to plan for") { module.plan?.landing != null }
     val anchor = client { module.plan!!.anchor }
     awaitServer(block(anchor, "minecraft:respawn_anchor[charges=1]"))
-    ticks(5)
-    screenshot("AnchorAura")
 
     // Guarded: glowstone in hand, a click on the waiting anchor does nothing
     input.pressKey { it.keyHotbarSlots[2] }
@@ -184,6 +189,12 @@ class AnchorAuraGameTest : PaperGameTest({
     awaitServer(block(anchor, "minecraft:respawn_anchor[charges=1]"))
     awaitServer("items entity $playerName hotbar.2 minecraft:glowstone[count=14]")
     input.pressKey { it.keyHotbarSlots[0] }
+
+    // From behind: the cover, the anchor and the landing with its countdown
+    lookAt(Vec3(anchor.x + 0.5, anchor.y.toDouble(), anchor.z + 0.5))
+    input.pressKey { it.keyTogglePerspective }
+    screenshot("AnchorAura")
+    repeat(2) { input.pressKey { it.keyTogglePerspective } }
 
     awaitClient("the thrower to be hit", timeout = 400) { target(it).hurtTime > 0 }
     disable(module)
@@ -198,7 +209,7 @@ class AnchorAuraGameTest : PaperGameTest({
     awaitClient("the target to come back") { target(it).z < origin.z + 5 }
     val anchors = client { it.player!!.inventory.getItem(1).count }
     val before = health(TARGET)
-    client { module.setting<Boolean>("OnlyExisting").set(true) }
+    configure(module, "OnlyExisting" to true)
     enable(module)
     ticks(40)
     check(client { module.plan } == null) { "planned without a standing anchor" }
@@ -211,7 +222,7 @@ class AnchorAuraGameTest : PaperGameTest({
     check(client { it.player!!.inventory.getItem(1).count } == anchors) { "OnlyExisting placed an anchor" }
 })
 
-class AnchorMacroGameTest : PaperGameTest({
+class AnchorMacroGameTest : ServerGameTest({
     arena()
     run("item replace entity $playerName hotbar.1 with minecraft:respawn_anchor 8")
     run("item replace entity $playerName hotbar.2 with minecraft:glowstone 16")
@@ -227,7 +238,7 @@ class AnchorMacroGameTest : PaperGameTest({
         (module.containedValues.first { it.name == "DoubleAnchor" } as ValueGroup).setting<Boolean>("Enabled").set(true)
     }
     // Glowstone breaks in the blast, so the spot is in reach again for the second anchor
-    client { ModuleBlastCover.setting<Any>("Block").setByString("Glowstone") }
+    configure(ModuleBlastCover, "Block" to "Glowstone")
     enable(ModuleBlastCover)
 
     // OnlyOwn: someone else's anchor stays as it is
@@ -256,7 +267,7 @@ class AnchorMacroGameTest : PaperGameTest({
     // BlastCover's Before charge timing: the cover stands before the first glowstone goes in
     clearArena()
     awaitClient("the arena to be clear") { it.level!!.getBlockState(spot).isAir }
-    client { ModuleBlastCover.setting<Any>("Timing").setByString("BeforeCharge") }
+    configure(ModuleBlastCover, "Timing" to "BeforeCharge")
     lookAt(Vec3(spot.x + 0.5, spot.y.toDouble(), spot.z + 0.5))
     var coveredAtCharge = false
     input.holdKey(key)
@@ -295,7 +306,7 @@ private fun GameTestScope.summonTarget(pos: BlockPos) {
     val health = TARGET_HEALTH.toInt()
     summon(
         "minecraft:zombie", pos,
-        "{NoAI:1b,PersistenceRequired:1b,UUID:$TARGET_UUID,Health:${health}f," +
+        "{NoAI:1b,PersistenceRequired:1b,UUID:$targetUuid,Health:${health}f," +
             "attributes:[{id:\"minecraft:max_health\",base:$health}]," +
             "equipment:{head:{id:\"minecraft:iron_helmet\",count:1}}," +
             "active_effects:[{id:\"minecraft:fire_resistance\",duration:-1}]}",

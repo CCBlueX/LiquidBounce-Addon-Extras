@@ -37,8 +37,8 @@ fabricApi {
 
 // Shared with LiquidBounce's own game tests, so the browser is downloaded once per machine.
 val gameTestLibraries = gradle.gradleUserHomeDir.resolve("liquidbounce-gametest")
-val paperDirectory = layout.buildDirectory.dir("paper").get().asFile
-val probeJar = project(":paper-probe").layout.buildDirectory.file("libs/paper-probe.jar").get().asFile
+
+val showcase = providers.gradleProperty("gametest.showcase").map { it != "false" }.getOrElse(false)
 
 loom.runs.named("clientGameTest") {
     systemProperties.putAll(
@@ -46,25 +46,22 @@ loom.runs.named("clientGameTest") {
             "net.ccbluex.liquidbounce.ui.basicMode" to "true",
             "net.ccbluex.liquidbounce.browser.libraries" to gameTestLibraries.resolve("mcef").path,
             "net.ccbluex.liquidbounce.deeplearning.engines" to gameTestLibraries.resolve("djl").path,
-            "extras.paper.directory" to paperDirectory.path,
-            "extras.paper.probe" to probeJar.path,
-            "extras.paper.minecraft" to minecraft,
+            // Chromium's accelerated paint crashes natively on llvmpipe, which is all CI has
+            "net.ccbluex.liquidbounce.browser.disableAcceleration" to "true",
             "fabric.noGui" to "true",
         )
     )
     // Loader and client errors go to the log instead of a dialog nobody sees
     environmentVars.put("CI", "true")
-    mapOf(
-        "gametest.only" to "extras.gametest.only",
-        "paper.build" to "extras.paper.build",
-        "grim.version" to "extras.grim.version",
-    ).forEach { (gradleProperty, systemProperty) ->
-        providers.gradleProperty(gradleProperty).orNull?.let { systemProperties.put(systemProperty, it) }
+    providers.gradleProperty("gameTestServerOnly").orNull?.let {
+        systemProperties.put("gametest.only", it)
+    }
+    if (showcase) {
+        systemProperties.put("extras.showcase", "true")
     }
 }
 
 tasks.named<JavaExec>("runClientGameTest") {
-    dependsOn(":paper-probe:jar")
     // A client that cannot start may wait on an error dialog forever
     timeout = Duration.ofMinutes(45)
 }
@@ -76,6 +73,9 @@ dependencies {
     minecraft(libs.minecraft)
 
     implementation(libs.liquidbounce)
+    // LiquidBounce's part of the game test harness, and the harness itself, newer than the one the client brings
+    "gametestImplementation"(libs.liquidbounce.gametest)
+    "gametestImplementation"(libs.gametest.harness)
 }
 
 // The client publishes a snapshot on every push to nextgen.

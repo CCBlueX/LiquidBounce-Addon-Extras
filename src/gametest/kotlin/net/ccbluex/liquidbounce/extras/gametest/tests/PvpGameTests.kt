@@ -5,17 +5,20 @@ import net.ccbluex.liquidbounce.event.EventListener
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
-import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
-import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
-import net.ccbluex.liquidbounce.extras.gametest.harness.disable
-import net.ccbluex.liquidbounce.extras.gametest.harness.enable
+import net.ccbluex.gametest.harness.GameTestScope
+import net.ccbluex.gametest.harness.ServerGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
+import net.ccbluex.gametest.harness.TestWorld
+import net.ccbluex.gametest.harness.action.awaitAnswer
+import net.ccbluex.gametest.harness.action.awaitServer
+import net.ccbluex.gametest.harness.action.chatContains
+import net.ccbluex.liquidbounce.gametest.harness.configure
+import net.ccbluex.liquidbounce.gametest.harness.disable
+import net.ccbluex.liquidbounce.gametest.harness.enable
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
-import net.ccbluex.liquidbounce.extras.gametest.harness.setting
-import net.ccbluex.liquidbounce.extras.gametest.harness.summon
-import net.ccbluex.liquidbounce.extras.gametest.harness.teleport
+import net.ccbluex.liquidbounce.gametest.harness.setting
+import net.ccbluex.gametest.harness.action.summon
+import net.ccbluex.gametest.harness.action.teleport
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitHold
@@ -35,9 +38,10 @@ import net.minecraft.world.item.Items
 import java.util.Collections
 import kotlin.math.abs
 
-class SwingRedirectGameTest : PaperGameTest({
-    // Within reach, but a quarter turn away from the crosshair
-    standIn(origin.east(2))
+class SwingRedirectGameTest : ServerGameTest(TestWorld.SURFACE, {
+    // Facing north. Within reach, but a quarter turn away from the crosshair
+    input.lookAt(NORTH, 0f)
+    standIn(origin.west(2))
     enable(ModuleSwingRedirect)
     ticks(5)
     check(client { ModuleSwingRedirect.aim } == null) { "aimed at a target far off the crosshair" }
@@ -45,19 +49,24 @@ class SwingRedirectGameTest : PaperGameTest({
     ticks(20)
     awaitServer("entity @e[tag=$STAND_IN,nbt={Health:20.0f}]")
 
-    // Off the crosshair by less than MaxYaw: the swing at the air lands on it
-    run("tp @e[tag=$STAND_IN] 1.5 -60 2.5")
+    // Off the crosshair by less than MaxYaw: the swing at the air lands on it. Looking a little down keeps
+    // the whole stand-in in view, and the swing still meets nothing but air
+    input.lookAt(NORTH, 10f)
+    run("tp @e[tag=$STAND_IN] ${origin.x - 0.5} ${origin.y} ${origin.z - 1.5}")
     awaitClient("an aim at the stand-in") { ModuleSwingRedirect.aim?.target is Husk }
-    screenshot("SwingRedirect")
+    // The hit shows for half a second, so the Enabled toast has to be gone before it
+    ticks(100)
     input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
+    ticks(3)
+    screenshot("SwingRedirect")
     awaitServer("entity @e[tag=$STAND_IN,nbt={Health:19.0f}]")
-    awaitClient("the rotation back") { abs(Mth.wrapDegrees(RotationManager.serverRotation.yaw)) < 5f }
+    awaitClient("the rotation back") { abs(Mth.wrapDegrees(RotationManager.serverRotation.yaw - NORTH)) < 5f }
 
     // ContinuousTracking: the server faces the stand-in, about 27 degrees to the left, before and between swings
-    client { ModuleSwingRedirect.setting<Boolean>("ContinuousTracking").set(true) }
+    configure(ModuleSwingRedirect, "ContinuousTracking" to true)
     ticks(3)
     repeat(20) {
-        val yaw = client { Mth.wrapDegrees(RotationManager.serverRotation.yaw) }
+        val yaw = client { Mth.wrapDegrees(RotationManager.serverRotation.yaw - NORTH) }
         check(yaw in -32f..-20f) { "not tracking the stand-in: $yaw" }
         ticks(1)
     }
@@ -69,7 +78,7 @@ class SwingRedirectGameTest : PaperGameTest({
     check(client { ModuleSwingRedirect.aim } == null) { "the aim survived disabling" }
 })
 
-class HitHoldGameTest : PaperGameTest({
+class HitHoldGameTest : ServerGameTest({
     standIn(origin.south(2))
     enable(ModuleHitHold)
 
@@ -101,7 +110,7 @@ class HitHoldGameTest : PaperGameTest({
     awaitServer("entity @e[tag=$STAND_IN,nbt={Health:20.0f}]")
 })
 
-class HitFlickGameTest : PaperGameTest({
+class HitFlickGameTest : ServerGameTest({
     standIn(origin.south(2))
     val sent = SentYaws()
     try {
@@ -116,12 +125,12 @@ class HitFlickGameTest : PaperGameTest({
         check(right.all { it in 24f..36f }) { "not turned right by 30 degrees: $right" }
         check(right.max() - right.min() > 0.3f) { "no jitter: $right" }
 
-        client { ModuleHitFlick.setting<Any>("Direction").setByString("Left") }
+        configure(ModuleHitFlick, "Direction" to "Left")
         val left = hitStandIn(16f, sent)
         check(left in -36f..-24f) { "not turned left by 30 degrees: $left" }
 
         // A husk is no player, and standing still is no sprint: plain hits
-        client { ModuleHitFlick.setting<Boolean>("PlayersOnly").set(true) }
+        configure(ModuleHitFlick, "PlayersOnly" to true)
         val notPlayer = hitStandIn(15f, sent)
         check(abs(notPlayer) < 5f) { "flicked a hit on a husk: $notPlayer" }
         client {
@@ -149,7 +158,7 @@ private fun GameTestScope.hitStandIn(health: Float, sent: SentYaws): Float {
     return synchronized(sent.yaws) { sent.yaws.map { Mth.wrapDegrees(it) } }.maxByOrNull { abs(it) } ?: 0f
 }
 
-class CrossbowLoaderGameTest : PaperGameTest({
+class CrossbowLoaderGameTest : ServerGameTest({
     run("item replace entity $playerName hotbar.0 with minecraft:stone_sword")
     run("item replace entity $playerName container.20 with minecraft:crossbow")
     awaitClient("the crossbow") { it.player!!.inventory.getItem(20).`is`(Items.CROSSBOW) }
@@ -163,13 +172,14 @@ class CrossbowLoaderGameTest : PaperGameTest({
     awaitClient("the arrows") { it.player!!.inventory.getItem(21).`is`(Items.ARROW) }
     enable(ModuleCrossbowLoader)
     awaitClient("the loader done", timeout = 200) { !ModuleCrossbowLoader.enabled }
-    awaitAnswer("data get entity $playerName Inventory", "charged_projectiles")
+    // The whole inventory is too long for the answer, which cuts it short
+    awaitAnswer("data get entity $playerName Inventory[{id:\"minecraft:crossbow\"}].components", "charged_projectiles")
     awaitServer("items entity $playerName container.21 minecraft:arrow[count=7]")
     awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:0}]")
     check(client { !it.player!!.isUsingItem }) { "still using the crossbow" }
 
     // KeepInHand: the loaded crossbow stays in hand for the next click, then the sword comes back
-    client { ModuleCrossbowLoader.setting<Boolean>("KeepInHand").set(true) }
+    configure(ModuleCrossbowLoader, "KeepInHand" to true)
     run("item replace entity $playerName hotbar.2 with minecraft:crossbow")
     awaitClient("the second crossbow") { it.player!!.inventory.getItem(2).`is`(Items.CROSSBOW) }
     enable(ModuleCrossbowLoader)
@@ -195,7 +205,7 @@ class CrossbowLoaderGameTest : PaperGameTest({
     check(client { it.player!!.inventory.selectedSlot == 3 }) { "the slot changed back after putting it away" }
 })
 
-class ShieldSwapGameTest : PaperGameTest({
+class ShieldSwapGameTest : ServerGameTest({
     standIn(origin.south(2))
     run("item replace entity $playerName hotbar.0 with minecraft:stone_sword")
     run("item replace entity $playerName container.20 with minecraft:shield")
@@ -225,7 +235,7 @@ class ShieldSwapGameTest : PaperGameTest({
     awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:0}]")
 })
 
-class ShieldGuardGameTest : PaperGameTest({
+class ShieldGuardGameTest : ServerGameTest({
     run("item replace entity $playerName hotbar.0 with minecraft:stone_sword")
     run("item replace entity $playerName hotbar.1 with minecraft:shield")
     input.pressKey { it.keyHotbarSlots[2] }
@@ -268,14 +278,14 @@ class ShieldGuardGameTest : PaperGameTest({
     awaitClient("the shield up again") { it.player!!.isBlocking }
 
     // LowerForAxes: the shield stays down rather than get disabled again
-    client { ModuleShieldGuard.setting<Boolean>("LowerForAxes").set(true) }
+    configure(ModuleShieldGuard, "LowerForAxes" to true)
     awaitClient("the shield down against the axe") { ModuleShieldGuard.threat != null && !it.player!!.isUsingItem }
     ticks(10)
     check(client { !it.player!!.isUsingItem }) { "blocked against an axe" }
-    client { ModuleShieldGuard.setting<Boolean>("LowerForAxes").set(false) }
+    configure(ModuleShieldGuard, "LowerForAxes" to false)
 
     // WeaponsOnly: an empty hand is no threat, a sword is
-    client { ModuleShieldGuard.setting<Boolean>("WeaponsOnly").set(true) }
+    configure(ModuleShieldGuard, "WeaponsOnly" to true)
     run("item replace entity @e[tag=$STAND_IN,limit=1] weapon.mainhand with minecraft:air")
     awaitClient("the empty hand ignored") { ModuleShieldGuard.threat == null && !it.player!!.isUsingItem }
     run("item replace entity @e[tag=$STAND_IN,limit=1] weapon.mainhand with minecraft:stone_sword")
@@ -285,7 +295,7 @@ class ShieldGuardGameTest : PaperGameTest({
     check(client { !attackEntity(it.standIn()!!, SwingMode.DO_NOT_HIDE) }) { "attacked while blocking" }
     ticks(5)
     awaitServer("entity @e[tag=$STAND_IN,nbt={Health:20.0f}]")
-    client { ModuleShieldGuard.setting<Boolean>("WeaponsOnly").set(false) }
+    configure(ModuleShieldGuard, "WeaponsOnly" to false)
     run("item replace entity @e[tag=$STAND_IN,limit=1] weapon.mainhand with minecraft:air")
 
     // With the shield in the offhand nothing switches, so a jump onto the stand-in can end in a critical hit
@@ -342,6 +352,7 @@ class ShieldGuardGameTest : PaperGameTest({
 })
 
 private const val STAND_IN = "standin"
+private const val NORTH = 180f
 
 /**
  * A still, unarmored husk as the enemy, since the server cannot provide a second player. Hostile mobs need a

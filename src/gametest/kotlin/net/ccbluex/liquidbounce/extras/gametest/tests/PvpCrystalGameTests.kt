@@ -1,17 +1,21 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import com.mojang.blaze3d.platform.InputConstants
-import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
-import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
-import net.ccbluex.liquidbounce.extras.gametest.harness.aim
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
-import net.ccbluex.liquidbounce.extras.gametest.harness.disable
-import net.ccbluex.liquidbounce.extras.gametest.harness.enable
-import net.ccbluex.liquidbounce.extras.gametest.harness.fill
-import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
-import net.ccbluex.liquidbounce.extras.gametest.harness.setting
-import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.gametest.harness.GameTestScope
+import net.ccbluex.gametest.harness.ServerGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
+import net.ccbluex.gametest.harness.TestWorld
+import net.ccbluex.gametest.harness.action.aim
+import net.ccbluex.gametest.harness.action.awaitAnswer
+import net.ccbluex.gametest.harness.action.awaitServer
+import net.ccbluex.liquidbounce.gametest.harness.configure
+import net.ccbluex.liquidbounce.gametest.harness.disable
+import net.ccbluex.liquidbounce.gametest.harness.enable
+import net.ccbluex.gametest.harness.action.fill
+import net.ccbluex.gametest.harness.action.setBlock
+import net.ccbluex.liquidbounce.gametest.harness.setting
+import net.ccbluex.gametest.harness.action.summon
+import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
@@ -28,7 +32,7 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 
-class CrystalMacroGameTest : PaperGameTest({
+class CrystalMacroGameTest : ServerGameTest({
     run("difficulty normal")
     val key = InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_G)
     client {
@@ -43,7 +47,7 @@ class CrystalMacroGameTest : PaperGameTest({
     run("effect give $playerName minecraft:resistance infinite 4 true")
     run("item replace entity $playerName hotbar.3 with minecraft:obsidian 4")
     run("item replace entity $playerName hotbar.4 with minecraft:end_crystal 4")
-    run("scoreboard objectives add crystals minecraft.used:minecraft.end_crystal")
+    run("scoreboard objectives add ${unique("crystals")} minecraft.used:minecraft.end_crystal")
     // Level with the crystal: from below, the obsidian would shield the husk from the blast
     fill(origin.offset(1, 0, 4), origin.offset(1, 1, 4), "minecraft:stone")
     summon("minecraft:husk", origin.offset(1, 2, 4), "{NoAI:1b,PersistenceRequired:1b}")
@@ -54,7 +58,7 @@ class CrystalMacroGameTest : PaperGameTest({
     lookAt(Vec3(0.5, stone.y + 1.0, 3.5))
     enable(ModuleCrystalMacro)
     ticks(20)
-    awaitServer("block ${obsidian.command} minecraft:air", 20)
+    awaitServer("block ${obsidian.command} minecraft:air")
 
     input.pressKey(key)
     awaitServer("block ${obsidian.command} minecraft:obsidian")
@@ -87,13 +91,13 @@ class CrystalMacroGameTest : PaperGameTest({
     awaitScore("crystals", 2)
 })
 
-class BucketStealGameTest : PaperGameTest({
+class BucketStealGameTest : ServerGameTest({
     run("difficulty normal")
     val water = origin.offset(1, -1, 3)
     summon("minecraft:husk", origin.offset(0, 0, 3), "{NoAI:1b,PersistenceRequired:1b}")
     setBlock(water, "minecraft:water")
     run("item replace entity $playerName hotbar.2 with minecraft:bucket")
-    client { ModuleBucketSteal.setting<Any>("RotationMode").setByString("None") }
+    configure(ModuleBucketSteal, "RotationMode" to "None")
     awaitClient("the husk, the pool and the bucket") { minecraft ->
         val level = minecraft.level!!
         minecraft.player!!.inventory.getItem(2).`is`(Items.BUCKET) && husks(level) == 1 &&
@@ -103,14 +107,14 @@ class BucketStealGameTest : PaperGameTest({
     // Without rotations, only what the crosshair is on
     enable(ModuleBucketSteal)
     ticks(30)
-    awaitServer("block ${water.command} minecraft:water", 20)
+    awaitServer("block ${water.command} minecraft:water")
     lookAt(Vec3(water.x + 0.5, water.y + 0.8, water.z + 0.5))
     awaitServer("block ${water.command} minecraft:air")
     awaitServer("entity @a[nbt={Inventory:[{id:\"minecraft:water_bucket\"}]}]")
     awaitSlot(0)
 
     // With them, the module aims on its own
-    client { ModuleBucketSteal.setting<Any>("RotationMode").setByString("Normal") }
+    configure(ModuleBucketSteal, "RotationMode" to "Normal")
     input.lookAt(0f, 0f)
     val lava = origin.offset(-1, -1, 3)
     setBlock(lava, "minecraft:lava")
@@ -127,11 +131,11 @@ class BucketStealGameTest : PaperGameTest({
     awaitSlot(0)
 
     // OnWeb: only a source next to a cobweb
-    client { ModuleBucketSteal.setting<Boolean>("OnWeb").set(true) }
+    configure(ModuleBucketSteal, "OnWeb" to true)
     run("item replace entity $playerName hotbar.5 with minecraft:bucket 3")
     setBlock(water, "minecraft:water")
     ticks(30)
-    awaitServer("block ${water.command} minecraft:water", 20)
+    awaitServer("block ${water.command} minecraft:water")
     // Beside it in the ground, where it does not get in the way of the bucket
     setBlock(water.east(), "minecraft:cobweb")
     awaitServer("block ${water.command} minecraft:air")
@@ -156,10 +160,10 @@ class BucketStealGameTest : PaperGameTest({
     run("item replace entity $playerName hotbar.5 with minecraft:bucket")
     setBlock(water, "minecraft:water")
     ticks(40)
-    awaitServer("block ${water.command} minecraft:water", 20)
+    awaitServer("block ${water.command} minecraft:water")
 })
 
-class MisplayGuardGameTest : PaperGameTest({
+class MisplayGuardGameTest : ServerGameTest({
     run("difficulty normal")
     val anchor = origin.offset(0, 0, 2)
     val stone = origin.offset(-1, 0, 2)
@@ -171,10 +175,13 @@ class MisplayGuardGameTest : PaperGameTest({
     run("item replace entity $playerName hotbar.1 with minecraft:end_crystal")
     run("item replace entity $playerName hotbar.2 with minecraft:firework_rocket 4")
     run("item replace entity $playerName hotbar.3 with minecraft:diamond_sword")
-    for (objective in listOf("enderchest minecraft.custom:minecraft.open_enderchest",
-        "rockets minecraft.used:minecraft.firework_rocket")) {
-        run("scoreboard objectives add $objective")
-        run("scoreboard players set $playerName ${objective.substringBefore(' ')} 0")
+    val objectives = mapOf(
+        "enderchest" to "minecraft.custom:minecraft.open_enderchest",
+        "rockets" to "minecraft.used:minecraft.firework_rocket",
+    )
+    for ((name, criterion) in objectives) {
+        run("scoreboard objectives add ${unique(name)} $criterion")
+        run("scoreboard players set $playerName ${unique(name)} 0")
     }
     awaitClient("the blocks and the items") { minecraft ->
         minecraft.player!!.inventory.getItem(3).`is`(Items.DIAMOND_SWORD) &&
@@ -186,8 +193,8 @@ class MisplayGuardGameTest : PaperGameTest({
     aim(anchor)
     rightClick()
     ticks(20)
-    awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=1]", 20)
-    client { ModuleMisplayGuard.setting<Boolean>("ChargedAnchor").set(false) }
+    awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=1]")
+    configure(ModuleMisplayGuard, "ChargedAnchor" to false)
     rightClick()
     awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=2]")
 
@@ -196,8 +203,8 @@ class MisplayGuardGameTest : PaperGameTest({
     val face = client { (it.hitResult as BlockHitResult).let { hit -> hit.blockPos.relative(hit.direction) } }
     rightClick()
     ticks(20)
-    awaitServer("block ${face.command} minecraft:air", 20)
-    client { ModuleMisplayGuard.setting<Boolean>("StrayGlowstone").set(false) }
+    awaitServer("block ${face.command} minecraft:air")
+    configure(ModuleMisplayGuard, "StrayGlowstone" to false)
     rightClick()
     awaitServer("block ${face.command} minecraft:glowstone")
 
@@ -208,7 +215,7 @@ class MisplayGuardGameTest : PaperGameTest({
     ticks(20)
     check(client { it.gui.screen() == null }) { "the ender chest opened" }
     awaitScore("enderchest", 0)
-    client { ModuleMisplayGuard.setting<Boolean>("EnderChest").set(false) }
+    configure(ModuleMisplayGuard, "EnderChest" to false)
     rightClick()
     awaitClient("the ender chest to open") { it.gui.screen() is ContainerScreen }
     awaitScore("enderchest", 1)
@@ -236,7 +243,7 @@ class MisplayGuardGameTest : PaperGameTest({
     awaitAnswer("execute unless entity @e[type=minecraft:husk,nbt={Health:20.0f}]", "Test passed")
 
     // Switched off, nothing is held back
-    client { ModuleMisplayGuard.setting<Boolean>("ChargedAnchor").set(true) }
+    configure(ModuleMisplayGuard, "ChargedAnchor" to true)
     disable(ModuleMisplayGuard)
     input.pressKey { it.keyHotbarSlots[0] }
     aim(anchor)
@@ -244,7 +251,7 @@ class MisplayGuardGameTest : PaperGameTest({
     awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=3]")
 })
 
-class TotemSwitchGameTest : PaperGameTest({
+class TotemSwitchGameTest : ServerGameTest(TestWorld.SURFACE, {
     run("difficulty normal")
     run("gamerule minecraft:natural_health_regeneration false")
     run("item replace entity $playerName hotbar.0 with minecraft:stick")
@@ -253,7 +260,7 @@ class TotemSwitchGameTest : PaperGameTest({
     enable(ModuleTotemSwitch)
 
     // Your own ender pearl in the air
-    client { ModuleTotemSwitch.setting<Boolean>("Pearl").set(true) }
+    configure(ModuleTotemSwitch, "Pearl" to true)
     run("item replace entity $playerName hotbar.1 with minecraft:ender_pearl")
     awaitClient("the pearl") { it.player!!.inventory.getItem(1).`is`(Items.ENDER_PEARL) }
     input.pressKey { it.keyHotbarSlots[1] }
@@ -267,9 +274,11 @@ class TotemSwitchGameTest : PaperGameTest({
     // The landing hurt; the threats below expect full health
     run("effect give $playerName minecraft:instant_health 1 4 true")
 
-    // A crystal two blocks away
-    summon("minecraft:end_crystal", origin.south(2), "{ShowBottom:0b}")
+    // A crystal two blocks away, north of us
+    summon("minecraft:end_crystal", origin.north(2), "{ShowBottom:0b}")
     awaitSlot(5)
+    lookAt(Vec3(origin.x + 0.5, origin.y + 0.8, origin.z - 1.5))
+    screenshot("TotemSwitch")
     run("kill @e[type=minecraft:end_crystal]")
     awaitSlot(0)
 
@@ -284,7 +293,9 @@ class TotemSwitchGameTest : PaperGameTest({
     awaitSlot(0)
     setBlock(origin.offset(0, -1, 2), "minecraft:grass_block")
 
-    // An enemy coming down with a mace
+    // An enemy coming down with a mace, into a pit out of reach: a server that is slow to kill it must not let the
+    // smash land, which would pop the totem
+    fill(origin.offset(2, -3, 2), origin.offset(2, -1, 2), "minecraft:air")
     summon(
         "minecraft:husk", origin.offset(2, 12, 2),
         "{PersistenceRequired:1b,equipment:{mainhand:{id:\"minecraft:mace\",count:1}}}",
@@ -311,7 +322,8 @@ class TotemSwitchGameTest : PaperGameTest({
     run("kill @e[type=minecraft:husk]")
 })
 
-private val AABB_AROUND = AABB(-16.0, -80.0, -16.0, 16.0, -40.0, 16.0)
+// Around the origin of the flat world and of the surface one
+private val AABB_AROUND = AABB(-16.0, -80.0, -16.0, 32.0, 160.0, 32.0)
 
 private val BlockPos.command get() = "$x $y $z"
 
@@ -332,5 +344,6 @@ private fun GameTestScope.rightClick() = input.pressMouse(InputConstants.MOUSE_B
 private fun GameTestScope.awaitSlot(slot: Int, timeout: Int = 200) =
     awaitAnswer("data get entity $playerName SelectedItemSlot", "entity data: $slot", timeout)
 
+/** The scoreboard is shared by every test on the server, so [objective] is the name before [GameTestScope.unique]. */
 private fun GameTestScope.awaitScore(objective: String, score: Int) =
-    awaitAnswer("scoreboard players get $playerName $objective", "has $score [$objective]")
+    awaitAnswer("scoreboard players get $playerName ${unique(objective)}", "has $score [${unique(objective)}]")

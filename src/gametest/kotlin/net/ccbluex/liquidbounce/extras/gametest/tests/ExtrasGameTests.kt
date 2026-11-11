@@ -3,7 +3,8 @@ package net.ccbluex.liquidbounce.extras.gametest.tests
 import com.mojang.authlib.GameProfile
 import com.mojang.blaze3d.platform.InputConstants
 import net.ccbluex.gametest.harness.GameTestScope
-import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
+import net.ccbluex.gametest.harness.ServerGameTest
+import net.ccbluex.gametest.harness.SingleplayerGameTest
 import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
 import net.ccbluex.gametest.harness.TestWorld
 import net.ccbluex.gametest.harness.action.aim
@@ -11,6 +12,7 @@ import net.ccbluex.gametest.harness.action.awaitAnswer
 import net.ccbluex.gametest.harness.action.awaitServer
 import net.ccbluex.gametest.harness.action.chat
 import net.ccbluex.gametest.harness.action.chatContains
+import net.ccbluex.liquidbounce.gametest.harness.configure
 import net.ccbluex.liquidbounce.gametest.harness.disable
 import net.ccbluex.liquidbounce.gametest.harness.enable
 import net.ccbluex.gametest.harness.action.hangItemFrame
@@ -48,7 +50,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.UUID
 
-class MessageAuraGameTest : PaperGameTest({
+class MessageAuraGameTest : ServerGameTest({
     enable(ModuleMessageAura.INSTANCE)
     ticks(5)
     client { FriendManager.add(FriendManager.Friend("ExtrasFriend", null)) }
@@ -65,7 +67,7 @@ class MessageAuraGameTest : PaperGameTest({
     client { FriendManager.remove("ExtrasFriend") }
 })
 
-class IntruderAlertGameTest : PaperGameTest(TestWorld.SURFACE, {
+class IntruderAlertGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client { FriendManager.add(FriendManager.Friend("ExtrasVisitor", null)) }
     // Looking north, at faces the sun lights; client-only players face south
     travel(origin, yaw = 180f)
@@ -84,7 +86,7 @@ class IntruderAlertGameTest : PaperGameTest(TestWorld.SURFACE, {
     hidePlayer(visitor)
 })
 
-class PacketCancellerGameTest : PaperGameTest({
+class PacketCancellerGameTest : SingleplayerGameTest({
     val incoming = ModulePacketCanceller.setting<MutableSet<Identifier>>("Incoming")
     client { incoming.set(sortedSetOf(Identifier.withDefaultNamespace("system_chat"))) }
     enable(ModulePacketCanceller)
@@ -98,7 +100,7 @@ class PacketCancellerGameTest : PaperGameTest({
     client { incoming.set(sortedSetOf()) }
 })
 
-class AntiTrapGameTest : PaperGameTest({
+class AntiTrapGameTest : ServerGameTest({
     enable(ModuleAntiTrap)
     ticks(5)
     val bait = origin.south(5)
@@ -122,10 +124,10 @@ class AntiTrapGameTest : PaperGameTest({
     }
     summon("minecraft:oak_boat", bait.east(6))
     awaitClient("the boat once boats are let in") { it.level!!.entitiesForRendering().any { e -> e is AbstractBoat } }
-    client { ModuleAntiTrap.setting<Boolean>("Boats").set(true) }
+    configure(ModuleAntiTrap, "Boats" to true)
     ticks(20)
     check(client { entitiesAround(it) }.size == 1) { "a loaded boat was removed without RemoveLoaded" }
-    client { ModuleAntiTrap.setting<Boolean>("RemoveLoaded").set(true) }
+    configure(ModuleAntiTrap, "RemoveLoaded" to true)
     awaitClient("the loaded boat to be removed") { entitiesAround(it).isEmpty() }
 
     // The server opening an editor on its own is refused, a sign of our own still gets one
@@ -164,7 +166,7 @@ class AntiTrapGameTest : PaperGameTest({
     disable(ModuleAntiTrap)
 })
 
-class DisguiseGameTest : PaperGameTest(TestWorld.SURFACE, {
+class DisguiseGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client { FriendManager.add(FriendManager.Friend("ExtrasFriend", null)) }
     travel(origin, yaw = 180f)
     val friend = showPlayer("ExtrasFriend", origin.north(4).east(2))
@@ -179,7 +181,7 @@ class DisguiseGameTest : PaperGameTest(TestWorld.SURFACE, {
     }
 
     // The tier goes on the nametag of the stranger, nowhere else
-    client { ModuleDisguise.setting<ModuleDisguise.Tier>("Tier").set(ModuleDisguise.Tier.HT1) }
+    configure(ModuleDisguise, "Tier" to ModuleDisguise.Tier.HT1)
     client {
         val label = checkNotNull(nameTag(it, stranger)) { "the stranger has no nametag" }
         check(shown(label).endsWith(" HT1 | Notch [Admin]")) { "the nametag reads '${shown(label)}'" }
@@ -204,7 +206,7 @@ class DisguiseGameTest : PaperGameTest(TestWorld.SURFACE, {
     awaitClient("the server's line") { it.chatContains("ExtrasStranger wants to trade") }
     ticks(5)
     screenshot("Disguise")
-    client { ModuleDisguise.setting<ModuleDisguise.Tier>("Tier").set(ModuleDisguise.Tier.OFF) }
+    configure(ModuleDisguise, "Tier" to ModuleDisguise.Tier.OFF)
 
     disable(ModuleDisguise)
     check(client { ModuleDisguise.target == null && !skinChanged(it, stranger) }) { "disabling kept the disguise" }

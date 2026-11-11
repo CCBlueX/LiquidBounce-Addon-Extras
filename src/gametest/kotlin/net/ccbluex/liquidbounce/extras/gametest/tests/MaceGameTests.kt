@@ -1,21 +1,25 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.config.types.list.MultiChoiceListValue
-import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
-import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
-import net.ccbluex.liquidbounce.extras.gametest.harness.aim
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
-import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
-import net.ccbluex.liquidbounce.extras.gametest.harness.disable
-import net.ccbluex.liquidbounce.extras.gametest.harness.enable
-import net.ccbluex.liquidbounce.extras.gametest.harness.fill
-import net.ccbluex.liquidbounce.extras.gametest.harness.query
+import net.ccbluex.gametest.harness.GameTestScope
+import net.ccbluex.gametest.harness.ServerGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
+import net.ccbluex.gametest.harness.TestWorld
+import net.ccbluex.gametest.harness.action.aim
+import net.ccbluex.gametest.harness.action.awaitAnswer
+import net.ccbluex.gametest.harness.action.awaitServer
+import net.ccbluex.gametest.harness.action.chatContains
+import net.ccbluex.liquidbounce.gametest.harness.configure
+import net.ccbluex.liquidbounce.gametest.harness.disable
+import net.ccbluex.liquidbounce.gametest.harness.enable
+import net.ccbluex.gametest.harness.action.fill
+import net.ccbluex.gametest.harness.action.query
+import net.ccbluex.liquidbounce.extras.gametest.harness.awaitToggleToasts
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
-import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
-import net.ccbluex.liquidbounce.extras.gametest.harness.setting
-import net.ccbluex.liquidbounce.extras.gametest.harness.summon
-import net.ccbluex.liquidbounce.extras.gametest.harness.teleport
+import net.ccbluex.gametest.harness.action.setBlock
+import net.ccbluex.liquidbounce.gametest.harness.setting
+import net.ccbluex.gametest.harness.action.summon
+import net.ccbluex.gametest.harness.action.teleport
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBreachSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleElytraDive
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleInstantLunge
@@ -44,7 +48,7 @@ private const val FULL_HEALTH = 500f
 private const val BREACH_MACE = "minecraft:mace[enchantments={'minecraft:breach':4}]"
 private const val DENSITY_MACE = "minecraft:mace[enchantments={'minecraft:density':5}]"
 
-class MaceAssistGameTest : PaperGameTest({
+class MaceAssistGameTest : ServerGameTest({
     run("gamerule minecraft:fall_damage false")
     hotbar(0, "minecraft:iron_sword")
     hotbar(1, BREACH_MACE)
@@ -107,7 +111,7 @@ class MaceAssistGameTest : PaperGameTest({
     check(health() == unhurt) { "the mace swung through the cobweb" }
     run("kill @e[type=minecraft:husk]")
     setBlock(web, "minecraft:air")
-    client { ModuleMaceAssist.StunSlam.setting<Boolean>("ScaleWithFall").set(false) }
+    configure(ModuleMaceAssist.StunSlam, "ScaleWithFall" to false)
 
     // StunSlam against a drowned with a raised trident. Paper lets the trident take no hit, but neither does it wear
     // the weapon then; the stun shows in the slot sent before the hit and in what the smash still deals.
@@ -144,7 +148,7 @@ class MaceAssistGameTest : PaperGameTest({
     check(health - health("drowned") in 0f..SMASH) { "the mace smashed into the raised trident" }
 
     // A cooldown lets the mace follow the axe, and keeps the next fall from another stun
-    client { ModuleMaceAssist.StunSlam.setting<Int>("Cooldown").set(5000) }
+    configure(ModuleMaceAssist.StunSlam, "Cooldown" to 5000)
     ticks(20)
     health = health("drowned")
     check(slam() > 0) { "no axe before the cooldown" }
@@ -153,7 +157,7 @@ class MaceAssistGameTest : PaperGameTest({
 
     // AxeHold: the axe stays selected for its ticks before it swings
     ticks(100)
-    client { ModuleMaceAssist.StunSlam.setting<Int>("AxeHold").set(2) }
+    configure(ModuleMaceAssist.StunSlam, "AxeHold" to 2)
     val held = slam()
     check(held >= 2) { "the axe was held for $held tick(s) only" }
     input.releaseKey(STUN_KEY)
@@ -169,21 +173,21 @@ class MaceAssistGameTest : PaperGameTest({
     }
 })
 
-class BreachSwapGameTest : PaperGameTest({
+class BreachSwapGameTest : ServerGameTest({
     hotbar(0, "minecraft:iron_sword")
     hotbar(1, BREACH_MACE)
     summonEnemy(0.5, 2.5)
     aim(origin.south(2).above())
 
     // Left to chance, and the chance is nil
-    client { ModuleBreachSwap.setting<Int>("Chance").set(0) }
+    configure(ModuleBreachSwap, "Chance" to 0)
     enable(ModuleBreachSwap)
     input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
     awaitServer("items entity $playerName hotbar.0 minecraft:iron_sword[damage=1]")
     awaitServer("items entity $playerName hotbar.1 minecraft:mace[damage=0]")
     ticks(20)
 
-    client { ModuleBreachSwap.setting<Int>("Chance").set(100) }
+    configure(ModuleBreachSwap, "Chance" to 100)
     input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
     awaitServer("items entity $playerName hotbar.1 minecraft:mace[damage=1]")
     awaitServer("items entity $playerName hotbar.0 minecraft:iron_sword[damage=1]")
@@ -193,7 +197,7 @@ class BreachSwapGameTest : PaperGameTest({
     check(client { !SilentHotbar.isSlotModifiedBy(ModuleBreachSwap) }) { "disabling left the mace selected" }
 })
 
-class ElytraDiveGameTest : PaperGameTest({
+class ElytraDiveGameTest : ServerGameTest({
     run("gamerule minecraft:fall_damage false")
     run("item replace entity $playerName armor.chest with minecraft:diamond_chestplate")
     // Neither on the hotbar: both come from the inventory, the elytra first, into the first empty slots
@@ -203,7 +207,7 @@ class ElytraDiveGameTest : PaperGameTest({
     travel(origin, pitch = -30f)
 
     // The macro: elytra on, jump, glide, rocket, and the chestplate back after two seconds
-    client { ModuleElytraDive.setting<Int>("FlightTime").set(2) }
+    configure(ModuleElytraDive, "FlightTime" to 2)
     enable(ModuleElytraDive)
     awaitServer("items entity $playerName armor.chest minecraft:elytra")
     awaitServer("entity @a[name=$playerName,nbt={FallFlying:1b}]")
@@ -243,7 +247,7 @@ class ElytraDiveGameTest : PaperGameTest({
     run("item replace entity $playerName hotbar.0 with minecraft:air")
     run("item replace entity $playerName container.22 with minecraft:diamond_chestplate")
     awaitClient("the chestplate") { it.player!!.inventory.getItem(22).`is`(Items.DIAMOND_CHESTPLATE) }
-    client { ModuleElytraDive.setting<Int>("FlightTime").set(1) }
+    configure(ModuleElytraDive, "FlightTime" to 1)
     enable(ModuleElytraDive)
     awaitServer("entity @a[name=$playerName,nbt={FallFlying:1b}]")
     awaitLanding()
@@ -270,13 +274,14 @@ class ElytraDiveGameTest : PaperGameTest({
     enable(ModuleElytraDive)
     // The husk stands on the ground: after the first smash a second one needs another fall from above it
     awaitClient("the climb above the husk") { it.player!!.isFallFlying && it.player!!.y > origin.y + 8 }
-    awaitServer("items entity $playerName hotbar.3 minecraft:mace[damage=2]", timeout = 400)
+    // Two or more: every smash starts another ReDive
+    awaitServer("items entity $playerName hotbar.3 minecraft:mace[damage~{damage:{min:2}}]", timeout = 400)
     disable(ModuleElytraDive)
     disable(ModuleMaceAssist)
     awaitLanding()
 })
 
-class ShieldDrainGameTest : PaperGameTest({
+class ShieldDrainGameTest : ServerGameTest({
     hotbar(0, "minecraft:iron_sword")
     hotbar(1, BREACH_MACE)
     run("item replace entity $playerName weapon.offhand with minecraft:shield")
@@ -292,7 +297,7 @@ class ShieldDrainGameTest : PaperGameTest({
 
     // A raised trident, held back by one gate after another
     summonBlocker(0.5, 2.5)
-    client { ModuleShieldDrain.setting<Float>("MinFall").set(2f) }
+    configure(ModuleShieldDrain, "MinFall" to 2f)
     heldBack("before a fall")
     client {
         ModuleShieldDrain.setting<Float>("MinFall").set(0f)
@@ -305,7 +310,7 @@ class ShieldDrainGameTest : PaperGameTest({
     }
     aim(origin.east(3).above())
     heldBack("off the crosshair")
-    client { ModuleShieldDrain.setting<Boolean>("CrosshairOnly").set(false) }
+    configure(ModuleShieldDrain, "CrosshairOnly" to false)
     input.pressKey { it.keyInventory }
     awaitClient("the inventory") { it.gui.screen() != null }
     heldBack("in a screen")
@@ -318,7 +323,7 @@ class ShieldDrainGameTest : PaperGameTest({
     awaitClient("the own shield down") { !it.player!!.isUsingItem }
 
     // On the crosshair and nothing else in the way: the mace hits the drowned
-    client { ModuleShieldDrain.setting<Boolean>("CrosshairOnly").set(true) }
+    configure(ModuleShieldDrain, "CrosshairOnly" to true)
     enable(ModuleShieldDrain)
     aim(origin.south(2).above())
     awaitClient("the drowned under the crosshair and its trident up") { minecraft ->
@@ -334,7 +339,7 @@ class ShieldDrainGameTest : PaperGameTest({
     }
 })
 
-class SpearAssistGameTest : PaperGameTest({
+class SpearAssistGameTest : ServerGameTest(TestWorld.SURFACE, {
     hotbar(0, "minecraft:iron_sword")
     hotbar(1, "minecraft:iron_spear")
     hotbar(2, "minecraft:iron_spear[enchantments={'minecraft:lunge':3}]")
@@ -343,7 +348,7 @@ class SpearAssistGameTest : PaperGameTest({
     enable(ModuleSpearAssist)
 
     // Left to chance, and the chance is nil
-    client { ModuleSpearAssist.Reach.setting<Int>("Chance").set(0) }
+    configure(ModuleSpearAssist.Reach, "Chance" to 0)
     input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT)
     ticks(20)
     // A sword in hand, but only axe and mace may stand aside for the spear
@@ -372,11 +377,14 @@ class SpearAssistGameTest : PaperGameTest({
     ticks(20)
     awaitServer("items entity $playerName hotbar.1 minecraft:iron_spear[damage=1]")
 
-    // Indicator: charging while running at the husk
+    // Indicator: charging while running at the husk, north of us
     run("kill @e[type=minecraft:husk]")
-    summonEnemy(0.5, 12.5)
+    summonEnemy(0.5, -11.5)
+    input.lookAt(180f, 0f)
     hotbar(0, "minecraft:iron_spear")
     awaitClient("the spear in hand") { it.player!!.mainHandItem.`is`(Items.IRON_SPEAR) }
+    // The spear's name over the hotbar fades first
+    ticks(40)
     input.holdMouse(InputConstants.MOUSE_BUTTON_RIGHT)
     ticks(14)
     input.holdKey { it.keyUp }
@@ -388,15 +396,18 @@ class SpearAssistGameTest : PaperGameTest({
     input.releaseMouse(InputConstants.MOUSE_BUTTON_RIGHT)
     awaitClient("the estimate to go") { ModuleSpearAssist.estimate == null }
 
-    // DoubleTap: a charge hit while falling past a husk on a pillar is followed by the mace
+    // DoubleTap: a charge hit while falling onto a husk on a pillar is followed by the mace
     run("gamerule minecraft:fall_damage false")
     run("kill @e[type=minecraft:husk]")
     travel(origin)
     hotbar(2, DENSITY_MACE)
     fill(origin.south(), origin.south().above(4), "minecraft:stone")
-    run("summon minecraft:husk 0.5 -55 1.5 $ENEMY")
+    summon("minecraft:husk", origin.south().above(5), ENEMY)
     awaitClient("the husk") { husks(it).isNotEmpty() }
-    teleport(origin.above(20), pitch = 75f)
+    // Right above it: falling past it, the mace has a tick or two of reach after the charge hit comes back
+    teleport(origin.south().above(20), pitch = 90f)
+    // A charge only hits for so long after it started, so it starts up there, not on the ground
+    awaitClient("the drop") { it.player!!.y > origin.y + 19 }
     input.holdMouse(InputConstants.MOUSE_BUTTON_RIGHT)
     awaitServer("items entity $playerName hotbar.2 minecraft:mace[damage=1]")
     input.releaseMouse(InputConstants.MOUSE_BUTTON_RIGHT)
@@ -408,7 +419,7 @@ class SpearAssistGameTest : PaperGameTest({
     }
 })
 
-class InstantLungeGameTest : PaperGameTest({
+class InstantLungeGameTest : ServerGameTest({
     hotbar(0, "minecraft:iron_sword")
     hotbar(2, "minecraft:iron_spear[enchantments={'minecraft:lunge':3}]")
     awaitClient("the spear") { it.player!!.inventory.getItem(2).`is`(Items.IRON_SPEAR) }
@@ -430,7 +441,7 @@ class InstantLungeGameTest : PaperGameTest({
     awaitClient("the note") { it.chatContains("No spear with Lunge") && !ModuleInstantLunge.enabled }
 })
 
-class MacePredictionGameTest : PaperGameTest({
+class MacePredictionGameTest : ServerGameTest(TestWorld.SURFACE, {
     run("difficulty easy")
     enable(ModuleMacePrediction)
 
@@ -441,8 +452,12 @@ class MacePredictionGameTest : PaperGameTest({
     run("kill @e[type=minecraft:husk]")
     awaitClient("the standing husk to go") { husks(it).isEmpty() }
 
-    // A husk thrown up comes down where the marker is
-    run("summon minecraft:husk 3.5 -60 9.5 {PersistenceRequired:1b,Silent:1b,Motion:[0.0d,1.3d,-0.15d]}")
+    // A husk thrown up comes down where the marker is. North of us, and looking up
+    // a little so the husk, the line, the marker and the ring all fit. The screenshot must not wait for the
+    // toast of enabling while the husk falls
+    awaitToggleToasts()
+    input.lookAt(180f, -15f)
+    summon("minecraft:husk", origin.offset(-3, 0, -9), "{PersistenceRequired:1b,Silent:1b,Motion:[0.0d,1.3d,0.15d]}")
     awaitClient("a prediction", timeout = 40) { ModuleMacePrediction.prediction.size > 5 }
     ticks(2)
     screenshot("MacePrediction")
@@ -454,25 +469,29 @@ class MacePredictionGameTest : PaperGameTest({
     awaitClient("the prediction to end") { ModuleMacePrediction.prediction.isEmpty() }
 
     // A husk walking at you along a ledge: its path over the ground, up to the edge
-    fill(BlockPos(-1, -60, 9), BlockPos(1, -60, 18), "minecraft:stone")
+    input.lookAt(0f, 0f)
+    val ledge = origin.offset(-1, 0, 5)
+    fill(ledge, ledge.offset(2, 0, 9), "minecraft:stone")
     client {
         ModuleMacePrediction.setting<Int>("WalkTicks").set(100)
         ModuleMacePrediction.setting<Any>("Marker").setByString("Outline")
     }
-    run("summon minecraft:husk 0.5 -59 17.5 {PersistenceRequired:1b,Silent:1b}")
+    summon("minecraft:husk", ledge.offset(1, 1, 8), "{PersistenceRequired:1b,Silent:1b}")
     awaitClient("a walk", timeout = 200) { minecraft ->
-        ModuleMacePrediction.walks && ModuleMacePrediction.prediction.size > 3 && husks(minecraft).any { it.z > 12.0 }
+        ModuleMacePrediction.walks && ModuleMacePrediction.prediction.size > 3 &&
+            husks(minecraft).any { it.z > ledge.z + 3.0 }
     }
     val walk = client { ModuleMacePrediction.prediction.toList() }
     screenshot("MacePredictionWalk")
     check(walk.all { it.y == walk.first().y }) { "the walk left the ground: $walk" }
-    // The ledge spans x -1..2 and z 9..19; without the edge rule a hundred ticks of walking would leave it
-    check(walk.size > 2 && walk.all { it.x in -1.3..2.3 && it.z in 8.7..19.3 }) { "the walk left the ledge: $walk" }
-    val end = walk.last()
-    check(minOf(abs(end.x + 1.0), abs(end.x - 2.0), abs(end.z - 9.0), abs(end.z - 19.0)) < 0.6) {
-        "the walk stopped short of the edge, at $end"
+    // The ledge spans x -1..2 and z 5..15 from the origin; without the edge rule a hundred ticks of walking would
+    // leave it
+    val (x, z) = walk.map { it.x - origin.x } to walk.map { it.z - origin.z }
+    check(walk.size > 2 && x.all { it in -1.3..2.3 } && z.all { it in 4.7..15.3 }) { "the walk left the ledge: $walk" }
+    check(minOf(abs(x.last() + 1.0), abs(x.last() - 2.0), abs(z.last() - 5.0), abs(z.last() - 15.0)) < 0.6) {
+        "the walk stopped short of the edge, at ${walk.last()}"
     }
-    client { ModuleMacePrediction.setting<Boolean>("Walking").set(false) }
+    configure(ModuleMacePrediction, "Walking" to false)
     ticks(2)
     check(client { ModuleMacePrediction.prediction.isEmpty() }) { "a walk with Walking off" }
     run("kill @e[type=minecraft:husk]")
@@ -494,8 +513,8 @@ private fun husks(minecraft: Minecraft) = minecraft.level!!.entitiesForRendering
 // Monsters need a difficulty above peaceful
 private fun GameTestScope.summonEnemy(x: Double, z: Double) {
     run("difficulty easy")
-    run("summon minecraft:husk $x ${origin.y} $z $ENEMY")
-    awaitClient("the husk") { minecraft -> husks(minecraft).any { it.z == z } }
+    run("summon minecraft:husk ${origin.x + x} ${origin.y} ${origin.z + z} $ENEMY")
+    awaitClient("the husk") { minecraft -> husks(minecraft).any { it.z == origin.z + z } }
 }
 
 private fun GameTestScope.awaitLanding() = awaitClient("the landing", timeout = 400) { it.player!!.onGround() }

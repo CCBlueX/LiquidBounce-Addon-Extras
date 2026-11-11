@@ -1,19 +1,21 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
-import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
-import net.ccbluex.liquidbounce.extras.gametest.harness.chat
-import net.ccbluex.liquidbounce.extras.gametest.harness.chatContains
-import net.ccbluex.liquidbounce.extras.gametest.harness.command
-import net.ccbluex.liquidbounce.extras.gametest.harness.disable
-import net.ccbluex.liquidbounce.extras.gametest.harness.enable
-import net.ccbluex.liquidbounce.extras.gametest.harness.fill
-import net.ccbluex.liquidbounce.extras.gametest.harness.forceLoad
-import net.ccbluex.liquidbounce.extras.gametest.harness.hangItemFrame
+import net.ccbluex.gametest.harness.SingleplayerGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
+import net.ccbluex.gametest.harness.TestWorld
+import net.ccbluex.gametest.harness.action.awaitAnswer
+import net.ccbluex.gametest.harness.action.chat
+import net.ccbluex.gametest.harness.action.chatContains
+import net.ccbluex.liquidbounce.gametest.harness.configure
+import net.ccbluex.liquidbounce.gametest.harness.command
+import net.ccbluex.liquidbounce.gametest.harness.disable
+import net.ccbluex.liquidbounce.gametest.harness.enable
+import net.ccbluex.gametest.harness.action.fill
+import net.ccbluex.gametest.harness.action.hangItemFrame
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
-import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
-import net.ccbluex.liquidbounce.extras.gametest.harness.setting
-import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.gametest.harness.action.setBlock
+import net.ccbluex.liquidbounce.gametest.harness.setting
+import net.ccbluex.gametest.harness.action.summon
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCaveDisturbanceDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCollectibleESP
@@ -24,6 +26,7 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlock
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
 import net.ccbluex.liquidbounce.extras.util.WorldJournal
+import net.ccbluex.liquidbounce.extras.util.coordinates
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.ChunkPos
@@ -31,38 +34,45 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 
-class StashFinderGameTest : PaperGameTest({
-    // Filled while the client cannot see it, so the chests arrive with the chunk
-    val stash = ChunkPos(12, 0)
-    forceLoad(stash)
-    for (x in 200..204) {
-        setBlock(BlockPos(x, -60, 3), "minecraft:chest")
-    }
-    forceLoad(stash, load = false)
-
+class StashFinderGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
+    // Filled while the client is in the End, so the chests arrive with the chunk
     enable(ModuleStashFinder)
-    travel(BlockPos(196, -60, 0), yaw = -60f, pitch = 20f)
-    awaitClient("the stash report") { it.chatContains("5 containers in the chunk at 192 0") }
+    // Far from the dragon, on a platform like in BaseFinderEnd
+    val end = BlockPos(1000, 80, 1000)
+    run("execute in minecraft:the_end run forceload add 1000 1000")
+    awaitAnswer("execute in minecraft:the_end if loaded 1000 80 1000", "Test passed")
+    run("execute in minecraft:the_end run fill 999 79 999 1001 79 1001 minecraft:stone")
+    travel(end, dimension = Level.END)
+    val row = (-2..2).map { origin.offset(it, 0, -4) }
+    fill(row.first(), row.last(), "minecraft:chest[facing=south]")
+    travel(origin, dimension = Level.OVERWORLD)
+
+    val stash = ChunkPos.containing(row.first())
+    awaitClient("the stash report") {
+        it.chatContains("5 containers in the chunk at ${stash.minBlockX} ${stash.minBlockZ}")
+    }
     check(client { stash.containers } == 5)
+    // Looking north, at faces the sun lights
+    travel(origin.offset(3, 0, 1), yaw = 155f, pitch = 8f)
     screenshot("StashFinder")
 
     disable(ModuleStashFinder)
     enable(ModuleStashFinder)
     awaitClient("the stash after enabling again") { stash.containers == 5 }
-    setBlock(BlockPos(204, -60, 3), "minecraft:air")
+    setBlock(row[4], "minecraft:air")
     awaitClient("one container less") { stash.containers == 4 }
-    setBlock(BlockPos(203, -61, 3), "minecraft:tuff_bricks")
+    setBlock(row[3].below(), "minecraft:tuff_bricks")
     awaitClient("a container on a trial chamber block left out") { stash !in ModuleStashFinder.stashes }
-    setBlock(BlockPos(203, -61, 3), "minecraft:stone")
+    setBlock(row[3].below(), "minecraft:grass_block")
     awaitClient("the container back") { stash.containers == 4 }
 
-    setBlock(BlockPos(200, -60, 3), "minecraft:barrel")
-    setBlock(BlockPos(201, -60, 3), "minecraft:red_shulker_box")
+    setBlock(row[0], "minecraft:barrel")
+    setBlock(row[1], "minecraft:red_shulker_box")
     awaitClient("containers counted by block") {
         ModuleStashFinder.stashes[stash] ==
             mapOf("minecraft:chest" to 2, "minecraft:barrel" to 1, "minecraft:red_shulker_box" to 1)
     }
-    client { ModuleStashFinder.setting<Set<Block>>("Containers").set(linkedSetOf(Blocks.CHEST)) }
+    configure(ModuleStashFinder, "Containers" to linkedSetOf(Blocks.CHEST))
     awaitClient("only chests counted") { stash !in ModuleStashFinder.stashes }
     client { ModuleStashFinder.setting<Set<Block>>("Containers").restore() }
     awaitClient("every container counted again") { stash.containers == 4 }
@@ -73,7 +83,7 @@ class StashFinderGameTest : PaperGameTest({
 
 private val ChunkPos.containers get() = ModuleStashFinder.stashes[this]?.values?.sum()
 
-class BaseFinderGameTest : PaperGameTest({
+class BaseFinderGameTest : SingleplayerGameTest({
     enable(ModuleBaseFinder)
     ticks(40)
     check(client { ModuleBaseFinder.bases.isEmpty() }) { "reported a base in an empty world" }
@@ -109,13 +119,13 @@ class BaseFinderGameTest : PaperGameTest({
 
     val landmark = BlockPos(20, -60, 20)
     setBlock(landmark, "minecraft:diamond_block")
-    client { ModuleBaseFinder.setting<Set<Block>>("LandmarkBlocks").set(linkedSetOf(Blocks.DIAMOND_BLOCK)) }
+    configure(ModuleBaseFinder, "LandmarkBlocks" to linkedSetOf(Blocks.DIAMOND_BLOCK))
     awaitClient("a landmark of your own") { ChunkPos.containing(landmark) in ModuleBaseFinder.bases }
     disable(ModuleBaseFinder)
     check(client { ModuleBaseFinder.bases.isEmpty() }) { "reports survived disabling" }
 })
 
-class BaseFinderEndGameTest : PaperGameTest({
+class BaseFinderEndGameTest : SingleplayerGameTest({
     val pos = BlockPos(1000, 80, 1000)
     run("execute in minecraft:the_end run forceload add 992 992")
     awaitAnswer("execute in minecraft:the_end if loaded 1000 80 1000", "Test passed")
@@ -141,7 +151,7 @@ class BaseFinderEndGameTest : PaperGameTest({
     awaitClient("diamond frames in the End") { ModuleBaseFinder.bases[chunk]?.get("entities") == 2 }
 })
 
-class FindingsGameTest : PaperGameTest({
+class FindingsGameTest : SingleplayerGameTest({
     for (x in 0..3) {
         setBlock(BlockPos(x, -60, 20), "minecraft:chest")
     }
@@ -168,8 +178,10 @@ class FindingsGameTest : PaperGameTest({
     check(client { stash !in WorldJournal.findings }) { "forgetting the stash did not" }
 })
 
-class SuspiciousBlockDetectorGameTest : PaperGameTest({
-    val block = origin.south(5)
+class SuspiciousBlockDetectorGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
+    // Looking north, as in StashFinder
+    travel(origin, yaw = 180f, pitch = 15f)
+    val block = origin.north(4)
     enable(ModuleSuspiciousBlockDetector)
     // Enabling rescans every chunk, so all of them are settling again
     setBlock(block, "minecraft:gold_block")
@@ -179,46 +191,63 @@ class SuspiciousBlockDetectorGameTest : PaperGameTest({
     // The rescan can come late on a slow machine, and each one settles the chunk anew
     awaitClient("the chunk to settle") { ModuleSuspiciousBlockDetector.isSettled(block) }
     setBlock(block, "minecraft:iron_block")
-    awaitClient("the iron block report") { it.chatContains("New Block of Iron at 0 -60 5") }
+    awaitClient("the iron block report") { it.chatContains("New Block of Iron at ${block.coordinates}") }
 
-    val trapdoor = block.east(3)
+    val trapdoor = block.west(3)
     setBlock(trapdoor, "minecraft:oak_trapdoor")
-    awaitClient("the trapdoor report") { it.chatContains("New Oak Trapdoor at 3 -60 5") }
+    awaitClient("the trapdoor report") { it.chatContains("New Oak Trapdoor at ${trapdoor.coordinates}") }
     setBlock(trapdoor, "minecraft:oak_trapdoor[open=true]")
     ticks(20)
     check(chat().count { "Oak Trapdoor" in it } == 1) { "opening the trapdoor was reported as a new block" }
+
+    val chest = block.east(3)
+    setBlock(chest, "minecraft:chest[facing=south]")
+    awaitClient("the chest report") { it.chatContains("New Chest at ${chest.coordinates}") }
+    ticks(10)
     screenshot("SuspiciousBlockDetector")
 })
 
-class CollectibleESPGameTest : PaperGameTest({
+class CollectibleESPGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
+    travel(origin.north(2), yaw = 180f, pitch = 10f)
     enable(ModuleCollectibleESP)
     ticks(20)
     check(client { ModuleCollectibleESP.findings.isEmpty() }) { "found collectibles in an empty world" }
 
-    val banner = origin.offset(-3, 0, 5)
-    val elytra = origin.offset(1, 1, 6)
-    val dirt = origin.offset(-1, 1, 6)
-    setBlock(banner, "minecraft:white_banner")
-    hangItemFrame(elytra, Direction.NORTH, "minecraft:elytra")
-    hangItemFrame(dirt, Direction.NORTH, "minecraft:dirt")
+    val banner = origin.offset(3, 0, -7)
+    val elytra = origin.offset(0, 1, -6)
+    val totem = origin.offset(-2, 1, -6)
+    val dirt = origin.offset(2, 1, -6)
+    setBlock(banner, "minecraft:red_banner")
+    hangItemFrame(elytra, Direction.SOUTH, "minecraft:elytra")
+    hangItemFrame(totem, Direction.SOUTH, "minecraft:totem_of_undying")
+    hangItemFrame(dirt, Direction.SOUTH, "minecraft:dirt")
 
-    awaitClient("the banner and the elytra") { ModuleCollectibleESP.findings.containsAll(listOf(banner, elytra)) }
+    awaitClient("the banner, the elytra and the totem") {
+        ModuleCollectibleESP.findings.containsAll(listOf(banner, elytra, totem))
+    }
     check(dirt !in client { ModuleCollectibleESP.findings }) { "a framed dirt block counted as collectible" }
     screenshot("CollectibleESP")
     disable(ModuleCollectibleESP)
     check(client { ModuleCollectibleESP.findings.isEmpty() }) { "findings survived disabling" }
 })
 
-class PortalFinderGameTest : PaperGameTest({
+class PortalFinderGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
+    travel(origin.south(2), yaw = 180f)
     enable(ModulePortalFinder)
-    val portal = origin.offset(4, 2, 4)
-    setBlock(portal, "minecraft:end_portal")
-    awaitClient("the portal report") { it.chatContains("Lit portal at 4 -58 4") }
-    check(client { ModulePortalFinder.portals[ChunkPos.containing(portal)] } == portal)
+    // A nether portal frame, lit like a player would
+    val frame = origin.offset(-2, 0, -6)
+    fill(frame, frame.offset(3, 4, 0), "minecraft:obsidian")
+    fill(frame.offset(1, 1, 0), frame.offset(2, 3, 0), "minecraft:air")
+    setBlock(frame.offset(1, 1, 0), "minecraft:fire")
+
+    val chunk = ChunkPos.containing(frame)
+    awaitClient("the lit portal") { chunk in ModulePortalFinder.portals }
+    val portal = client { ModulePortalFinder.portals.getValue(chunk) }
+    awaitClient("the portal report") { it.chatContains("Lit portal at ${portal.coordinates}") }
     screenshot("PortalFinder")
 })
 
-class CaveDisturbanceDetectorGameTest : PaperGameTest({
+class CaveDisturbanceDetectorGameTest : SingleplayerGameTest({
     enable(ModuleCaveDisturbanceDetector)
     ticks(30)
     check(client { ModuleCaveDisturbanceDetector.findings.isEmpty() }) { "found disturbances without caves" }
@@ -231,34 +260,46 @@ class CaveDisturbanceDetectorGameTest : PaperGameTest({
     awaitClient("the mined block", timeout = 60) { ModuleCaveDisturbanceDetector.findings == setOf(mined) }
 })
 
-class TunnelTrailESPGameTest : PaperGameTest({
+class TunnelTrailESPGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
+    travel(origin.south(3), yaw = 180f, pitch = 10f)
     enable(ModuleTunnelTrailESP)
 
-    // A six long tunnel along X
-    fill(BlockPos(4, -60, 8), BlockPos(11, -57, 10), "minecraft:stone")
-    fill(BlockPos(5, -59, 9), BlockPos(10, -58, 9), "minecraft:air")
-    // Six steps up towards south, three blocks of headroom each
-    fill(BlockPos(-9, -60, 3), BlockPos(-7, -50, 11), "minecraft:stone")
+    // An eight long tunnel straight ahead
+    val tunnel = origin.north(5)
+    fill(tunnel.offset(-1, 0, -7), tunnel.offset(1, 2, 0), "minecraft:stone")
+    fill(tunnel.offset(0, 0, -7), tunnel.above(), "minecraft:air")
+    // Six steps up towards north, three blocks of headroom each
+    val staircase = origin.offset(-5, 1, -4)
+    fill(staircase.offset(-1, -1, -7), staircase.offset(1, 9, 0), "minecraft:stone")
     for (step in 0..5) {
-        fill(BlockPos(-8, -59 + step, 4 + step), BlockPos(-8, -57 + step, 4 + step), "minecraft:air")
+        fill(staircase.offset(0, step, -step), staircase.offset(0, step + 2, -step), "minecraft:air")
     }
     // A five deep shaft
-    fill(BlockPos(12, -60, -6), BlockPos(14, -54, -4), "minecraft:stone")
-    fill(BlockPos(13, -59, -5), BlockPos(13, -55, -5), "minecraft:air")
+    val shaft = origin.offset(5, 5, -5)
+    fill(shaft.offset(-1, -5, -1), shaft.offset(1, 0, 1), "minecraft:stone")
+    fill(shaft.below(4), shaft, "minecraft:air")
 
-    val entrances = listOf(BlockPos(5, -59, 9), BlockPos(-8, -59, 4), BlockPos(13, -55, -5))
     awaitClient("the tunnel, staircase and shaft", timeout = 60) {
-        ModuleTunnelTrailESP.findings.containsAll(entrances)
+        ModuleTunnelTrailESP.findings.containsAll(listOf(tunnel, staircase, shaft))
     }
     screenshot("TunnelTrailESP")
 })
 
-class SoundLocatorGameTest : PaperGameTest({
+class SoundLocatorGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
+    travel(origin, yaw = 180f, pitch = 10f)
+    configure(ModuleSoundLocator, "Chat" to true)
     enable(ModuleSoundLocator)
-    run("playsound minecraft:block.chest.open block $playerName 4 -60 4")
-    run("playsound minecraft:block.stone.break block $playerName -4 -60 4")
-    awaitClient("the chest sound") { BlockPos(4, -60, 4) in ModuleSoundLocator.markers }
-    check(BlockPos(-4, -60, 4) !in client { ModuleSoundLocator.markers }) { "marked an unselected sound" }
+    // A chest opened inside a hut, out of sight
+    val hut = origin.offset(-2, -1, -10)
+    fill(hut, hut.offset(4, 3, 4), "minecraft:cobblestone hollow")
+    val chest = hut.offset(2, 1, 2)
+    setBlock(chest, "minecraft:chest")
+    val stone = origin.offset(5, 0, -4)
+    run("playsound minecraft:block.chest.open block $playerName ${chest.coordinates}")
+    run("playsound minecraft:block.stone.break block $playerName ${stone.coordinates}")
+    awaitClient("the chest sound") { chest in ModuleSoundLocator.markers }
+    check(stone !in client { ModuleSoundLocator.markers }) { "marked an unselected sound" }
+    screenshot("SoundLocator")
     disable(ModuleSoundLocator)
     check(client { ModuleSoundLocator.markers.isEmpty() }) { "markers survived disabling" }
 })

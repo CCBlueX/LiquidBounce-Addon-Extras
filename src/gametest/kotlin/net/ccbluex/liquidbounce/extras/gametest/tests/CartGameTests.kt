@@ -2,18 +2,23 @@ package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import com.mojang.blaze3d.platform.InputConstants
 import net.ccbluex.liquidbounce.config.types.group.ValueGroup
-import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
-import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
-import net.ccbluex.liquidbounce.extras.gametest.harness.disable
-import net.ccbluex.liquidbounce.extras.gametest.harness.enable
-import net.ccbluex.liquidbounce.extras.gametest.harness.fill
-import net.ccbluex.liquidbounce.extras.gametest.harness.query
+import net.ccbluex.gametest.harness.GameTestScope
+import net.ccbluex.gametest.harness.ServerGameTest
+import net.ccbluex.gametest.harness.SingleplayerGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
+import net.ccbluex.liquidbounce.extras.gametest.harness.uniqueUuid
+import net.ccbluex.gametest.harness.TestWorld
+import net.ccbluex.gametest.harness.action.awaitAnswer
+import net.ccbluex.gametest.harness.action.awaitServer
+import net.ccbluex.liquidbounce.gametest.harness.configure
+import net.ccbluex.liquidbounce.gametest.harness.disable
+import net.ccbluex.liquidbounce.gametest.harness.enable
+import net.ccbluex.gametest.harness.action.fill
+import net.ccbluex.gametest.harness.action.query
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
-import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
-import net.ccbluex.liquidbounce.extras.gametest.harness.setting
-import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.gametest.harness.action.setBlock
+import net.ccbluex.liquidbounce.gametest.harness.setting
+import net.ccbluex.gametest.harness.action.summon
 import net.ccbluex.liquidbounce.extras.hud.CartKitHud
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBreaker
@@ -33,7 +38,7 @@ private const val FLAME_BOW = "minecraft:bow[enchantments={'minecraft:flame':1}]
 private const val INVENTORY_0 = 9
 private val ARMOR = mapOf("head" to "helmet", "chest" to "chestplate", "legs" to "leggings", "feet" to "boots")
 
-class CartBombGameTest : PaperGameTest({
+class CartBombGameTest : ServerGameTest({
     arena()
     val module = ModuleCartBomb
     val safeBlock = client { module.containedValues.first { it.name == "SafeBlock" } as ValueGroup }
@@ -133,11 +138,12 @@ class CartBombGameTest : PaperGameTest({
     check(client { module.shotRail == null }) { "the predicted landing survived disabling" }
 })
 
-class PearlCartGameTest : PaperGameTest({
+class PearlCartGameTest : ServerGameTest({
     arena()
     kit(FLAME_BOW)
     // Far enough that a blast at the landing spot cannot reach it there
-    summon("minecraft:zombie", origin.south(40), standInNbt(",UUID:[I;1,2,3,4]"))
+    val thrower = uniqueUuid(STAND_IN)
+    summon("minecraft:zombie", origin.south(40), standInNbt(",UUID:$thrower"))
     awaitClient("the thrower") { minecraft -> minecraft.level!!.entitiesForRendering().any { it is Zombie } }
     enable(ModulePearlCart)
 
@@ -154,7 +160,7 @@ class PearlCartGameTest : PaperGameTest({
         }
         // The effect packets first
         ticks(5)
-        summon("minecraft:ender_pearl", origin.south(4).above(10), "{Owner:[I;1,2,3,4],Motion:[0.0d,0.2d,0.0d]}")
+        summon("minecraft:ender_pearl", origin.south(4).above(10), "{Owner:$thrower,Motion:[0.0d,0.2d,0.0d]}")
         awaitClient("the pearl") { minecraft ->
             minecraft.level!!.entitiesForRendering().any { it is ThrownEnderpearl }
         }
@@ -174,7 +180,7 @@ class PearlCartGameTest : PaperGameTest({
         ModulePearlCart.setting<Float>("MaxSelfDamage").set(40f)
     }
 
-    summon("minecraft:ender_pearl", origin.south(4).above(10), "{Owner:[I;1,2,3,4],Motion:[0.0d,0.2d,0.0d]}")
+    summon("minecraft:ender_pearl", origin.south(4).above(10), "{Owner:$thrower,Motion:[0.0d,0.2d,0.0d]}")
     // Only a blast at the landing spot reaches it, and it keeps the place the pearl took it to
     awaitStandInHurt()
     awaitServer("entity @e[tag=$STAND_IN,x=0,y=-60,z=0,distance=..20]")
@@ -183,7 +189,7 @@ class PearlCartGameTest : PaperGameTest({
     check(client { ModulePearlCart.pearls.isEmpty() }) { "met pearls survived disabling" }
 })
 
-class CartBreakerGameTest : PaperGameTest({
+class CartBreakerGameTest : ServerGameTest({
     run("item replace entity $playerName hotbar.0 with minecraft:tnt_minecart")
     run("item replace entity $playerName hotbar.4 with minecraft:iron_sword")
     val own = origin.south(2)
@@ -213,7 +219,7 @@ class CartBreakerGameTest : PaperGameTest({
     check(client { ModuleCartBreaker.target == null }) { "the target survived disabling" }
 })
 
-class CartCoverGameTest : PaperGameTest({
+class CartCoverGameTest : ServerGameTest({
     run("difficulty normal")
     fill(origin.offset(-6, -1, -6), origin.offset(6, -1, 8), "minecraft:obsidian")
     run("item replace entity $playerName hotbar.2 with minecraft:cobblestone 16")
@@ -237,19 +243,21 @@ class CartCoverGameTest : PaperGameTest({
     awaitClient("the lit cart") { minecraft ->
         minecraft.level!!.entitiesForRendering().any { it is MinecartTNT && it.isPrimed }
     }
+    // The round trips below outlast the 80 tick fuse; the client's copy stops at 0 and still shows the cart lit
+    run("data merge entity @e[type=minecraft:tnt_minecart,limit=1] {fuse:300}")
     ticks(10)
     awaitServer("items entity $playerName hotbar.2 minecraft:cobblestone[count=16]")
     // Then one block against it, no more
-    client { ModuleCartCover.setting<Any>("Protect").setByString("Both") }
+    configure(ModuleCartCover, "Protect" to "Both")
     awaitServer("items entity $playerName hotbar.2 minecraft:cobblestone[count=15]")
     ticks(10)
     awaitServer("items entity $playerName hotbar.2 minecraft:cobblestone[count=15]")
-    client { ModuleCartCover.setting<Int>("MaxBlocks").set(26) }
+    configure(ModuleCartCover, "MaxBlocks" to 26)
     awaitClient("the covered player") { ModuleCartCover.predictedDamage in 0.1f..4f }
     input.lookAt(0f, 35f)
     ticks(2)
     screenshot("CartCover")
-    awaitAnswer("execute unless entity @e[type=minecraft:tnt_minecart]", "Test passed", 200)
+    awaitAnswer("execute unless entity @e[type=minecraft:tnt_minecart]", "Test passed", 400)
     ticks(20)
     check(server.console.none { playerName in it.message && "blown up" in it.message }) { "the blast killed us" }
     val health = query("data get entity $playerName Health", Regex("""([\d.]+)f""")).groupValues[1].toFloat()
@@ -258,12 +266,19 @@ class CartCoverGameTest : PaperGameTest({
     check(client { ModuleCartCover.predictedDamage == 0f }) { "the prediction survived disabling" }
 })
 
-class CartKitHudGameTest : PaperGameTest({
+class CartKitHudGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     kit(FLAME_BOW)
+    val rail = origin.north(4)
+    setBlock(rail, "minecraft:rail")
+    summon("minecraft:tnt_minecart", rail)
     client { CartKitHud.enabled = true }
+    awaitClient("the live cart") { "Live 1" in CartKitHud.text.string }
     val text = client { CartKitHud.text.string }
     check("Rails 16" in text && "Carts 3" in text && "Bow" in text) { "the kit reads '$text'" }
     input.pressKey { it.keyHotbarSlots[3] }
+    input.lookAt(180f, 20f)
+    // The bow's name over the hotbar fades first
+    ticks(50)
     input.holdMouse(InputConstants.MOUSE_BUTTON_RIGHT)
     ticks(12)
     screenshot("CartKit")
@@ -271,10 +286,14 @@ class CartKitHudGameTest : PaperGameTest({
     client { CartKitHud.enabled = false }
 })
 
-/** Monsters need more than peaceful; resistance keeps us out of our own blasts, obsidian keeps the floor. */
+/**
+ * Monsters need more than peaceful; resistance keeps us out of our own blasts and the attribute keeps them from
+ * pushing us, since a cart going off a block away is a knock the tests do not look at. Obsidian keeps the floor.
+ */
 private fun GameTestScope.arena() {
     run("difficulty normal")
     run("effect give $playerName minecraft:resistance infinite 4 true")
+    run("attribute $playerName minecraft:explosion_knockback_resistance base set 1")
     fill(origin.offset(-8, -1, -8), origin.offset(8, -1, 12), "minecraft:obsidian")
 }
 
@@ -290,7 +309,7 @@ private fun GameTestScope.kit(launcher: String) {
     }
     run("item replace entity $playerName hotbar.3 with $launcher")
     run("item replace entity $playerName inventory.0 with minecraft:arrow 16")
-    // Grim ends the server's item use when the item in hand changes, a draw begun before the kit arrived too
+    // The anticheat ends the server's item use when the item in hand changes, a draw begun before the kit arrived too
     awaitClient("the kit") { minecraft ->
         listOf(1, 2, 3, 6, 7, INVENTORY_0).none { minecraft.player!!.inventory.getItem(it).isEmpty }
     }

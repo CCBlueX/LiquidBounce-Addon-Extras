@@ -1,20 +1,23 @@
 package net.ccbluex.liquidbounce.extras.gametest.tests
 
 import net.ccbluex.liquidbounce.config.types.group.ValueGroup
-import net.ccbluex.liquidbounce.extras.gametest.harness.GameTestScope
-import net.ccbluex.liquidbounce.extras.gametest.harness.PaperGameTest
-import net.ccbluex.liquidbounce.extras.gametest.harness.aim
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitAnswer
-import net.ccbluex.liquidbounce.extras.gametest.harness.awaitServer
-import net.ccbluex.liquidbounce.extras.gametest.harness.disable
-import net.ccbluex.liquidbounce.extras.gametest.harness.enable
-import net.ccbluex.liquidbounce.extras.gametest.harness.fill
-import net.ccbluex.liquidbounce.extras.gametest.harness.give
-import net.ccbluex.liquidbounce.extras.gametest.harness.query
+import net.ccbluex.gametest.harness.GameTestScope
+import net.ccbluex.gametest.harness.ServerGameTest
+import net.ccbluex.liquidbounce.extras.gametest.harness.SURFACE
+import net.ccbluex.gametest.harness.action.aim
+import net.ccbluex.gametest.harness.action.awaitAnswer
+import net.ccbluex.gametest.harness.action.awaitServer
+import net.ccbluex.liquidbounce.gametest.harness.configure
+import net.ccbluex.liquidbounce.gametest.harness.disable
+import net.ccbluex.liquidbounce.gametest.harness.enable
+import net.ccbluex.gametest.harness.action.fill
+import net.ccbluex.gametest.harness.action.give
+import net.ccbluex.gametest.harness.action.query
 import net.ccbluex.liquidbounce.extras.gametest.harness.screenshot
-import net.ccbluex.liquidbounce.extras.gametest.harness.setBlock
-import net.ccbluex.liquidbounce.extras.gametest.harness.setting
-import net.ccbluex.liquidbounce.extras.gametest.harness.summon
+import net.ccbluex.gametest.harness.action.setBlock
+import net.ccbluex.liquidbounce.gametest.harness.setting
+import net.ccbluex.gametest.harness.action.summon
+import net.ccbluex.gametest.harness.TestWorld
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoAnvilRepair
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoBreed
 import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoJump
@@ -41,39 +44,42 @@ import net.minecraft.world.level.block.entity.SignBlockEntity
 import net.minecraft.world.level.block.entity.SignTextSlot
 import com.mojang.blaze3d.platform.InputConstants
 
-class AutoJumpGameTest : PaperGameTest({
+class AutoJumpGameTest : ServerGameTest({
     enable(ModuleAutoJump.INSTANCE)
     input.holdKey { it.keyUp }
     awaitClient("a jump", timeout = 40) { !it.player!!.onGround() }
-    ticks(10)
-    screenshot("AutoJump")
-    ticks(60)
+    ticks(70)
     input.releaseKey { it.keyUp }
 })
 
-class AutoShearerGameTest : PaperGameTest({
+class AutoShearerGameTest : ServerGameTest(TestWorld.SURFACE, {
+    // Looking north, at faces the sun lights
+    travel(origin, yaw = 180f)
     // Off the selected slot, so the module has to switch to them
     run("item replace entity $playerName hotbar.3 with minecraft:shears")
-    summon("minecraft:sheep", origin.south(2), "{NoAI:1b}")
+    val flock = mapOf(origin.north(2) to 0, origin.north(2).west(2) to 14, origin.north(2).east(2) to 11)
+    for ((pos, color) in flock) {
+        summon("minecraft:sheep", pos, "{NoAI:1b,Color:${color}b}")
+    }
     awaitClient("the sheep and the shears") { minecraft ->
         val player = minecraft.player!!
         player.inventory.getItem(3).`is`(Items.SHEARS) &&
-            minecraft.level!!.getEntitiesOfClass(Sheep::class.java, player.boundingBox.inflate(4.0)).isNotEmpty()
+            minecraft.level!!.getEntitiesOfClass(Sheep::class.java, player.boundingBox.inflate(4.0)).size == 3
     }
 
     enable(ModuleAutoShearer)
-    awaitServer("entity @e[type=minecraft:sheep,nbt={Sheared:1b}]")
-    ticks(10)
+    awaitAnswer("execute if entity @e[type=minecraft:sheep,nbt={Sheared:1b}]", "Count: 3")
+    travel(origin.south(2), yaw = 180f, pitch = 25f)
     screenshot("AutoShearer")
 })
 
-class AutoSignGameTest : PaperGameTest({
-    run("item replace entity $playerName hotbar.0 with minecraft:oak_sign 2")
+class AutoSignGameTest : ServerGameTest(TestWorld.SURFACE, {
+    run("item replace entity $playerName hotbar.0 with minecraft:oak_sign 3")
     awaitClient("the signs") { it.player!!.mainHandItem.`is`(Items.OAK_SIGN) }
     enable(ModuleAutoSign.INSTANCE)
 
     // Nothing written yet, so the first sign is written by hand
-    val first = origin.south(2)
+    val first = origin.north(2)
     aim(first.below())
     input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
     context.waitForScreen(AbstractSignEditScreen::class.java)
@@ -81,18 +87,20 @@ class AutoSignGameTest : PaperGameTest({
     context.clickScreenButton("gui.done")
     awaitSignText(first, "Extras")
 
-    val second = origin.south(2).east()
-    aim(second.below())
-    input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
-    repeat(20) {
-        check(client { it.gui.screen() !is AbstractSignEditScreen }) { "the sign editor opened" }
-        ticks(1)
+    for (next in listOf(first.east(), first.west())) {
+        aim(next.below())
+        input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
+        repeat(20) {
+            check(client { it.gui.screen() !is AbstractSignEditScreen }) { "the sign editor opened" }
+            ticks(1)
+        }
+        awaitSignText(next, "Extras")
     }
-    awaitSignText(second, "Extras")
+    travel(origin.south(), yaw = 180f, pitch = 25f)
     screenshot("AutoSign")
 })
 
-class AutoSignTemplatesGameTest : PaperGameTest({
+class AutoSignTemplatesGameTest : ServerGameTest(TestWorld.SURFACE, {
     val module = ModuleAutoSign.INSTANCE
     val nearby = client { module.containedValues.first { it.name == "Nearby" } as ValueGroup }
     client {
@@ -116,7 +124,6 @@ class AutoSignTemplatesGameTest : PaperGameTest({
     for (line in 0..3) {
         awaitSignText(sign, "Back ${line + 1}", side = "back", line = line)
     }
-    screenshot("AutoSign-templates")
     disable(module)
 
     travel(origin)
@@ -126,7 +133,7 @@ class AutoSignTemplatesGameTest : PaperGameTest({
     enable(module)
     ticks(60)
     awaitSignText(sign, "Keep")
-    client { nearby.setting<Boolean>("Overwrite").set(true) }
+    configure(nearby, "Overwrite" to true)
     awaitSignText(sign, "Front 1")
     disable(module)
 
@@ -156,18 +163,28 @@ class AutoSignTemplatesGameTest : PaperGameTest({
     }
 })
 
-class AutoAnvilRepairGameTest : PaperGameTest({
+class AutoAnvilRepairGameTest : ServerGameTest(TestWorld.SURFACE, {
     val anvil = origin.south(2)
     setBlock(anvil, "minecraft:anvil")
     give("minecraft:diamond_pickaxe[damage=1000]", 2)
     run("experience set $playerName 30 levels")
 
+    // Slow clicks, so the screenshot catches the pair in the anvil
+    val clickDelay = client {
+        val constraints = ModuleAutoAnvilRepair.containedValues.first { it.name == "Constraints" } as ValueGroup
+        constraints.setting<IntRange>("ClickDelay").apply { set(40..40) }
+    }
     enable(ModuleAutoAnvilRepair)
+    ticks(100)
     openAnvil(anvil)
+    awaitClient("the repaired pickaxe on offer") { minecraft ->
+        (minecraft.gui.screen() as AnvilScreen).menu.getSlot(AnvilMenu.RESULT_SLOT).hasItem()
+    }
+    screenshot("AutoAnvilRepair")
     awaitServer("entity @a[name=$playerName,level=28]")
     check(pickaxes() == 1) { "the pair was not combined into one pickaxe" }
-    screenshot("AutoAnvilRepair")
     client { it.player!!.closeContainer() }
+    client { clickDelay.restore() }
 
     // Priced above MaxLevelCost: goes back untouched
     run("clear $playerName")
@@ -185,10 +202,10 @@ class AutoAnvilRepairGameTest : PaperGameTest({
     client { it.player!!.closeContainer() }
 })
 
-class AutoSmelterGameTest : PaperGameTest({
+class AutoSmelterGameTest : ServerGameTest(TestWorld.SURFACE, {
     val furnace = origin.south(2)
     val inputs = linkedSetOf(Items.RAW_IRON, Items.RAW_GOLD, Items.BEEF)
-    client { ModuleAutoSmelter.setting<Set<Item>>("Inputs").set(inputs) }
+    configure(ModuleAutoSmelter, "Inputs" to inputs)
     for ((station, ingredient, result) in listOf(
         Triple("furnace", "raw_iron", "iron_ingot"),
         Triple("blast_furnace", "raw_gold", "gold_ingot"),
@@ -200,11 +217,15 @@ class AutoSmelterGameTest : PaperGameTest({
         give("minecraft:coal", 8)
         openFurnace(furnace)
         enable(ModuleAutoSmelter)
-        awaitServer("items entity $playerName container.* minecraft:$result[count=2]", timeout = 600)
-        awaitServer("items entity $playerName container.* minecraft:coal[count=7]")
         if (station == "furnace") {
+            awaitClient("the furnace to burn") { minecraft ->
+                val menu = (minecraft.gui.screen() as AbstractFurnaceScreen<*>).menu
+                menu.getSlot(0).hasItem() && menu.isLit
+            }
             screenshot("AutoSmelter")
         }
+        awaitServer("items entity $playerName container.* minecraft:$result[count=2]", timeout = 600)
+        awaitServer("items entity $playerName container.* minecraft:coal[count=7]")
         disable(ModuleAutoSmelter)
         client { it.player!!.closeContainer() }
     }
@@ -220,7 +241,7 @@ class AutoSmelterGameTest : PaperGameTest({
     disable(ModuleAutoSmelter)
     client { it.player!!.closeContainer() }
 
-    client { ModuleAutoSmelter.setting<Int>("Refill").set(3) }
+    configure(ModuleAutoSmelter, "Refill" to 3)
     setBlock(furnace, "minecraft:furnace")
     openFurnace(furnace)
     enable(ModuleAutoSmelter)
@@ -250,7 +271,7 @@ class AutoSmelterGameTest : PaperGameTest({
     run("clear $playerName")
     give("minecraft:raw_iron")
     give("minecraft:lava_bucket")
-    client { ModuleAutoSmelter.setting<Set<Item>>("Fuels").set(linkedSetOf(Items.LAVA_BUCKET)) }
+    configure(ModuleAutoSmelter, "Fuels" to linkedSetOf(Items.LAVA_BUCKET))
     setBlock(furnace, "minecraft:air")
     setBlock(furnace, "minecraft:furnace")
     openFurnace(furnace)
@@ -273,10 +294,14 @@ class AutoSmelterGameTest : PaperGameTest({
     client { it.player!!.closeContainer() }
 })
 
-class AutoBreedGameTest : PaperGameTest({
+class AutoBreedGameTest : ServerGameTest(TestWorld.SURFACE, {
     breed("cow", "wheat") {
         awaitBaby("cow")
-        travel(origin.north(3), pitch = 15f)
+        // The calf in front of its parents, all facing the camera
+        val calf = origin.offset(1, 0, 3)
+        run("tp @e[type=minecraft:cow,tag=!parents] ${calf.x + 0.5} ${calf.y} ${calf.z + 0.5} 0 0")
+        run("execute as @e[tag=parents] run tp @s ~ ~ ~ 0 0")
+        travel(origin.offset(1, 0, 6), yaw = 170f, pitch = 12f)
         screenshot("AutoBreed")
     }
     for ((species, food) in listOf(
@@ -288,7 +313,7 @@ class AutoBreedGameTest : PaperGameTest({
     }
 })
 
-class AutoBreedRareGameTest : PaperGameTest({
+class AutoBreedRareGameTest : ServerGameTest({
     breed("sniffer", "torchflower_seeds") {
         awaitServer("entity @e[type=minecraft:item,nbt={Item:{id:'minecraft:sniffer_egg'}}]", timeout = 400)
     }
@@ -300,7 +325,7 @@ class AutoBreedRareGameTest : PaperGameTest({
     breed("strider", "warped_fungus")
 })
 
-class AutoBreedTamedGameTest : PaperGameTest({
+class AutoBreedTamedGameTest : ServerGameTest({
     val owner = owner()
     for ((species, food) in listOf(
         "horse" to "golden_carrot", "donkey" to "golden_carrot", "llama" to "hay_block", "trader_llama" to "hay_block",
@@ -312,7 +337,7 @@ class AutoBreedTamedGameTest : PaperGameTest({
     breed("ocelot", "cod", "Trusting:1b")
 })
 
-class AutoBreedAquaticGameTest : PaperGameTest({
+class AutoBreedAquaticGameTest : ServerGameTest({
     fill(origin.offset(-2, -1, -2), origin.offset(3, 2, 5), "minecraft:stone hollow")
     fill(origin.offset(-2, 2, -2), origin.offset(3, 2, 5), "minecraft:air")
     fill(origin.offset(-1, 0, -1), origin.offset(2, 1, 4), "minecraft:water")
@@ -334,7 +359,7 @@ class AutoBreedAquaticGameTest : PaperGameTest({
     }
 })
 
-class AutoBreedSafetyGameTest : PaperGameTest({
+class AutoBreedSafetyGameTest : ServerGameTest({
     run("item replace entity $playerName weapon.offhand with minecraft:wheat 16")
     for (pos in listOf(origin.south(2), origin.south(2).east())) {
         summon("minecraft:cow", pos, "{NoAI:1b,Age:-24000}")

@@ -10,5 +10,3 @@ pluginManagement {
 }
 
 rootProject.name = "LiquidBounce-Addon-Extras"
-
-include("paper-probe")

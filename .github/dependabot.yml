@@ -10,12 +10,6 @@ registries:
   fabric:
     type: maven-repository
     url: https://maven.fabricmc.net
-  papermc:
-    type: maven-repository
-    url: https://repo.papermc.io/repository/maven-public
-  grim-snapshots:
-    type: maven-repository
-    url: https://repo.grim.ac/snapshots
 updates:
   - package-ecosystem: gradle
     directory: "/"

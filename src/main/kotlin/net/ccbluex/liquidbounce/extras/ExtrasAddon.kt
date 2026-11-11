@@ -4,6 +4,7 @@ import net.ccbluex.liquidbounce.extras.commands.CommandFindings
 import net.ccbluex.liquidbounce.extras.commands.CommandWaypoint
 import net.ccbluex.liquidbounce.extras.commands.CommandWhere
 import net.ccbluex.liquidbounce.extras.hud.ClickCounter
+import net.ccbluex.liquidbounce.extras.hud.ServerTimeUpdates
 import net.ccbluex.liquidbounce.extras.hud.extrasHudComponents
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleBaseFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleCaveDisturbanceDetector
@@ -13,6 +14,7 @@ import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSoundLocator
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleStashFinder
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleSuspiciousBlockDetector
 import net.ccbluex.liquidbounce.extras.modules.basehunting.ModuleTunnelTrailESP
+import net.ccbluex.liquidbounce.extras.modules.extras.ModuleAntiTrap
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleDisguise
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleIntruderAlert
 import net.ccbluex.liquidbounce.extras.modules.extras.ModuleMessageAura
@@ -26,16 +28,32 @@ import net.ccbluex.liquidbounce.extras.modules.grinding.ModuleAutoSmelter
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorAura
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleAnchorMacro
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBlastCover
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBreachSwap
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleBucketSteal
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBomb
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartBreaker
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCartCover
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrossbowLoader
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleCrystalMacro
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleElytraDive
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitFlick
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleHitHold
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleInstantLunge
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMaceAssist
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMacePrediction
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleMisplayGuard
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCart
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlCatch
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlHop
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModulePearlLaunch
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldDrain
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldGuard
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleShieldSwap
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSpearAssist
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleSwingRedirect
 import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleTotemSwitch
+import net.ccbluex.liquidbounce.extras.modules.pvp.ModuleWindGlide
+import net.ccbluex.liquidbounce.extras.modules.pvp.OwnCarts
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleLightOverlay
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleNoItemBounce
 import net.ccbluex.liquidbounce.extras.modules.qol.ModuleWaypoints
@@ -43,52 +61,70 @@ import net.ccbluex.liquidbounce.extras.util.WorldJournal
 import net.ccbluex.liquidbounce.features.addon.LiquidBounceAddon
 import net.ccbluex.liquidbounce.integration.theme.component.HudComponentManager
 
+private val modules = arrayOf(
+    ModuleBaseFinder,
+    ModuleStashFinder,
+    ModuleSuspiciousBlockDetector,
+    ModuleCollectibleESP,
+    ModulePortalFinder,
+    ModuleCaveDisturbanceDetector,
+    ModuleTunnelTrailESP,
+    ModuleSoundLocator,
+    ModuleAutoJump.INSTANCE,
+    ModuleAutoShearer,
+    ModuleAutoSign.INSTANCE,
+    ModuleAutoAnvilRepair,
+    ModuleAutoSmelter,
+    ModuleAutoBreed,
+    ModuleLightOverlay,
+    ModuleWaypoints,
+    ModuleNoItemBounce,
+    ModuleBlastCover,
+    ModuleAnchorAura,
+    ModuleAnchorMacro,
+    ModuleCrystalMacro,
+    ModuleBucketSteal,
+    ModuleMisplayGuard,
+    ModuleTotemSwitch,
+    ModuleCartBomb,
+    ModulePearlCart,
+    ModuleCartBreaker,
+    ModuleCartCover,
+    ModuleSwingRedirect,
+    ModuleHitHold,
+    ModuleHitFlick,
+    ModuleCrossbowLoader,
+    ModuleShieldSwap,
+    ModuleShieldGuard,
+    ModuleMaceAssist,
+    ModuleBreachSwap,
+    ModuleElytraDive,
+    ModuleShieldDrain,
+    ModuleSpearAssist,
+    ModuleInstantLunge,
+    ModuleMacePrediction,
+    ModulePearlCatch,
+    ModulePearlLaunch,
+    ModuleWindGlide,
+    ModulePearlHop,
+    ModuleMessageAura.INSTANCE,
+    ModulePacketCanceller,
+    ModuleIntruderAlert,
+    ModuleAntiTrap,
+    ModuleDisguise,
+)
+
 /** Entry point, named under the `liquidbounce` entrypoint in `fabric.mod.json`. */
 class ExtrasAddon : LiquidBounceAddon() {
 
     override val categories = ExtrasCategories.all
 
     override fun onInitialize() {
-        registerModules(
-            ModuleBaseFinder,
-            ModuleStashFinder,
-            ModuleSuspiciousBlockDetector,
-            ModuleCollectibleESP,
-            ModulePortalFinder,
-            ModuleCaveDisturbanceDetector,
-            ModuleTunnelTrailESP,
-            ModuleSoundLocator,
-            ModuleAutoJump.INSTANCE,
-            ModuleAutoShearer,
-            ModuleAutoSign.INSTANCE,
-            ModuleAutoAnvilRepair,
-            ModuleAutoSmelter,
-            ModuleAutoBreed,
-            ModuleLightOverlay,
-            ModuleWaypoints,
-            ModuleCrystalMacro,
-            ModuleBucketSteal,
-            ModuleMisplayGuard,
-            ModuleTotemSwitch,
-            ModuleMessageAura.INSTANCE,
-            ModulePacketCanceller,
-            ModuleIntruderAlert,
-            ModuleBlastCover,
-            ModuleAnchorAura,
-            ModuleAnchorMacro,
-            ModuleSwingRedirect,
-            ModuleHitHold,
-            ModuleHitFlick,
-            ModuleCrossbowLoader,
-            ModuleShieldSwap,
-            ModuleShieldGuard,
-            ModuleDisguise,
-            ModuleNoItemBounce,
-        )
+        registerModules(*modules)
         registerCommand(CommandWhere.INSTANCE)
         registerCommand(CommandWaypoint)
         registerCommand(CommandFindings)
-        registerListeners(ClickCounter, WorldJournal)
+        registerListeners(ClickCounter, ServerTimeUpdates, WorldJournal, OwnCarts)
         // The client does not persist native HUD components, so their settings live in the add-on's config
         config("extras-hud", extrasHudComponents.toMutableList())
     }
