@@ -1,18 +1,14 @@
 package net.ccbluex.liquidbounce.extras.modules.basehunting
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.job
-import kotlinx.coroutines.launch
-import net.ccbluex.liquidbounce.event.eventListenerScope
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.event.waitTicks
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.extras.util.coordinates
 import net.ccbluex.liquidbounce.extras.util.report
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.utils.block.ChunkScanner
 import net.minecraft.core.BlockPos
+import net.minecraft.util.Util
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.block.BedBlock
 import net.minecraft.world.level.block.Block
@@ -31,12 +27,17 @@ import java.util.concurrent.ConcurrentHashMap
  */
 object ModuleSuspiciousBlockDetector : ClientModule("SuspiciousBlockDetector", ExtrasCategories.BASE_HUNTING) {
 
+    private const val MILLIS_PER_TICK = 50L
+
     private val radius by int("Radius", 64, 8..128, "blocks")
     private val settleTicks by int("SettleTicks", 40, 5..200, "ticks")
     private val notify by boolean("Notify", true)
 
     val findings: Set<BlockPos>
         field = LinkedHashSet<BlockPos>()
+
+    /** Whether [pos] was scanned and its chunk has settled in, so that what is placed there now gets reported. */
+    fun isSettled(pos: BlockPos) = Watcher.isSettled(pos)
 
     @Suppress("unused")
     private val worldChangeHandler = handler<WorldChangeEvent> { findings.clear() }
@@ -62,7 +63,12 @@ object ModuleSuspiciousBlockDetector : ClientModule("SuspiciousBlockDetector", E
     private object Watcher : ChunkScanner.BlockChangeSubscriber {
 
         private val known = ConcurrentHashMap<BlockPos, Block>()
-        private val settling = ConcurrentHashMap<ChunkPos, Job>()
+
+        /**
+         * By [Util.getMillis], when each chunk that loaded lately has settled in. A clock and no coroutine: chunks load
+         * on the scanner's threads, and a coroutine that starts before the module counts as running is cancelled.
+         */
+        private val settledAt = ConcurrentHashMap<ChunkPos, Long>()
 
         override val shouldCallRecordBlockOnChunkUpdate get() = false
 
@@ -74,29 +80,28 @@ object ModuleSuspiciousBlockDetector : ClientModule("SuspiciousBlockDetector", E
         override fun recordBlock(pos: BlockPos, state: BlockState, cleared: Boolean) {
             val block = state.block
             val previous = if (isSuspicious(block)) known.put(pos.immutable(), block) else known.remove(pos)
-            if (isSuspicious(block) && previous !== block && !settling.containsKey(ChunkPos.containing(pos))) {
+            if (isSuspicious(block) && previous !== block && !isSettling(ChunkPos.containing(pos))) {
                 val placedAt = pos.immutable()
                 mc.execute { placed(placedAt, block) }
             }
         }
 
         override fun clearChunk(pos: ChunkPos) {
-            settling.remove(pos)?.cancel()
+            settledAt.remove(pos)
             known.keys.removeIf(pos::contains)
         }
 
         override fun clearAllChunks() {
-            settling.values.forEach(Job::cancel)
-            settling.clear()
+            settledAt.clear()
             known.clear()
         }
 
+        fun isSettled(pos: BlockPos) = known.containsKey(pos) && !isSettling(ChunkPos.containing(pos))
+
+        private fun isSettling(chunk: ChunkPos) = settledAt[chunk]?.let { Util.getMillis() < it } == true
+
         private fun settle(chunk: ChunkPos) {
-            val job = ModuleSuspiciousBlockDetector.eventListenerScope.launch {
-                waitTicks(settleTicks)
-                settling.remove(chunk, coroutineContext.job)
-            }
-            settling.put(chunk, job)?.cancel()
+            settledAt[chunk] = Util.getMillis() + settleTicks * MILLIS_PER_TICK
         }
 
     }

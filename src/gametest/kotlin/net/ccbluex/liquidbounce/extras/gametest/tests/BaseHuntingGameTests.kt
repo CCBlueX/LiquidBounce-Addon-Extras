@@ -176,7 +176,8 @@ class SuspiciousBlockDetectorGameTest : PaperGameTest({
     ticks(20)
     check(client { ModuleSuspiciousBlockDetector.findings.isEmpty() }) { "reported a block of a settling chunk" }
 
-    ticks(40)
+    // The rescan can come late on a slow machine, and each one settles the chunk anew
+    awaitClient("the chunk to settle") { ModuleSuspiciousBlockDetector.isSettled(block) }
     setBlock(block, "minecraft:iron_block")
     awaitClient("the iron block report") { it.chatContains("New Block of Iron at 0 -60 5") }
 
