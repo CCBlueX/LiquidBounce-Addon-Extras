@@ -33,12 +33,15 @@ object ModuleAutoAnvilRepair : ClientModule("AutoAnvilRepair", ExtrasCategories.
         fun quickMove(slot: Int) = InventoryAction.Click.performQuickMove(screen, ContainerItemSlot(slot))
 
         val inputs = listOf(AnvilMenu.INPUT_SLOT, AnvilMenu.ADDITIONAL_SLOT).filter { menu.getSlot(it).hasItem() }
-        val actions = when {
-            inputs.size == 2 && isWorthIt(menu) -> listOf(quickMove(AnvilMenu.RESULT_SLOT))
-            inputs.isNotEmpty() -> {
+        val actions = when (inputs.size) {
+            2 if isWorthIt(menu) -> listOf(quickMove(AnvilMenu.RESULT_SLOT))
+            2 -> {
                 rejectedMenu = menu.containerId
                 inputs.map(::quickMove)
             }
+            // Half a pair is a click the server has not confirmed yet; its updates for the clicks before can
+            // briefly take it back
+            1 -> return@handler
             else -> findPair(menu)?.toList()?.map(::quickMove) ?: return@handler
         }
         event.schedule(constraints, actions)
