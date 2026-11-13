@@ -78,7 +78,6 @@ dependencies {
     "gametestImplementation"(libs.gametest.harness)
 }
 
-// The client publishes a snapshot on every push to nextgen.
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
