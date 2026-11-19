@@ -15,6 +15,8 @@ internal const val PULL_TIMEOUT = 40
 /**
  * Swaps the first inventory stack that [wanted] accepts onto the hotbar, unless one is there already: into an empty
  * slot, or the last one not in hand.
+ *
+ * @agent claude-opus-5-5
  */
 internal fun ScheduleInventoryActionEvent.pullToHotbar(
     constraints: InventoryConstraints,
@@ -29,6 +31,8 @@ internal fun ScheduleInventoryActionEvent.pullToHotbar(
     schedule(constraints, InventoryAction.Click.performSwap(from = from, to = to))
 }
 
+/** @agent claude-opus-5-5 */
 internal fun hotbarSlot(wanted: (ItemStack) -> Boolean): HotbarItemSlot? = Slots.Hotbar.findSlot(wanted)
 
+/** @agent claude-opus-5-5 */
 internal fun inInventory(wanted: (ItemStack) -> Boolean) = Slots.Inventory.findSlot(wanted) != null

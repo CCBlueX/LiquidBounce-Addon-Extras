@@ -23,6 +23,8 @@ import kotlin.math.min
 /**
  * Breaks TNT minecarts others put down while they are still unlit. A stationary cart that is hit drops as an
  * item instead of going off. Carts we placed ourselves are left alone.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleCartBreaker : ClientModule("CartBreaker", ExtrasCategories.PVP) {
 

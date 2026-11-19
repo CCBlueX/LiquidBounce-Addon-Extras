@@ -39,6 +39,7 @@ private const val PLAYER_HEALTH = 20f
 // What the zombie stand-in is called in an ender pearl's Owner
 private val GameTestScope.targetUuid get() = uniqueUuid("target")
 
+/** @agent claude-opus-5-5 */
 class BlastCoverGameTest : ServerGameTest({
     arena()
     run("item replace entity $playerName hotbar.2 with minecraft:glowstone 4")
@@ -136,6 +137,7 @@ class BlastCoverGameTest : ServerGameTest({
     check(client { ModuleBlastCover.pending } == null) { "disabling kept a pending cover" }
 })
 
+/** @agent claude-opus-5-5 */
 class AnchorAuraGameTest : ServerGameTest(TestWorld.SURFACE, {
     arena()
     run("item replace entity $playerName hotbar.1 with minecraft:respawn_anchor 8")
@@ -222,6 +224,7 @@ class AnchorAuraGameTest : ServerGameTest(TestWorld.SURFACE, {
     check(client { it.player!!.inventory.getItem(1).count } == anchors) { "OnlyExisting placed an anchor" }
 })
 
+/** @agent claude-opus-5-5 */
 class AnchorMacroGameTest : ServerGameTest({
     arena()
     run("item replace entity $playerName hotbar.1 with minecraft:respawn_anchor 8")
@@ -286,6 +289,7 @@ class AnchorMacroGameTest : ServerGameTest({
     check(coveredAtCharge) { "the anchor was charged before its cover went up" }
 })
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.arena() {
     // Peaceful takes the zombie away and scales blast damage to players down to nothing
     run("difficulty normal")
@@ -294,14 +298,20 @@ private fun GameTestScope.arena() {
     fill(origin.offset(-6, -1, -4), origin.offset(6, -1, 10), "minecraft:obsidian")
 }
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.clearArena() = fill(origin.offset(-5, 0, 1), origin.offset(5, 4, 9), "minecraft:air")
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.chargedAnchor(pos: BlockPos) {
     setBlock(pos, "minecraft:respawn_anchor[charges=1]")
     awaitClient("the anchor") { it.level!!.getBlockState(pos).`is`(Blocks.RESPAWN_ANCHOR) }
 }
 
-/** A zombie that stands still, has health for a few blasts and does not burn. */
+/**
+ * A zombie that stands still, has health for a few blasts and does not burn.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.summonTarget(pos: BlockPos) {
     val health = TARGET_HEALTH.toInt()
     summon(
@@ -318,14 +328,18 @@ private fun GameTestScope.summonTarget(pos: BlockPos) {
     }
 }
 
+/** @agent claude-opus-5-5 */
 private fun target(minecraft: Minecraft) =
     minecraft.level!!.getEntitiesOfClass(Zombie::class.java, minecraft.player!!.boundingBox.inflate(30.0)).single()
 
+/** @agent claude-opus-5-5 */
 private fun block(pos: BlockPos, block: String) = "block ${pos.x} ${pos.y} ${pos.z} $block"
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.health(entity: String) =
     query("data get entity $entity Health", Regex("""entity data: ([\d.]+)f""")).groupValues[1].toFloat()
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.awaitHealthBelow(entity: String, limit: Float, timeout: Int = 200): Float {
     repeat(timeout / 10) {
         val health = health(entity)
@@ -337,8 +351,10 @@ private fun GameTestScope.awaitHealthBelow(entity: String, limit: Float, timeout
     throw AssertionError("$entity never went below $limit health, see ${server.log}")
 }
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.lookAtTop(pos: BlockPos) = lookAt(Vec3(pos.x + 0.5, pos.y + 1.0, pos.z + 0.5))
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.lookAt(point: Vec3) {
     val rotation = client { Rotation.lookingAt(point, it.player!!.eyePosition) }
     input.lookAt(rotation.yaw, rotation.pitch)

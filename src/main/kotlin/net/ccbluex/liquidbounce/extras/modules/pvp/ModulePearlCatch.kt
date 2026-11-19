@@ -34,6 +34,8 @@ import kotlin.math.pow
 /**
  * Throws a pearl, then a wind charge at the feet, which launches us into the pearl's path. The pearl hits its
  * own thrower once it left them, so it teleports us where we are, high above the ground.
+ *
+ * @agent claude-opus-5-5
  */
 object ModulePearlCatch : ClientModule("PearlCatch", ExtrasCategories.PVP, disableOnQuit = true) {
 
@@ -56,6 +58,7 @@ object ModulePearlCatch : ClientModule("PearlCatch", ExtrasCategories.PVP, disab
     private val compensate by boolean("Compensate", true)
     private val walk by boolean("Walk", true)
 
+    /** @agent claude-opus-5-5 */
     private object Fast : ValueGroup("Fast") {
         val pearlPitch by float("PearlPitch", -90f, -90f..90f)
         val chargePitch by float("ChargePitch", FEET_PITCH, -90f..90f)
@@ -219,12 +222,14 @@ object ModulePearlCatch : ClientModule("PearlCatch", ExtrasCategories.PVP, disab
     private fun ownPearls() = world.entitiesForRendering().filterIsInstance<ThrownEnderpearl>()
         .filter { it.owner === player }
 
+    /** @agent claude-opus-5-5 */
     private enum class Mode(override val tag: String) : Tagged {
         UP("Up"),
         VIEW("View"),
         FAST("Fast"),
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class Timing(override val tag: String) : Tagged {
         FIXED("Fixed"),
         SIMULATE("Simulate"),

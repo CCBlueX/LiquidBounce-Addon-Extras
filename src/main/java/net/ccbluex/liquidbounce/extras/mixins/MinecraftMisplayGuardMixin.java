@@ -18,7 +18,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** The player's own clicks, before anything reaches the server. */
+/**
+ * The player's own clicks, before anything reaches the server.
+ *
+ * @agent claude-opus-5-5
+ */
 @Mixin(Minecraft.class)
 public abstract class MinecraftMisplayGuardMixin {
 

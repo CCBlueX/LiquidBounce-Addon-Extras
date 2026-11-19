@@ -15,7 +15,11 @@ import java.util.EnumMap
 import kotlin.math.PI
 import kotlin.math.sin
 
-/** Totems, golden apples, end crystals and experience bottles in the inventory, red and pulsing when low. */
+/**
+ * Totems, golden apples, end crystals and experience bottles in the inventory, red and pulsing when low.
+ *
+ * @agent claude-opus-5-5
+ */
 object ResourcesHud : TextHudComponent(
     "Resources", "Totems, golden apples, end crystals and experience bottles in your inventory.", "", row = 10,
 ) {
@@ -82,6 +86,7 @@ object ResourcesHud : TextHudComponent(
         return ARGB.srgbLerp(phase.toFloat(), lowColor.argb, lowColor.darker().argb) and 0xFFFFFF
     }
 
+    /** @agent claude-opus-5-5 */
     enum class Resource(val label: String, val limit: Int, vararg val items: Item) {
         TOTEMS("Totems", 2, Items.TOTEM_OF_UNDYING),
         GAPPLES("Gapples", 5, Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE),

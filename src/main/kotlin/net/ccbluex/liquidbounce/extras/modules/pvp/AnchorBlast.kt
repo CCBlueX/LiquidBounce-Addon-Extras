@@ -23,14 +23,20 @@ private const val POWER = 5f
 
 private val COVER_SIDES = Direction.entries.filter { it != Direction.DOWN }
 
+/** @agent claude-opus-5-5 */
 fun BlockPos.isAnchor() = world.getBlockState(this).block is RespawnAnchorBlock
 
+/** @agent claude-opus-5-5 */
 fun BlockPos.charges(): Int {
     val state = world.getBlockState(this)
     return if (state.block is RespawnAnchorBlock) state.getValue(RespawnAnchorBlock.CHARGE) else 0
 }
 
-/** What the blast of an anchor at [anchor] does to this entity, with [cover] standing as a full block. */
+/**
+ * What the blast of an anchor at [anchor] does to this entity, with [cover] standing as a full block.
+ *
+ * @agent claude-opus-5-5
+ */
 fun LivingEntity.anchorDamage(anchor: BlockPos, cover: BlockPos? = null): Float {
     val center = Vec3.atCenterOf(anchor)
     // The anchor is gone before the blast traces its rays
@@ -47,6 +53,7 @@ fun LivingEntity.anchorDamage(anchor: BlockPos, cover: BlockPos? = null): Float 
  * Whether using the main hand on [state] sets the anchor off rather than charging it.
  *
  * @see RespawnAnchorBlock.useItemOn
+ * @agent claude-opus-5-5
  */
 fun detonatesOnUse(state: BlockState): Boolean {
     val charges = state.getValue(RespawnAnchorBlock.CHARGE)
@@ -63,6 +70,8 @@ fun detonatesOnUse(state: BlockState): Boolean {
 /**
  * A hotbar slot that sets an anchor off: an empty hand or any block but glowstone, the held one first.
  * Glowstone in the offhand would charge the anchor instead, see [RespawnAnchorBlock.useItemOn].
+ *
+ * @agent claude-opus-5-5
  */
 fun detonator(): HotbarItemSlot? {
     if (player.offhandItem.`is`(Items.GLOWSTONE)) {
@@ -74,15 +83,22 @@ fun detonator(): HotbarItemSlot? {
         .firstOrNull { it.itemStack.setsOff() }
 }
 
+/** @agent claude-opus-5-5 */
 private fun ItemStack.setsOff() = isEmpty || item is BlockItem && !`is`(Items.GLOWSTONE)
 
-/** Whether a block can go to [pos] now: replaceable and no entity in the way. */
+/**
+ * Whether a block can go to [pos] now: replaceable and no entity in the way.
+ *
+ * @agent claude-opus-5-5
+ */
 fun canPlace(pos: BlockPos, state: BlockState = Blocks.OBSIDIAN.defaultBlockState()) =
     world.getBlockState(pos).canBeReplaced() && world.isUnobstructed(state, pos, CollisionContext.empty())
 
 /**
  * The neighbour of [anchor] that keeps the most of its blast off the player, and the damage left behind it.
  * Cells [avoid] rejects stay free.
+ *
+ * @agent claude-opus-5-5
  */
 fun bestCover(anchor: BlockPos, range: Double, avoid: (BlockPos) -> Boolean = { false }): Pair<BlockPos, Float>? =
     COVER_SIDES.asSequence()

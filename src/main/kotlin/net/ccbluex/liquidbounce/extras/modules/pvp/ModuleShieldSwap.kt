@@ -18,6 +18,8 @@ import net.minecraft.world.item.Items
 /**
  * Blocks with a shield while enabled, taken from the hotbar or the inventory; the slot in hand comes back once it is
  * off. Bound to a key, that is a shield on one press and the weapon on the next, or a shield while the key is held.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleShieldSwap : ClientModule("ShieldSwap", ExtrasCategories.PVP, disableOnQuit = true) {
 

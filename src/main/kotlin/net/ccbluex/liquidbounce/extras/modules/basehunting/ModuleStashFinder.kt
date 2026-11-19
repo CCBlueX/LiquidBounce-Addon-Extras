@@ -17,7 +17,11 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.ShulkerBoxBlock
 
-/** Chunks with many containers, counted by block type and followed as they change. */
+/**
+ * Chunks with many containers, counted by block type and followed as they change.
+ *
+ * @agent claude-fable-5-1
+ */
 object ModuleStashFinder : ClientModule("StashFinder", ExtrasCategories.BASE_HUNTING) {
 
     private val minimum by int("Minimum", 4, 1..64, "containers")

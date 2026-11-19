@@ -67,6 +67,7 @@ class MessageAuraGameTest : ServerGameTest({
     client { FriendManager.remove("ExtrasFriend") }
 })
 
+/** @agent claude-opus-5-5 */
 class IntruderAlertGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client { FriendManager.add(FriendManager.Friend("ExtrasVisitor", null)) }
     // Looking north, at faces the sun lights; client-only players face south
@@ -100,6 +101,7 @@ class PacketCancellerGameTest : SingleplayerGameTest({
     client { incoming.set(sortedSetOf()) }
 })
 
+/** @agent claude-opus-5-5 */
 class AntiTrapGameTest : ServerGameTest({
     enable(ModuleAntiTrap)
     ticks(5)
@@ -166,6 +168,7 @@ class AntiTrapGameTest : ServerGameTest({
     disable(ModuleAntiTrap)
 })
 
+/** @agent claude-opus-5-5 */
 class DisguiseGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client { FriendManager.add(FriendManager.Friend("ExtrasFriend", null)) }
     travel(origin, yaw = 180f)
@@ -216,7 +219,11 @@ class DisguiseGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client { FriendManager.remove("ExtrasFriend") }
 })
 
-/** Entities other than us within AntiTrap's default range. */
+/**
+ * Entities other than us within AntiTrap's default range.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun entitiesAround(minecraft: Minecraft): List<String> {
     val player = minecraft.player!!
     return minecraft.level!!.entitiesForRendering()
@@ -224,6 +231,7 @@ private fun entitiesAround(minecraft: Minecraft): List<String> {
         .map { it.type.toShortString() }
 }
 
+/** @agent claude-opus-5-5 */
 private fun shown(text: Component): String {
     val shown = StringBuilder()
     ModuleDisguise.disguise(text.visualOrderText).accept { _, _, codePoint ->
@@ -233,12 +241,17 @@ private fun shown(text: Component): String {
     return shown.toString()
 }
 
-/** The label the game puts above the head of entity [id] this frame. */
+/**
+ * The label the game puts above the head of entity [id] this frame.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun nameTag(minecraft: Minecraft, id: Int): Component? {
     val entity = minecraft.level!!.getEntity(id)!!
     return minecraft.entityRenderDispatcher.getRenderer(entity).createRenderState(entity, 1f).nameTag
 }
 
+/** @agent claude-opus-5-5 */
 private fun mojangRefuses(): Boolean {
     val request = HttpRequest.newBuilder(URI("https://api.mojang.com/users/profiles/minecraft/Notch")).build()
     val status = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.discarding()).statusCode()
@@ -247,6 +260,7 @@ private fun mojangRefuses(): Boolean {
 
 private const val HTTP_TOO_MANY_REQUESTS = 429
 
+/** @agent claude-opus-5-5 */
 private fun skinChanged(minecraft: Minecraft, id: Int): Boolean {
     val player = minecraft.level!!.getEntity(id) as AbstractClientPlayer
     return player.skin != DefaultPlayerSkin.get(player.uuid)

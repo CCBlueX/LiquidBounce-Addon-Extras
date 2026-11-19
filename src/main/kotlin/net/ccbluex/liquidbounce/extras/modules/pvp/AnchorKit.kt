@@ -16,6 +16,8 @@ import net.minecraft.world.phys.HitResult
 /**
  * What the anchor modules remember together: anchors that exploded or that we placed, for a few seconds, so
  * nothing acts on a block the server already took away, and who holds manual clicks on anchors back.
+ *
+ * @agent claude-opus-5-5
  */
 object AnchorKit : EventListener {
 

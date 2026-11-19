@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-08",
+  "change": "feat(AnchorAura): blast targets and pearl landings with respawn anchors",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 2542, "cachedInput": 21706929, "cacheWrite": 539731, "output": 177247 },
+      "usd": 12.21
+    }
+  ]
+}

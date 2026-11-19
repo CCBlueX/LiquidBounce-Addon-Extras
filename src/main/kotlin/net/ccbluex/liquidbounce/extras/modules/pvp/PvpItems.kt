@@ -17,7 +17,11 @@ import kotlin.math.ceil
 
 internal val ItemStack.isMace get() = item is MaceItem
 
-/** The mace that hits hardest after falling [fallen] blocks: Breach below [densityFrom], Density from there on. */
+/**
+ * The mace that hits hardest after falling [fallen] blocks: Breach below [densityFrom], Density from there on.
+ *
+ * @agent claude-opus-5-5
+ */
 internal fun bestMace(fallen: Double, densityFrom: Float): HotbarItemSlot? {
     val (first, second) = if (fallen >= densityFrom) {
         Enchantments.DENSITY to Enchantments.BREACH
@@ -45,6 +49,7 @@ private const val TICKS_PER_SECOND = 20.0
  */
 @IgnorableReturnValue
 context(requester: EventListener)
+/** @agent claude-opus-5-5 */
 internal fun wearChest(glider: Boolean): Boolean {
     val slot = Slots.Hotbar.findSlot { if (glider) it.isGlider && !it.nextDamageWillBreak() else it.isChestArmor }
         ?: return false

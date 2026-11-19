@@ -27,6 +27,8 @@ import net.minecraft.world.phys.HitResult
  * anchor, and before AnchorAura or AnchorMacro set one off. Those wait while a cover is pending. With the Before
  * charge timing, the cover already goes up before the anchor is charged. Only blasts within the damage window
  * get a cover, and each anchor at most Limit of them.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleBlastCover : ClientModule("BlastCover", ExtrasCategories.PVP) {
 
@@ -154,16 +156,19 @@ object ModuleBlastCover : ClientModule("BlastCover", ExtrasCategories.PVP) {
         skipped.clear()
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class Mode(override val tag: String) : Tagged {
         CROSSHAIR("Crosshair"),
         ROTATE("Rotate"),
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class Timing(override val tag: String) : Tagged {
         BEFORE_CHARGE("BeforeCharge"),
         AFTER_CHARGE("AfterCharge"),
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class Material(override val tag: String, val item: Item, val other: Item) : Tagged {
         OBSIDIAN("Obsidian", Items.OBSIDIAN, Items.GLOWSTONE),
         GLOWSTONE("Glowstone", Items.GLOWSTONE, Items.OBSIDIAN),

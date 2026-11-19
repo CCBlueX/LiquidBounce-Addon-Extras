@@ -13,6 +13,21 @@ permissions:
   contents: write
 
 jobs:
+  agent-usage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          # agent-usage check compares .agent-usage/ with the base branch
+          fetch-depth: 0
+      - name: Check agent usage
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/agent-usage" https://raw.githubusercontent.com/1zun4/agent-usage/v1.2.0/agent-usage
+          echo "4dd8f5dbac6dc84c3552d038f9311061e4216a77e79c843cf68511aa76be7011  $RUNNER_TEMP/agent-usage" | sha256sum -c -
+          python3 "$RUNNER_TEMP/agent-usage" check --base "origin/${GITHUB_BASE_REF:-main}"
+
   build:
     runs-on: ubuntu-latest
     steps:

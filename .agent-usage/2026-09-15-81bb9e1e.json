@@ -1,0 +1,13 @@
+{
+  "date": "2026-09-15",
+  "change": "chore: extras skeleton",
+  "tool": "claude-code",
+  "models": [
+    {
+      "model": "claude-fable-5-1",
+      "provider": "anthropic",
+      "tokens": { "input": 0, "cachedInput": 0, "cacheWrite": 0, "output": 0 },
+      "usd": 0.00
+    }
+  ]
+}

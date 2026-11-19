@@ -14,6 +14,8 @@ import net.minecraft.world.item.enchantment.Enchantments
 /**
  * Lunges once with your best Lunge spear and turns itself off. The spear is held until it is charged, then
  * the slot you held comes back after a random delay.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleInstantLunge : ClientModule("InstantLunge", ExtrasCategories.PVP) {
 

@@ -29,7 +29,11 @@ private const val CLICK_TIMEOUT = 20
 // still offers a click
 private const val FACE_INSET = 0.3
 
-/** A face of [block] to click at [point]. */
+/**
+ * A face of [block] to click at [point].
+ *
+ * @agent claude-opus-5-5
+ */
 class Click(val block: BlockPos, val face: Direction, val point: Vec3, private val range: Double) {
 
     val rotation: Rotation get() = Rotation.lookingAt(point, player.eyePosition)
@@ -45,6 +49,8 @@ class Click(val block: BlockPos, val face: Direction, val point: Vec3, private v
 /**
  * A click that puts a block at [pos]: on what stands there when the game replaces it, like the fire a blast
  * leaves behind, or against a neighbour that does nothing when used.
+ *
+ * @agent claude-opus-5-5
  */
 fun placeClick(pos: BlockPos, range: Double): Click? = Direction.entries.asSequence()
     .mapNotNull { side ->
@@ -55,14 +61,23 @@ fun placeClick(pos: BlockPos, range: Double): Click? = Direction.entries.asSeque
     .plus(listOfNotNull(inPlaceClick(pos, range)))
     .minByOrNull { it.point.distanceToSqr(player.eyePosition) }
 
+/** @agent claude-opus-5-5 */
 private fun inPlaceClick(pos: BlockPos, range: Double) =
     if (world.getBlockState(pos).canBeReplaced()) clickOn(pos, range = range) else null
 
-/** Where a block placed with [hit] goes: into what it hit when the game replaces that, else in front of the face. */
+/**
+ * Where a block placed with [hit] goes: into what it hit when the game replaces that, else in front of the face.
+ *
+ * @agent claude-opus-5-5
+ */
 fun placedAt(hit: BlockHitResult): BlockPos =
     if (world.getBlockState(hit.blockPos).canBeReplaced()) hit.blockPos else hit.blockPos.relative(hit.direction)
 
-/** A click on one of [faces] of [block] that nothing in between blocks. */
+/**
+ * A click on one of [faces] of [block] that nothing in between blocks.
+ *
+ * @agent claude-opus-5-5
+ */
 fun clickOn(block: BlockPos, faces: Collection<Direction> = Direction.entries, range: Double): Click? {
     val eyes = player.eyePosition
     val center = Vec3.atCenterOf(block)
@@ -74,7 +89,11 @@ fun clickOn(block: BlockPos, faces: Collection<Direction> = Direction.entries, r
         }
 }
 
-/** Points on [face] of what the crosshair can hit of [block], none for a block it passes through. */
+/**
+ * Points on [face] of what the crosshair can hit of [block], none for a block it passes through.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun facePoints(block: BlockPos, face: Direction): Sequence<Vec3> {
     val shape = world.getBlockState(block).getShape(world, block)
     if (shape.isEmpty) {
@@ -91,11 +110,14 @@ private fun facePoints(block: BlockPos, face: Direction): Sequence<Vec3> {
     }
 }
 
+/** @agent claude-opus-5-5 */
 private fun AABB.size(axis: Direction.Axis) = max(axis) - min(axis)
 
 /**
  * Turns towards [find]'s click through the rotation manager and runs [action] once the server has a rotation
  * that hits it. Gives up when there is no click left or after [timeout] ticks.
+ *
+ * @agent claude-opus-5-5
  */
 suspend fun EventListener.clickAimed(
     rotations: RotationsValueGroup,
@@ -128,7 +150,11 @@ suspend fun EventListener.clickAimed(
     return done
 }
 
-/** Uses [slot] for [action]: picked like a number key, or only for the server, and back right after. */
+/**
+ * Uses [slot] for [action]: picked like a number key, or only for the server, and back right after.
+ *
+ * @agent claude-opus-5-5
+ */
 inline fun EventListener.withSlot(slot: HotbarItemSlot, visible: Boolean, action: () -> Unit) {
     val index = slot.hotbarIndex ?: return action()
     val inventory = player.inventory
@@ -149,7 +175,11 @@ inline fun EventListener.withSlot(slot: HotbarItemSlot, visible: Boolean, action
     }
 }
 
-/** Right-clicks [hit] with [slot] as vanilla would, with the rotation the server has. */
+/**
+ * Right-clicks [hit] with [slot] as vanilla would, with the rotation the server has.
+ *
+ * @agent claude-opus-5-5
+ */
 fun EventListener.use(hit: BlockHitResult, slot: HotbarItemSlot, visible: Boolean = false) =
     withSlot(slot, visible) {
         doPlacement(hit, RotationManager.serverRotation, slot.useHand)

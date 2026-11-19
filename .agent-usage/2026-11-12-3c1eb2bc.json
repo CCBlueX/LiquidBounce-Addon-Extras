@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-12",
+  "change": "fix(AutoAnvilRepair): wait out half a pair",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 1170, "cachedInput": 250300148, "cacheWrite": 1452988, "output": 279328 },
+      "usd": 67.28
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 64957, "cachedInput": 112710, "cacheWrite": 0, "output": 7081 },
+      "usd": 0.01
+    }
+  ]
+}

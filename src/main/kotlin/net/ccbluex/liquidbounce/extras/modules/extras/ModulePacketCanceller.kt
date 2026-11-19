@@ -7,7 +7,11 @@ import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention
 
-/** Drops the selected packets before any other module sees them. */
+/**
+ * Drops the selected packets before any other module sees them.
+ *
+ * @agent claude-fable-5-1
+ */
 object ModulePacketCanceller : ClientModule("PacketCanceller", ExtrasCategories.EXTRAS) {
 
     private val outgoing by c2sPackets("Outgoing", sortedSetOf())

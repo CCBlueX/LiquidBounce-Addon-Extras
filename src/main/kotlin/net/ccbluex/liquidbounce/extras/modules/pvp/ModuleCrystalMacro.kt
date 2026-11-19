@@ -54,6 +54,8 @@ import net.minecraft.world.phys.shapes.CollisionContext
 /**
  * Crystals the block you look at: obsidian first if it is not a valid base, then the crystal, then the hits
  * that blow it up. Every click waits for the server to have the rotation it needs.
+ *
+ * @agent claude-opus-5-5
  */
 @Suppress("TooManyFunctions")
 object ModuleCrystalMacro : ClientModule("CrystalMacro", ExtrasCategories.PVP) {
@@ -299,6 +301,7 @@ object ModuleCrystalMacro : ClientModule("CrystalMacro", ExtrasCategories.PVP) {
         return done
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class Breaks(override val tag: String) : Tagged {
         ONCE("Once"),
         TWICE("Twice"),

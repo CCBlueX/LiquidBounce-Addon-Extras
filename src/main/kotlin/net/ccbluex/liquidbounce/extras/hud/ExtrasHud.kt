@@ -32,8 +32,10 @@ val extrasHudComponents: List<TextHudComponent> = [
 
 internal const val UNAVAILABLE = "N/A"
 
+/** @agent gpt-6-astra */
 private fun decimal(value: Double, digits: Int = 2) = "%.${digits}f".format(Locale.ROOT, value)
 
+/** @agent claude-opus-5-5 */
 object FpsHud : MetricHudComponent(
     "FPS", "Frames rendered per second.", "FPS: ", row = 0, good = 50.0, ok = 30.0,
 ) {
@@ -61,6 +63,7 @@ object FpsHud : MetricHudComponent(
 
 }
 
+/** @agent claude-opus-5-5 */
 object TpsHud : MetricHudComponent(
     "TPS", "Server ticks per second, estimated from time updates.", "TPS: ", row = 1, good = 18.0, ok = 15.0,
 ) {
@@ -78,7 +81,11 @@ object TpsHud : MetricHudComponent(
 
 }
 
-/** When the server last sent the time. */
+/**
+ * When the server last sent the time.
+ *
+ * @agent claude-opus-5-5
+ */
 object ServerTimeUpdates : EventListener {
 
     @Volatile
@@ -99,6 +106,7 @@ object ServerTimeUpdates : EventListener {
 
 }
 
+/** @agent claude-opus-5-5 */
 object PingHud : MetricHudComponent(
     "Ping", "Your latency to the server.", "Ping: ", " ms", row = 2, good = 80.0, ok = 150.0,
 ) {
@@ -161,6 +169,7 @@ object SpeedometerHud : TextHudComponent("Speedometer", "Your horizontal speed."
         return Component.literal(decimal(speed) + if (showUnit) " ${unit.label}" else "")
     }
 
+    /** @agent gpt-6-astra */
     private enum class SpeedUnit(override val tag: String, val perTick: Double, val label: String) : Tagged {
         BLOCKS_PER_TICK("BlocksPerTick", 1.0, "b/t"),
         BLOCKS_PER_SECOND("BlocksPerSecond", 20.0, "b/s"),
@@ -168,6 +177,7 @@ object SpeedometerHud : TextHudComponent("Speedometer", "Your horizontal speed."
 
 }
 
+/** @agent claude-opus-5-5 */
 object ClockHud : TextHudComponent("Clock", "The time on your computer.", "", row = 8) {
 
     private const val BAR_HEIGHT = 2f

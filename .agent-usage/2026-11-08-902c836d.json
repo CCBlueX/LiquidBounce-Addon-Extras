@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-08",
+  "change": "feat(PearlLaunch): throw a wind charge the moment a pearl lands you",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 5043, "cachedInput": 74116071, "cacheWrite": 682564, "output": 232718 },
+      "usd": 24.96
+    }
+  ]
+}

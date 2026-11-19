@@ -21,6 +21,8 @@ import kotlin.math.roundToInt
 /**
  * Saved spots of this world and dimension, listed with distance and direction, and the selected one marked
  * in the world. Managed with `.waypoint`.
+ *
+ * @agent gpt-6-astra
  */
 object ModuleWaypoints : ClientModule("Waypoints", ExtrasCategories.QOL) {
 

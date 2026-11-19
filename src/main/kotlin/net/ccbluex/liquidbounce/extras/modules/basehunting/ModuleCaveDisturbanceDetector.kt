@@ -16,6 +16,8 @@ import net.minecraft.world.level.block.Blocks
 /**
  * Caves generate as cave air, so a lone block of plain air in a cave wall is where someone mined. The idea
  * comes from Trouser-Streak's CaveDisturbanceDetector, see README Credits.
+ *
+ * @agent gpt-6-sol
  */
 object ModuleCaveDisturbanceDetector : ClientModule("CaveDisturbanceDetector", ExtrasCategories.BASE_HUNTING) {
 

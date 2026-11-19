@@ -26,7 +26,11 @@ import net.minecraft.world.level.block.SignBlock
 import net.minecraft.world.level.block.entity.SignBlockEntity
 import net.minecraft.world.level.block.entity.SignTextSlot
 
-/** Chunks with the blocks and entities players leave behind where they live. */
+/**
+ * Chunks with the blocks and entities players leave behind where they live.
+ *
+ * @agent gpt-6-sol
+ */
 object ModuleBaseFinder : ClientModule("BaseFinder", ExtrasCategories.BASE_HUNTING) {
 
     private val landmarks by boolean("Landmarks", true)

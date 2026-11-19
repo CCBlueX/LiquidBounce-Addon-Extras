@@ -13,6 +13,8 @@ import net.minecraft.core.BlockPos;
 /**
  * `.where` prints your position, `.where share` says it in the server chat. Plain Brigadier, the way
  * Java builds commands; Kotlin gets a DSL on top, see `CommandWaypoint`.
+ *
+ * @agent claude-fable-5-1
  */
 public final class CommandWhere implements CommandRegistrar {
 

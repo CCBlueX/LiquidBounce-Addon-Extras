@@ -16,13 +16,19 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
-/** A wind charge throw [delay] ticks from now that puts us into the pearl's path [height] blocks up. */
+/**
+ * A wind charge throw [delay] ticks from now that puts us into the pearl's path [height] blocks up.
+ *
+ * @agent claude-opus-5-5
+ */
 internal class Intercept(val delay: Int, val rotation: Rotation, val miss: Double, val height: Double)
 
 /**
  * Plays the next ticks forward: the pearl as it flies, a wind charge thrown at some tick and angle, its burst,
  * and our launch from it. Explosions push from their center towards the eyes, with less force the further
  * the feet are; a pearl hits its owner too once it left them.
+ *
+ * @agent claude-opus-5-5
  */
 internal object PearlIntercept {
 

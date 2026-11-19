@@ -48,6 +48,8 @@ import kotlin.random.Random
  * Spear tricks. Reach stabs with a spear what your sword, axe or mace cannot reach. DoubleTap follows a charge
  * hit that lands while you fall with a mace hit on the same enemy. Indicator shows what your charge would deal to
  * the nearest enemy right now.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleSpearAssist : ClientModule("SpearAssist", ExtrasCategories.PVP) {
 
@@ -63,23 +65,27 @@ object ModuleSpearAssist : ClientModule("SpearAssist", ExtrasCategories.PVP) {
     private const val TICKS_PER_SECOND = 20.0
     private const val PERCENT = 100
 
+    /** @agent claude-opus-5-5 */
     object Reach : ToggleableValueGroup(ModuleSpearAssist, "Reach", true) {
         val chance by int("Chance", 100, 0..100, "%")
         val weapons by multiEnumChoice("Weapons", Weapon.SWORD, Weapon.AXE, Weapon.MACE)
     }
 
+    /** @agent claude-opus-5-5 */
     enum class Weapon(override val tag: String, val matches: (ItemStack) -> Boolean) : Tagged {
         SWORD("Sword", { it.isSword }),
         AXE("Axe", { it.isAxe }),
         MACE("Mace", { it.isMace }),
     }
 
+    /** @agent claude-opus-5-5 */
     object DoubleTap : ToggleableValueGroup(ModuleSpearAssist, "DoubleTap", true) {
         val minFall by float("MinFall", 3f, 1.5f..30f, "blocks")
         val densityFrom by float("DensityFrom", 8f, 1.5f..60f, "blocks")
         val aimMode = modes(this, "RotationMode") { arrayOf(NormalRotationMode(it, this)) }
     }
 
+    /** @agent claude-opus-5-5 */
     object Indicator : ToggleableValueGroup(ModuleSpearAssist, "Indicator", true) {
         val range by float("Range", 12f, 3f..64f, "blocks")
         val color by color("Color", Color4b(90, 200, 255))

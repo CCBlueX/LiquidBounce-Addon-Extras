@@ -19,6 +19,8 @@ import net.minecraft.world.item.Items
 /**
  * Shears the closest sheep in reach. The interaction goes out only once the server has our rotation,
  * which is what an anticheat compares it against.
+ *
+ * @agent claude-fable-5-1
  */
 object ModuleAutoShearer : ClientModule("AutoShearer", ExtrasCategories.GRINDING) {
 

@@ -38,6 +38,8 @@ import kotlin.math.min
  * Takes water and lava away from your enemy: scoops source blocks next to them with an empty bucket, or
  * plugs them with a cobweb when there is no bucket. With rotations off, only what your crosshair is on, with
  * OnWeb only sources next to a cobweb.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleBucketSteal : ClientModule("BucketSteal", ExtrasCategories.PVP) {
 

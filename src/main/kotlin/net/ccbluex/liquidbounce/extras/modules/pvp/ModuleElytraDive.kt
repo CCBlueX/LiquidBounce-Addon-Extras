@@ -38,6 +38,8 @@ import net.minecraft.world.phys.Vec3
  * chestplate back on. Elytra, rockets and chestplate come from the inventory when the hotbar has none, but only
  * on the ground. While gliding, the jump key fires another rocket. ReDive takes off again once it lands after a
  * mace hit, climbs above the same enemy and steers back down onto it.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleElytraDive : ClientModule("ElytraDive", ExtrasCategories.PVP) {
 
@@ -57,6 +59,7 @@ object ModuleElytraDive : ClientModule("ElytraDive", ExtrasCategories.PVP) {
     private val requireLand by boolean("RequireLand", true)
     private val constraints = tree(PlayerInventoryConstraints())
 
+    /** @agent claude-opus-5-5 */
     object ReDive : ToggleableValueGroup(ModuleElytraDive, "ReDive", false) {
         val height by float("Height", 12f, 4f..40f, "blocks")
         val releaseDistance by float("ReleaseDistance", 5f, 2f..20f, "blocks")
@@ -79,6 +82,7 @@ object ModuleElytraDive : ClientModule("ElytraDive", ExtrasCategories.PVP) {
     private var jumpInput = false
     private var flight: Job? = null
 
+    /** @agent claude-opus-5-5 */
     private enum class Use { ELYTRA, CHESTPLATE, ROCKET }
 
     private var pendingUse: Use? = null

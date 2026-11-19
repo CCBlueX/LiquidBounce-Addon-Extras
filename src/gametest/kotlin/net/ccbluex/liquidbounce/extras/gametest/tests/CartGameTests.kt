@@ -38,6 +38,7 @@ private const val FLAME_BOW = "minecraft:bow[enchantments={'minecraft:flame':1}]
 private const val INVENTORY_0 = 9
 private val ARMOR = mapOf("head" to "helmet", "chest" to "chestplate", "legs" to "leggings", "feet" to "boots")
 
+/** @agent claude-opus-5-5 */
 class CartBombGameTest : ServerGameTest({
     arena()
     val module = ModuleCartBomb
@@ -138,6 +139,7 @@ class CartBombGameTest : ServerGameTest({
     check(client { module.shotRail == null }) { "the predicted landing survived disabling" }
 })
 
+/** @agent claude-opus-5-5 */
 class PearlCartGameTest : ServerGameTest({
     arena()
     kit(FLAME_BOW)
@@ -189,6 +191,7 @@ class PearlCartGameTest : ServerGameTest({
     check(client { ModulePearlCart.pearls.isEmpty() }) { "met pearls survived disabling" }
 })
 
+/** @agent claude-opus-5-5 */
 class CartBreakerGameTest : ServerGameTest({
     run("item replace entity $playerName hotbar.0 with minecraft:tnt_minecart")
     run("item replace entity $playerName hotbar.4 with minecraft:iron_sword")
@@ -219,6 +222,7 @@ class CartBreakerGameTest : ServerGameTest({
     check(client { ModuleCartBreaker.target == null }) { "the target survived disabling" }
 })
 
+/** @agent claude-opus-5-5 */
 class CartCoverGameTest : ServerGameTest({
     run("difficulty normal")
     fill(origin.offset(-6, -1, -6), origin.offset(6, -1, 8), "minecraft:obsidian")
@@ -266,6 +270,7 @@ class CartCoverGameTest : ServerGameTest({
     check(client { ModuleCartCover.predictedDamage == 0f }) { "the prediction survived disabling" }
 })
 
+/** @agent claude-opus-5-5 */
 class CartKitHudGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     kit(FLAME_BOW)
     val rail = origin.north(4)
@@ -289,6 +294,8 @@ class CartKitHudGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
 /**
  * Monsters need more than peaceful; resistance keeps us out of our own blasts and the attribute keeps them from
  * pushing us, since a cart going off a block away is a knock the tests do not look at. Obsidian keeps the floor.
+ *
+ * @agent claude-opus-5-5
  */
 private fun GameTestScope.arena() {
     run("difficulty normal")
@@ -297,7 +304,11 @@ private fun GameTestScope.arena() {
     fill(origin.offset(-8, -1, -8), origin.offset(8, -1, 12), "minecraft:obsidian")
 }
 
-/** The [launcher], rails, three TNT minecarts and arrows, nothing in hand. */
+/**
+ * The [launcher], rails, three TNT minecarts and arrows, nothing in hand.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.kit(launcher: String) {
     run("clear $playerName")
     // Otherwise the last kit's leftovers would pass for this one
@@ -315,16 +326,25 @@ private fun GameTestScope.kit(launcher: String) {
     }
 }
 
-/** TNT minecarts left in the inventory, as the server counts them. */
+/**
+ * TNT minecarts left in the inventory, as the server counts them.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.awaitCarts(count: Int) =
     awaitAnswer("clear $playerName minecraft:tnt_minecart 0", "Found $count matching")
 
-/** An enemy that cannot die of our blasts: armoured against the sun, with a thousand health. */
+/**
+ * An enemy that cannot die of our blasts: armoured against the sun, with a thousand health.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun standInNbt(extra: String = "") =
     "{NoAI:1b,PersistenceRequired:1b,Silent:1b,Tags:['$STAND_IN'],Health:1000f" +
         ",attributes:[{id:'minecraft:max_health',base:1000d}]" +
         ",equipment:{head:{id:'minecraft:iron_helmet',count:1}}$extra}"
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.standIn(pos: BlockPos) {
     // The last one stands on the same spot until the client learns that it died
     val before = client { minecraft ->
@@ -339,8 +359,10 @@ private fun GameTestScope.standIn(pos: BlockPos) {
     }
 }
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.awaitStandInHurt() = awaitServer("entity @e[tag=$STAND_IN,nbt=!{Health:1000.0f}]")
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.lookAt(point: Vec3) {
     val rotation = client { Rotation.lookingAt(point, it.player!!.eyePosition) }
     input.lookAt(rotation.yaw, rotation.pitch)

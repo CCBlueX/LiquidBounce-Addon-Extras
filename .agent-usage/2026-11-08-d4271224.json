@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-08",
+  "change": "feat(MaceAssist): hold the best mace while falling onto an enemy",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 5096, "cachedInput": 88070016, "cacheWrite": 809194, "output": 249239 },
+      "usd": 29.09
+    }
+  ]
+}

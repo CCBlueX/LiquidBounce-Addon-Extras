@@ -42,6 +42,8 @@ import net.minecraft.world.phys.HitResult
 /**
  * Lays a rail with TNT minecarts on the block you look at and sets them off with an arrow, or lays them where
  * your own shot comes down.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleCartBomb : ClientModule("CartBomb", ExtrasCategories.PVP) {
 
@@ -62,18 +64,27 @@ object ModuleCartBomb : ClientModule("CartBomb", ExtrasCategories.PVP) {
     private val charge by int("Charge", 20, 3..20, "ticks")
     private val switchBack by boolean("SwitchBack", true)
 
+    /** @agent claude-opus-5-5 */
     private object SafeBlock : ToggleableValueGroup(this, "SafeBlock", false) {
         val blocks by blocks("Blocks", linkedSetOf(Blocks.OBSIDIAN, Blocks.COBBLESTONE))
     }
 
-    /** While you draw a bow, aims at a cart that already sits next to an enemy and lets go once the draw is enough. */
+    /**
+     * While you draw a bow, aims at a cart that already sits next to an enemy and lets go once the draw is enough.
+     *
+     * @agent claude-opus-5-5
+     */
     private object HitPlaced : ToggleableValueGroup(this, "HitPlaced", false) {
         val range by float("Range", 8f, 4f..16f, "blocks")
         val nearEnemy by float("NearEnemy", 4f, 1f..8f, "blocks")
         val minDraw by int("MinDraw", 10, 3..20, "ticks")
     }
 
-    /** A second key that stacks more carts in one go, with a little time between them. */
+    /**
+     * A second key that stacks more carts in one go, with a little time between them.
+     *
+     * @agent claude-opus-5-5
+     */
     private object Overload : ValueGroup("Overload") {
         val bind by key("Key")
         val carts by int("Carts", 3, 2..8)

@@ -34,6 +34,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 
+/** @agent claude-opus-5-5 */
 class StashFinderGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     // Filled while the client is in the End, so the chests arrive with the chunk
     enable(ModuleStashFinder)
@@ -178,6 +179,7 @@ class FindingsGameTest : SingleplayerGameTest({
     check(client { stash !in WorldJournal.findings }) { "forgetting the stash did not" }
 })
 
+/** @agent claude-opus-5-5 */
 class SuspiciousBlockDetectorGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     // Looking north, as in StashFinder
     travel(origin, yaw = 180f, pitch = 15f)
@@ -207,6 +209,7 @@ class SuspiciousBlockDetectorGameTest : SingleplayerGameTest(TestWorld.SURFACE, 
     screenshot("SuspiciousBlockDetector")
 })
 
+/** @agent claude-opus-5-5 */
 class CollectibleESPGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     travel(origin.north(2), yaw = 180f, pitch = 10f)
     enable(ModuleCollectibleESP)
@@ -231,6 +234,7 @@ class CollectibleESPGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     check(client { ModuleCollectibleESP.findings.isEmpty() }) { "findings survived disabling" }
 })
 
+/** @agent claude-opus-5-5 */
 class PortalFinderGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     travel(origin.south(2), yaw = 180f)
     enable(ModulePortalFinder)
@@ -260,6 +264,7 @@ class CaveDisturbanceDetectorGameTest : SingleplayerGameTest({
     awaitClient("the mined block", timeout = 60) { ModuleCaveDisturbanceDetector.findings == setOf(mined) }
 })
 
+/** @agent claude-opus-5-5 */
 class TunnelTrailESPGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     travel(origin.south(3), yaw = 180f, pitch = 10f)
     enable(ModuleTunnelTrailESP)
@@ -285,6 +290,7 @@ class TunnelTrailESPGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     screenshot("TunnelTrailESP")
 })
 
+/** @agent claude-opus-5-5 */
 class SoundLocatorGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     travel(origin, yaw = 180f, pitch = 10f)
     configure(ModuleSoundLocator, "Chat" to true)

@@ -19,6 +19,8 @@ import net.minecraft.world.item.Items
 /**
  * Loads a crossbow and switches itself off: takes one from the hotbar or the inventory, holds use until it is loaded,
  * and goes back to the slot in hand. KeepInHand holds the loaded crossbow instead until it is fired or put away.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleCrossbowLoader : ClientModule("CrossbowLoader", ExtrasCategories.PVP, disableOnQuit = true) {
 

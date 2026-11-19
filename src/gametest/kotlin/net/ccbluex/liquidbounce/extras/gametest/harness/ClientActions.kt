@@ -16,14 +16,22 @@ fun GameTestScope.screenshot(name: String) {
     takeScreenshot(name)
 }
 
-/** Waits until the theme no longer shows an "Enabled" or "Disabled" toast, before a scene a screenshot needs. */
+/**
+ * Waits until the theme no longer shows an "Enabled" or "Disabled" toast, before a scene a screenshot needs.
+ *
+ * @agent claude-opus-5-5
+ */
 fun GameTestScope.awaitToggleToasts() {
     while (ToggleToasts.showing) {
         ticks(1)
     }
 }
 
-/** Whether the theme still shows an "Enabled" or "Disabled" toast, which no screenshot is about. */
+/**
+ * Whether the theme still shows an "Enabled" or "Disabled" toast, which no screenshot is about.
+ *
+ * @agent claude-opus-5-5
+ */
 internal object ToggleToasts : EventListener {
 
     // The theme keeps a toast for three seconds and slides it out in a fifth, and on llvmpipe the browser's
@@ -47,6 +55,10 @@ internal object ToggleToasts : EventListener {
 
 }
 
-/** An entity UUID as NBT that no other session uses; the server finds some, like a pearl's owner, in any world. */
+/**
+ * An entity UUID as NBT that no other session uses; the server finds some, like a pearl's owner, in any world.
+ *
+ * @agent claude-opus-5-5
+ */
 fun GameTestScope.uniqueUuid(name: String): String =
     UUIDUtil.uuidToIntArray(UUID.nameUUIDFromBytes(unique(name).toByteArray())).joinToString(",", "[I;", "]")

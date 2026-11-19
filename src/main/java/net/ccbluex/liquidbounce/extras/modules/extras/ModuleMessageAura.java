@@ -20,6 +20,8 @@ import java.util.UUID;
  * Whispers a message to every player who comes into view, one per delay. The client has no event for an
  * entity entering, so arrivals are the difference between two ticks' player lists. Whoever is around when
  * you join or enable the module is left alone.
+ *
+ * @agent claude-fable-5-1
  */
 public final class ModuleMessageAura extends ClientModule {
 

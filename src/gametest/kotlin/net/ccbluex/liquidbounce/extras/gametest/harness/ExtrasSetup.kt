@@ -10,6 +10,8 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext
 /**
  * Puts back what the add-on keeps between tests: its module settings are saved with the client's config, and every
  * world starts unknown. The client's chat with real players stays off, their messages would end up in screenshots.
+ *
+ * @agent claude-opus-5-5
  */
 object ExtrasSetup : GameTestSetup {
 

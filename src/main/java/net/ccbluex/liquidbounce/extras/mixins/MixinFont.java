@@ -7,7 +7,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-/** Everything the game draws as text and every width it measures for it passes here. */
+/**
+ * Everything the game draws as text and every width it measures for it passes here.
+ *
+ * @agent claude-opus-5-5
+ */
 @Mixin(Font.class)
 abstract class MixinFont {
 

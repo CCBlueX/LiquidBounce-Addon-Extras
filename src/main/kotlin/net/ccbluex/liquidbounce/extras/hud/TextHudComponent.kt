@@ -13,7 +13,11 @@ import net.ccbluex.liquidbounce.utils.render.Alignment
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 
-/** One line of text on the HUD: a live value between an editable prefix and suffix. */
+/**
+ * One line of text on the HUD: a live value between an editable prefix and suffix.
+ *
+ * @agent claude-opus-5-5
+ */
 abstract class TextHudComponent(
     name: String,
     description: String,

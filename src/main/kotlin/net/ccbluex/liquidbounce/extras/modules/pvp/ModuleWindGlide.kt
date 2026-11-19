@@ -24,6 +24,8 @@ import kotlin.math.hypot
 /**
  * Puts on an elytra and glides, throwing a wind charge steeply down whenever the ground comes close, so the
  * burst lifts us again. Stops once a chestplate is worn again.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleWindGlide : ClientModule("WindGlide", ExtrasCategories.PVP, disableOnQuit = true) {
 

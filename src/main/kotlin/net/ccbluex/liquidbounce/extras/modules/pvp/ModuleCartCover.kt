@@ -21,6 +21,8 @@ import kotlin.math.sqrt
 /**
  * Walls you in against TNT minecarts that are lit or about to be. Each block goes where it cuts the predicted
  * damage the most, until the prediction is low enough.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleCartCover : ClientModule("CartCover", ExtrasCategories.PVP) {
 
@@ -120,6 +122,7 @@ object ModuleCartCover : ClientModule("CartCover", ExtrasCategories.PVP) {
             .minByOrNull { it.second }
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class Protect(override val tag: String, val own: Boolean, val enemy: Boolean) : Tagged {
         OWN("Own", true, false),
         ENEMY("Enemy", false, true),

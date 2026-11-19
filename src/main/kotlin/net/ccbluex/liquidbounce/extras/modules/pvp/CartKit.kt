@@ -35,16 +35,25 @@ internal val ItemStack.isFlameBow get() = item is BowItem && getEnchantment(Ench
 
 internal val ItemStack.isLoadedCrossbow get() = item is CrossbowItem && CrossbowItem.isCharged(this)
 
+/** @agent claude-opus-5-5 */
 internal fun ItemStack.canShoot() =
     isLoadedCrossbow || item is BowItem && !player.getProjectile(this).isEmpty
 
-/** Uses the launcher in [slot] facing where the server last saw us face. */
+/**
+ * Uses the launcher in [slot] facing where the server last saw us face.
+ *
+ * @agent claude-opus-5-5
+ */
 internal fun useLauncher(slot: HotbarItemSlot) {
     val rotation = RotationManager.serverRotation
     useItem(slot.useHand, rotation.yRot, rotation.xRot)
 }
 
-/** What sets the cart off: a launcher, and flint and steel when its arrows do not burn by themselves. */
+/**
+ * What sets the cart off: a launcher, and flint and steel when its arrows do not burn by themselves.
+ *
+ * @agent claude-opus-5-5
+ */
 internal class Igniter(val launcher: HotbarItemSlot, val flint: HotbarItemSlot?) {
 
     val burns get() = launcher.itemStack.isFlameBow
@@ -63,7 +72,11 @@ internal class Igniter(val launcher: HotbarItemSlot, val flint: HotbarItemSlot?)
 
 }
 
-/** Where things go: rails, carts, fire on an arrow's path and the arrow itself. */
+/**
+ * Where things go: rails, carts, fire on an arrow's path and the arrow itself.
+ *
+ * @agent claude-opus-5-5
+ */
 internal object CartAim {
 
     // Arrow speed per tick at full draw and from a crossbow, and its gravity

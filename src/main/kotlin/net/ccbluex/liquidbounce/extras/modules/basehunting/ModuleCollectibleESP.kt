@@ -17,7 +17,11 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.AbstractBannerBlock
 
-/** Valuables on display and banners, both put there by players. */
+/**
+ * Valuables on display and banners, both put there by players.
+ *
+ * @agent gpt-6-sol
+ */
 object ModuleCollectibleESP : ClientModule("CollectibleESP", ExtrasCategories.BASE_HUNTING) {
 
     private val range by int("Range", 64, 8..128, "blocks")

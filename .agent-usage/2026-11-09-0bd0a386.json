@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-09",
+  "change": "feat(SpearAssist): stab beyond reach, follow charge hits with the mace, estimate the charge",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 7171, "cachedInput": 141700311, "cacheWrite": 1152172, "output": 442474 },
+      "usd": 46.44
+    }
+  ]
+}

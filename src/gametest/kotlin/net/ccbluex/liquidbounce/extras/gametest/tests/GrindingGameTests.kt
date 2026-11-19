@@ -52,6 +52,7 @@ class AutoJumpGameTest : ServerGameTest({
     input.releaseKey { it.keyUp }
 })
 
+/** @agent claude-opus-5-5 */
 class AutoShearerGameTest : ServerGameTest(TestWorld.SURFACE, {
     // Looking north, at faces the sun lights
     travel(origin, yaw = 180f)
@@ -73,6 +74,7 @@ class AutoShearerGameTest : ServerGameTest(TestWorld.SURFACE, {
     screenshot("AutoShearer")
 })
 
+/** @agent claude-opus-5-5 */
 class AutoSignGameTest : ServerGameTest(TestWorld.SURFACE, {
     run("item replace entity $playerName hotbar.0 with minecraft:oak_sign 3")
     awaitClient("the signs") { it.player!!.mainHandItem.`is`(Items.OAK_SIGN) }
@@ -163,6 +165,7 @@ class AutoSignTemplatesGameTest : ServerGameTest(TestWorld.SURFACE, {
     }
 })
 
+/** @agent claude-opus-5-5 */
 class AutoAnvilRepairGameTest : ServerGameTest(TestWorld.SURFACE, {
     val anvil = origin.south(2)
     setBlock(anvil, "minecraft:anvil")
@@ -202,6 +205,7 @@ class AutoAnvilRepairGameTest : ServerGameTest(TestWorld.SURFACE, {
     client { it.player!!.closeContainer() }
 })
 
+/** @agent claude-opus-5-5 */
 class AutoSmelterGameTest : ServerGameTest(TestWorld.SURFACE, {
     val furnace = origin.south(2)
     val inputs = linkedSetOf(Items.RAW_IRON, Items.RAW_GOLD, Items.BEEF)
@@ -294,6 +298,7 @@ class AutoSmelterGameTest : ServerGameTest(TestWorld.SURFACE, {
     client { it.player!!.closeContainer() }
 })
 
+/** @agent claude-opus-5-5 */
 class AutoBreedGameTest : ServerGameTest(TestWorld.SURFACE, {
     breed("cow", "wheat") {
         awaitBaby("cow")

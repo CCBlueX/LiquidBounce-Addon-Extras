@@ -8,7 +8,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** The attack key of a weapon that misses: SpearAssist may stab with a spear instead of the empty swing. */
+/**
+ * The attack key of a weapon that misses: SpearAssist may stab with a spear instead of the empty swing.
+ *
+ * @agent claude-opus-5-5
+ */
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraftSpearReach {
 

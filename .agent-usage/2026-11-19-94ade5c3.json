@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-19",
+  "change": "chore: agent-usage",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 108, "cachedInput": 19573710, "cacheWrite": 263200, "output": 35327 },
+      "usd": 6.73
+    }
+  ]
+}

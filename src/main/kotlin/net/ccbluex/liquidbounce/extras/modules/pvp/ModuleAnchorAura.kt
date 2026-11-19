@@ -39,6 +39,8 @@ import java.util.Locale
  * Places a respawn anchor next to a target, optionally covers it on your side, charges it and sets it off,
  * wherever the blast hurts the target enough and you little enough. Also meets enemy ender pearls where they
  * land.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleAnchorAura : ClientModule("AnchorAura", ExtrasCategories.PVP, disableOnQuit = true) {
 
@@ -61,6 +63,7 @@ object ModuleAnchorAura : ClientModule("AnchorAura", ExtrasCategories.PVP, disab
     private val color by color("Color", Color4b(255, 140, 0, 90))
     private val rotations = tree(RotationsValueGroup(this))
 
+    /** @agent claude-opus-5-5 */
     private object PearlPunish : ToggleableValueGroup(ModuleAnchorAura, "PearlPunish", true) {
         val color by color("Color", Color4b(170, 80, 255, 90))
     }
@@ -69,10 +72,18 @@ object ModuleAnchorAura : ClientModule("AnchorAura", ExtrasCategories.PVP, disab
         tree(PearlPunish)
     }
 
-    /** Where an anchor goes, its cover on your side if it needs one, whom it is for. */
+    /**
+     * Where an anchor goes, its cover on your side if it needs one, whom it is for.
+     *
+     * @agent claude-opus-5-5
+     */
     class Plan(val anchor: BlockPos, val cover: BlockPos?, val target: LivingEntity, val landing: Landing?)
 
-    /** Where an enemy pearl comes down, in how many ticks, and the cells it passes. */
+    /**
+     * Where an enemy pearl comes down, in how many ticks, and the cells it passes.
+     *
+     * @agent claude-opus-5-5
+     */
     class Landing(
         val pearl: ThrownEnderpearl,
         val thrower: LivingEntity,
@@ -108,6 +119,7 @@ object ModuleAnchorAura : ClientModule("AnchorAura", ExtrasCategories.PVP, disab
 
     }
 
+    /** @agent claude-opus-5-5 */
     private class Shelter(val cover: BlockPos?, val damage: Float)
 
     var plan: Plan? = null

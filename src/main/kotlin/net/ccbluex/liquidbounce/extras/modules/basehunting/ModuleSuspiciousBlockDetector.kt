@@ -24,6 +24,9 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Blocks a player just placed nearby. Everything a chunk brings along when it loads counts as old, and
  * so does everything placed while it is still settling in.
+ *
+ * @agent gpt-6-astra
+ * @agent claude-opus-5-5
  */
 object ModuleSuspiciousBlockDetector : ClientModule("SuspiciousBlockDetector", ExtrasCategories.BASE_HUNTING) {
 
@@ -60,6 +63,7 @@ object ModuleSuspiciousBlockDetector : ClientModule("SuspiciousBlockDetector", E
         else -> block === Blocks.OBSIDIAN || block === Blocks.IRON_BLOCK || block === Blocks.GOLD_BLOCK
     }
 
+    /** @agent claude-opus-5-5 */
     private object Watcher : ChunkScanner.BlockChangeSubscriber {
 
         private val known = ConcurrentHashMap<BlockPos, Block>()

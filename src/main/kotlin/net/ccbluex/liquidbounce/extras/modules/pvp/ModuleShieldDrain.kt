@@ -17,6 +17,8 @@ import net.minecraft.world.phys.EntityHitResult
 /**
  * Hits an enemy who holds up a shield several times a tick; every blocked hit costs the shield durability.
  * A mace hits the shield harder than most weapons.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleShieldDrain : ClientModule("ShieldDrain", ExtrasCategories.PVP) {
 

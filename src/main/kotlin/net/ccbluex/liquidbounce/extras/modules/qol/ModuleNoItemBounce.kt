@@ -3,7 +3,11 @@ package net.ccbluex.liquidbounce.extras.modules.qol
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.features.module.ClientModule
 
-/** Hotbar stacks no longer bounce when they change. The hotbar asks [popTime] through `MixinHud`. */
+/**
+ * Hotbar stacks no longer bounce when they change. The hotbar asks [popTime] through `MixinHud`.
+ *
+ * @agent claude-opus-5-5
+ */
 object ModuleNoItemBounce : ClientModule("NoItemBounce", ExtrasCategories.QOL) {
 
     /** Frames that would have drawn a bouncing stack. */

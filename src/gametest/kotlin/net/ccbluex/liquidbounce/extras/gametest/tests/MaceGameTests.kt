@@ -48,6 +48,7 @@ private const val FULL_HEALTH = 500f
 private const val BREACH_MACE = "minecraft:mace[enchantments={'minecraft:breach':4}]"
 private const val DENSITY_MACE = "minecraft:mace[enchantments={'minecraft:density':5}]"
 
+/** @agent claude-opus-5-5 */
 class MaceAssistGameTest : ServerGameTest({
     run("gamerule minecraft:fall_damage false")
     hotbar(0, "minecraft:iron_sword")
@@ -173,6 +174,7 @@ class MaceAssistGameTest : ServerGameTest({
     }
 })
 
+/** @agent claude-opus-5-5 */
 class BreachSwapGameTest : ServerGameTest({
     hotbar(0, "minecraft:iron_sword")
     hotbar(1, BREACH_MACE)
@@ -197,6 +199,7 @@ class BreachSwapGameTest : ServerGameTest({
     check(client { !SilentHotbar.isSlotModifiedBy(ModuleBreachSwap) }) { "disabling left the mace selected" }
 })
 
+/** @agent claude-opus-5-5 */
 class ElytraDiveGameTest : ServerGameTest({
     run("gamerule minecraft:fall_damage false")
     run("item replace entity $playerName armor.chest with minecraft:diamond_chestplate")
@@ -281,6 +284,7 @@ class ElytraDiveGameTest : ServerGameTest({
     awaitLanding()
 })
 
+/** @agent claude-opus-5-5 */
 class ShieldDrainGameTest : ServerGameTest({
     hotbar(0, "minecraft:iron_sword")
     hotbar(1, BREACH_MACE)
@@ -339,6 +343,7 @@ class ShieldDrainGameTest : ServerGameTest({
     }
 })
 
+/** @agent claude-opus-5-5 */
 class SpearAssistGameTest : ServerGameTest(TestWorld.SURFACE, {
     hotbar(0, "minecraft:iron_sword")
     hotbar(1, "minecraft:iron_spear")
@@ -419,6 +424,7 @@ class SpearAssistGameTest : ServerGameTest(TestWorld.SURFACE, {
     }
 })
 
+/** @agent claude-opus-5-5 */
 class InstantLungeGameTest : ServerGameTest({
     hotbar(0, "minecraft:iron_sword")
     hotbar(2, "minecraft:iron_spear[enchantments={'minecraft:lunge':3}]")
@@ -441,6 +447,7 @@ class InstantLungeGameTest : ServerGameTest({
     awaitClient("the note") { it.chatContains("No spear with Lunge") && !ModuleInstantLunge.enabled }
 })
 
+/** @agent claude-opus-5-5 */
 class MacePredictionGameTest : ServerGameTest(TestWorld.SURFACE, {
     run("difficulty easy")
     enable(ModuleMacePrediction)
@@ -505,24 +512,30 @@ class MacePredictionGameTest : ServerGameTest(TestWorld.SURFACE, {
     check(client { ModuleMacePrediction.target == null }) { "disabling left a target" }
 })
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.hotbar(slot: Int, item: String) =
     run("item replace entity $playerName hotbar.$slot with $item")
 
+/** @agent claude-opus-5-5 */
 private fun husks(minecraft: Minecraft) = minecraft.level!!.entitiesForRendering().filterIsInstance<Husk>()
 
 // Monsters need a difficulty above peaceful
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.summonEnemy(x: Double, z: Double) {
     run("difficulty easy")
     run("summon minecraft:husk ${origin.x + x} ${origin.y} ${origin.z + z} $ENEMY")
     awaitClient("the husk") { minecraft -> husks(minecraft).any { it.z == origin.z + z } }
 }
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.awaitLanding() = awaitClient("the landing", timeout = 400) { it.player!!.onGround() }
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.health(type: String = "husk") =
     query("data get entity @e[type=minecraft:$type,limit=1] Health", Regex("entity data: ([\\d.]+)f"))
         .groupValues[1].toFloat()
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.selectedSlot() =
     query("data get entity $playerName SelectedItemSlot", Regex("entity data: (\\d+)")).groupValues[1].toInt()
 
@@ -539,6 +552,7 @@ private const val IRON_AXE = "minecraft:iron_axe"
 private const val SMASH = 8f
 private const val STUN_KEY = InputConstants.KEY_NUMPAD9
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.summonBlocker(x: Double, z: Double) {
     run("difficulty easy")
     run("time set midnight")
@@ -554,6 +568,7 @@ private val raisedTrident = { minecraft: Minecraft ->
 }
 
 // Twenty ticks with a raised trident in reach and nothing drained
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.heldBack(why: String) {
     enable(ModuleShieldDrain)
     ticks(20)
@@ -564,7 +579,11 @@ private fun GameTestScope.heldBack(why: String) {
     check(health("drowned") == FULL_HEALTH) { "drained $why" }
 }
 
-/** Falls onto the drowned and returns the longest run of ticks the axe was the slot sent to the server. */
+/**
+ * Falls onto the drowned and returns the longest run of ticks the axe was the slot sent to the server.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.slam(): Int {
     var run = 0
     var longest = 0
@@ -582,6 +601,7 @@ private fun GameTestScope.slam(): Int {
     return longest
 }
 
+/** @agent claude-opus-5-5 */
 @Suppress("UNCHECKED_CAST")
 private fun reachWeapons() =
     ModuleSpearAssist.Reach.setting<Any>("Weapons") as MultiChoiceListValue<ModuleSpearAssist.Weapon>

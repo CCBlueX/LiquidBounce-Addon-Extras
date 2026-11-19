@@ -26,6 +26,8 @@ import kotlin.math.ceil
 /**
  * Meets an enemy's ender pearl with a TNT minecart: lays it next to where the pearl comes down and shoots it
  * just as the thrower arrives.
+ *
+ * @agent claude-opus-5-5
  */
 object ModulePearlCart : ClientModule("PearlCart", ExtrasCategories.PVP) {
 

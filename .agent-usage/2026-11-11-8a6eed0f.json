@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-11",
+  "change": "docs: list modules, components and commands in tables",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 1950, "cachedInput": 234248512, "cacheWrite": 1633688, "output": 362955 },
+      "usd": 67.19
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 76028, "cachedInput": 41327, "cacheWrite": 1910, "output": 2749 },
+      "usd": 0.01
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Hud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+/** @agent claude-opus-5-5 */
 @Mixin(Hud.class)
 abstract class MixinHud {
 

@@ -25,11 +25,17 @@ internal const val AIM_TIMEOUT = 20
 /** Straight down at the feet, where a wind charge launches its thrower the most. */
 internal const val FEET_PITCH = 90f
 
+/** @agent claude-opus-5-5 */
 internal fun hotbarSlotOf(item: Item) = Slots.OffhandWithHotbar.findSlot(item)
 
+/** @agent claude-opus-5-5 */
 internal fun isReady(slot: HotbarItemSlot) = !player.cooldowns.isOnCooldown(slot.itemStack)
 
-/** The rotation group's target, let go of the tick after it was last asked for. */
+/**
+ * The rotation group's target, let go of the tick after it was last asked for.
+ *
+ * @agent claude-opus-5-5
+ */
 internal fun RotationsValueGroup.briefTarget(rotation: Rotation): RotationTarget {
     val target = toRotationTarget(rotation)
     return RotationTarget(
@@ -40,6 +46,7 @@ internal fun RotationsValueGroup.briefTarget(rotation: Rotation): RotationTarget
 /** Keeps turning towards [target] until the rotation the server has is settled on it, at most [AIM_TIMEOUT] ticks. */
 @IgnorableReturnValue
 context(listener: EventListener)
+/** @agent claude-opus-5-5 */
 internal suspend fun turnTo(target: () -> RotationTarget): Boolean {
     // LiquidBounce up to 0.42.0 wraps pitch deltas like yaw: straight up to straight down sticks, so cross the horizon
     if (target().rotation.pitch - sentRotation.pitch > PITCH_WRAP) {
@@ -56,6 +63,7 @@ internal suspend fun turnTo(target: () -> RotationTarget): Boolean {
 
 @IgnorableReturnValue
 context(listener: EventListener)
+/** @agent claude-opus-5-5 */
 private suspend fun settle(target: () -> RotationTarget): Boolean {
     tickUntil {
         RotationManager.setRotationTarget(target(), Priority.IMPORTANT_FOR_USAGE_2, listener)
@@ -73,6 +81,7 @@ private suspend fun settle(target: () -> RotationTarget): Boolean {
  */
 @IgnorableReturnValue
 context(listener: EventListener)
+/** @agent claude-opus-5-5 */
 internal suspend fun throwFrom(slot: HotbarItemSlot, target: () -> RotationTarget): Boolean {
     if (!turnTo(target) || !isReady(slot)) {
         return false
@@ -87,6 +96,8 @@ internal suspend fun throwFrom(slot: HotbarItemSlot, target: () -> RotationTarge
 /**
  * Turns our own view towards [rotation] by at most [speed] degrees a tick, as a mouse would, then waits
  * until the server has it. No rotation of the client's own is involved, the view is what gets sent.
+ *
+ * @agent claude-opus-5-5
  */
 @IgnorableReturnValue
 internal suspend fun lookAt(rotation: Rotation, speed: ClosedFloatingPointRange<Float>): Boolean {
@@ -104,6 +115,7 @@ internal suspend fun lookAt(rotation: Rotation, speed: ClosedFloatingPointRange<
 private val sentRotation get() = RotationManager.currentRotation ?: player.rotation
 
 // Turn steps snap to the mouse's smallest step, anything below half of it stays where it is, on both axes
+/** @agent claude-opus-5-5 */
 private fun settledOn(rotation: Rotation) =
     RotationManager.serverRotation.isRotationDeltaCloseTo(sentRotation, SAME_ROTATION) &&
         sentRotation.isRotationDeltaCloseTo(rotation, RotationUtil.gcd.toFloat() / sqrt(2f))

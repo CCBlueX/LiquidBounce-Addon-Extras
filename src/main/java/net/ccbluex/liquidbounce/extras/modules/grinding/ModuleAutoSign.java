@@ -21,6 +21,8 @@ import java.util.stream.IntStream;
  * Writes every sign the server opens, without showing the editor: with the text of the last one you wrote
  * yourself, or with a template for each side. {@link SignAura} opens the signs around you for it. `sign` and
  * `slot` of the editor are opened up in `liquidbounce-extras.accesswidener`.
+ *
+ * @agent claude-fable-5-1
  */
 public final class ModuleAutoSign extends ClientModule {
 

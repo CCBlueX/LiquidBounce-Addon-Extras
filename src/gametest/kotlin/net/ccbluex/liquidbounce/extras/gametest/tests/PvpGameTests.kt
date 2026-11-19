@@ -38,6 +38,7 @@ import net.minecraft.world.item.Items
 import java.util.Collections
 import kotlin.math.abs
 
+/** @agent claude-opus-5-5 */
 class SwingRedirectGameTest : ServerGameTest(TestWorld.SURFACE, {
     // Facing north. Within reach, but a quarter turn away from the crosshair
     input.lookAt(NORTH, 0f)
@@ -78,6 +79,7 @@ class SwingRedirectGameTest : ServerGameTest(TestWorld.SURFACE, {
     check(client { ModuleSwingRedirect.aim } == null) { "the aim survived disabling" }
 })
 
+/** @agent claude-opus-5-5 */
 class HitHoldGameTest : ServerGameTest({
     standIn(origin.south(2))
     enable(ModuleHitHold)
@@ -110,6 +112,7 @@ class HitHoldGameTest : ServerGameTest({
     awaitServer("entity @e[tag=$STAND_IN,nbt={Health:20.0f}]")
 })
 
+/** @agent claude-opus-5-5 */
 class HitFlickGameTest : ServerGameTest({
     standIn(origin.south(2))
     val sent = SentYaws()
@@ -147,7 +150,11 @@ class HitFlickGameTest : ServerGameTest({
     }
 })
 
-/** Hits the stand-in down to [health] and returns the yaw furthest from south sent meanwhile. */
+/**
+ * Hits the stand-in down to [health] and returns the yaw furthest from south sent meanwhile.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.hitStandIn(health: Float, sent: SentYaws): Float {
     // Past the hurt time of the last hit
     ticks(15)
@@ -158,6 +165,7 @@ private fun GameTestScope.hitStandIn(health: Float, sent: SentYaws): Float {
     return synchronized(sent.yaws) { sent.yaws.map { Mth.wrapDegrees(it) } }.maxByOrNull { abs(it) } ?: 0f
 }
 
+/** @agent claude-opus-5-5 */
 class CrossbowLoaderGameTest : ServerGameTest({
     run("item replace entity $playerName hotbar.0 with minecraft:stone_sword")
     run("item replace entity $playerName container.20 with minecraft:crossbow")
@@ -205,6 +213,7 @@ class CrossbowLoaderGameTest : ServerGameTest({
     check(client { it.player!!.inventory.selectedSlot == 3 }) { "the slot changed back after putting it away" }
 })
 
+/** @agent claude-opus-5-5 */
 class ShieldSwapGameTest : ServerGameTest({
     standIn(origin.south(2))
     run("item replace entity $playerName hotbar.0 with minecraft:stone_sword")
@@ -235,6 +244,7 @@ class ShieldSwapGameTest : ServerGameTest({
     awaitServer("entity @a[name=$playerName,nbt={SelectedItemSlot:0}]")
 })
 
+/** @agent claude-opus-5-5 */
 class ShieldGuardGameTest : ServerGameTest({
     run("item replace entity $playerName hotbar.0 with minecraft:stone_sword")
     run("item replace entity $playerName hotbar.1 with minecraft:shield")
@@ -357,6 +367,8 @@ private const val NORTH = 180f
 /**
  * A still, unarmored husk as the enemy, since the server cannot provide a second player. Hostile mobs need a
  * difficulty above peaceful; a husk does not burn in daylight. A fist takes exactly one point off it.
+ *
+ * @agent claude-opus-5-5
  */
 private fun GameTestScope.standIn(pos: BlockPos) {
     run("difficulty easy")
@@ -367,13 +379,22 @@ private fun GameTestScope.standIn(pos: BlockPos) {
     awaitClient("the stand-in on the ground", timeout = 100) { it.standIn()!!.onGround() }
 }
 
+/** @agent claude-opus-5-5 */
 private fun Minecraft.standIn() = level!!.entitiesForRendering().firstOrNull { it is Husk } as Husk?
 
-/** A blockable hit from the stand-in, which the player faces; easy difficulty makes 4 of it. */
+/**
+ * A blockable hit from the stand-in, which the player faces; easy difficulty makes 4 of it.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.hitPlayer() =
     run("damage $playerName 6 minecraft:mob_attack by @e[tag=$STAND_IN,limit=1]")
 
-/** Yaws of the movement packets sent while it is open. */
+/**
+ * Yaws of the movement packets sent while it is open.
+ *
+ * @agent claude-opus-5-5
+ */
 private class SentYaws : EventListener, AutoCloseable {
 
     val yaws: MutableList<Float> = Collections.synchronizedList(mutableListOf())

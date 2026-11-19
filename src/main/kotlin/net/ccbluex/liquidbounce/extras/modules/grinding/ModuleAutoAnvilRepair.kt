@@ -14,6 +14,9 @@ import net.minecraft.world.inventory.AnvilMenu
  * Repairs damaged gear by combining two of the same kind in an open anvil. Enchanted items are never
  * sacrificed. A pair the anvil prices above the limit goes back, and the anvil is left alone until it is
  * opened again.
+ *
+ * @agent gpt-6-astra
+ * @agent claude-opus-5-5
  */
 object ModuleAutoAnvilRepair : ClientModule("AutoAnvilRepair", ExtrasCategories.GRINDING) {
 

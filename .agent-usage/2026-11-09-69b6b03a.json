@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-09",
+  "change": "feat(BlastCover): cover charged anchors before they go off",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 4178, "cachedInput": 20951807, "cacheWrite": 1071889, "output": 145311 },
+      "usd": 15.69
+    }
+  ]
+}

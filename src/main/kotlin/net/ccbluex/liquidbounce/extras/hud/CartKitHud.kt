@@ -13,7 +13,11 @@ import net.minecraft.world.item.BowItem
 import net.minecraft.world.item.CrossbowItem
 import kotlin.math.roundToInt
 
-/** Whether the TNT minecart kit is ready: rails, carts, something to shoot them with, and its draw. */
+/**
+ * Whether the TNT minecart kit is ready: rails, carts, something to shoot them with, and its draw.
+ *
+ * @agent claude-opus-5-5
+ */
 object CartKitHud : TextHudComponent(
     "CartKit", "Rails, TNT minecarts and a launcher in your hotbar, the draw, and live carts around you.", "",
     row = 9,

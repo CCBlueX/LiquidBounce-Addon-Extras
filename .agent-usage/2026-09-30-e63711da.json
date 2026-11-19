@@ -1,0 +1,13 @@
+{
+  "date": "2026-09-30",
+  "change": "feat(hud): add Extras widgets and migrate Speedometer",
+  "tool": "codex",
+  "models": [
+    {
+      "model": "gpt-6-astra",
+      "provider": "openai",
+      "tokens": { "input": 0, "cachedInput": 0, "cacheWrite": 0, "output": 0 },
+      "usd": 0.00
+    }
+  ]
+}

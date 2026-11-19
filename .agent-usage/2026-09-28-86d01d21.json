@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-28",
+  "change": "feat(BaseFinder): report chunks with player-made blocks and entities",
+  "tool": "codex",
+  "models": [
+    {
+      "model": "gpt-6-sol",
+      "provider": "openai",
+      "tokens": { "input": 0, "cachedInput": 0, "cacheWrite": 0, "output": 0 },
+      "usd": 0.00
+    },
+    {
+      "model": "gpt-6-luna",
+      "provider": "openai",
+      "tokens": { "input": 0, "cachedInput": 0, "cacheWrite": 0, "output": 0 },
+      "usd": 0.00
+    }
+  ]
+}

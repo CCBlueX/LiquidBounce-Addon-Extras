@@ -24,6 +24,8 @@ import net.minecraft.world.phys.Vec3
  * Shows where the nearest enemy in the air comes down: its fall arc, or its track over the ground, a marker
  * where it lands and a ring of your reach around that spot. An enemy walking on the ground gets the path it
  * keeps to at its current pace, up to the next edge.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleMacePrediction : ClientModule("MacePrediction", ExtrasCategories.PVP) {
 
@@ -49,11 +51,13 @@ object ModuleMacePrediction : ClientModule("MacePrediction", ExtrasCategories.PV
     private val pathColor by color("PathColor", Color4b(255, 170, 40))
     private val ringColor by color("RingColor", Color4b(255, 60, 60, 160))
 
+    /** @agent claude-opus-5-5 */
     enum class PathMode(override val tag: String) : Tagged {
         ARC("Arc"),
         GROUND("Ground"),
     }
 
+    /** @agent claude-opus-5-5 */
     enum class MarkerStyle(override val tag: String) : Tagged {
         BOX("Box"),
         OUTLINE("Outline"),

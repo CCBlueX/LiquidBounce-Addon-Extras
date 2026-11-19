@@ -30,6 +30,8 @@ import java.util.UUID
  * game draws text, and the skin of a Mojang account. Text reaches [disguise] through `MixinFont` and
  * `MixinStringSplitter`, skins reach [skinOf] through `MixinAbstractClientPlayer` and `MixinPlayerInfo`, the
  * label above their head reaches [nameTag] through `MixinEntityRenderer`.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleDisguise : ClientModule("Disguise", ExtrasCategories.EXTRAS) {
 
@@ -147,11 +149,13 @@ object ModuleDisguise : ClientModule("Disguise", ExtrasCategories.EXTRAS) {
         return disguise(sequence).takeIf { it !== sequence }
     }
 
+    /** @agent claude-opus-5-5 */
     class Target(val id: UUID, val name: String) {
         // A name inside a longer one is somebody else
         val pattern = Regex("(?<![A-Za-z0-9_])${Regex.escape(name)}(?![A-Za-z0-9_])")
     }
 
+    /** @agent claude-opus-5-5 */
     @Suppress("MagicNumber")
     enum class Tier(override val tag: String, val color: Int) : Tagged {
         OFF("Off", 0),
@@ -167,7 +171,11 @@ object ModuleDisguise : ClientModule("Disguise", ExtrasCategories.EXTRAS) {
         LT5("LT5", 0x6E7E92),
     }
 
-    /** Each kit is shown by the item sprite the game already has for it. */
+    /**
+     * Each kit is shown by the item sprite the game already has for it.
+     *
+     * @agent claude-opus-5-5
+     */
     enum class Gamemode(override val tag: String, val sprite: String) : Tagged {
         SWORD("Sword", "item/diamond_sword"),
         AXE("Axe", "item/diamond_axe"),
@@ -181,7 +189,11 @@ object ModuleDisguise : ClientModule("Disguise", ExtrasCategories.EXTRAS) {
 
 }
 
-/** [original] with each name starting at [starts] replaced by [name], in its style, and [rank] in [rankColor]. */
+/**
+ * [original] with each name starting at [starts] replaced by [name], in its style, and [rank] in [rankColor].
+ *
+ * @agent claude-opus-5-5
+ */
 private class DisguisedText(
     private val original: FormattedCharSequence,
     private val starts: IntArray,

@@ -32,6 +32,8 @@ import kotlin.math.abs
  * Turns a swing at the air onto the closest target in reach that is close to the crosshair. The server sees one
  * tick of rotation towards a body height of the target, then the hit; with ContinuousTracking it faces that spot
  * the whole time, so the swing needs no turn at all.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleSwingRedirect : ClientModule("SwingRedirect", ExtrasCategories.PVP) {
 
@@ -127,10 +129,12 @@ object ModuleSwingRedirect : ClientModule("SwingRedirect", ExtrasCategories.PVP)
             ?.first
     }
 
+    /** @agent claude-opus-5-5 */
     class Aim(val target: Entity, val offset: Vec3) {
         val point: Vec3 get() = target.position().add(offset)
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class BodyHeight(override val tag: String, val fraction: Double) : Tagged {
         HEAD("Head", 0.9),
         NECK("Neck", 0.8),

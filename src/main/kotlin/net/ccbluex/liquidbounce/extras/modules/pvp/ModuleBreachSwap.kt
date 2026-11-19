@@ -15,6 +15,8 @@ import kotlin.random.Random
 /**
  * Now and then swings the mace with the most Breach in place of your sword, which takes armor off that hit.
  * The sword is back with the next tick.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleBreachSwap : ClientModule("BreachSwap", ExtrasCategories.PVP) {
 

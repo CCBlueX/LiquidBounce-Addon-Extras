@@ -8,7 +8,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** The faces in the player list. */
+/**
+ * The faces in the player list.
+ *
+ * @agent claude-opus-5-5
+ */
 @Mixin(PlayerInfo.class)
 abstract class MixinPlayerInfo {
 

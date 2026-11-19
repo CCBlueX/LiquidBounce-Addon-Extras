@@ -48,6 +48,8 @@ import java.util.Collections
 /**
  * Plain vanilla movement has to pass, or no other verdict means anything. Then the negative control: a
  * client claiming to be five blocks up has to be caught, or twenty where only Paper watches.
+ *
+ * @agent claude-opus-5-5
  */
 class HarnessGameTest : ServerGameTest({
     input.holdKey { it.keyUp }
@@ -72,6 +74,7 @@ class HarnessGameTest : ServerGameTest({
     input.releaseKey { it.keyUp }
 })
 
+/** @agent claude-opus-5-5 */
 class AddonGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client {
         val modules = ModuleManager.filter { it.category in ExtrasCategories.all }
@@ -121,6 +124,7 @@ private fun GameTestScope.awaitClickGui() {
     ticks(40)
 }
 
+/** @agent claude-opus-5-5 */
 class HudGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client {
         val catalog = HudComponentManager.getComponentCatalog(ThemeManager.theme!!.metadata.id)
@@ -193,6 +197,7 @@ class HudGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client { extrasHudComponents.forEach { it.enabled = false } }
 })
 
+/** @agent claude-opus-5-5 */
 class HudGraphGameTest : SingleplayerGameTest({
     val metrics = listOf(FpsHud, TpsHud, PingHud)
     client {
@@ -241,11 +246,17 @@ class HudGraphGameTest : SingleplayerGameTest({
     }
 })
 
+/** @agent claude-opus-5-5 */
 private fun Component.valueColor() = siblings.first().style.color?.value
 
+/** @agent claude-opus-5-5 */
 private fun MetricHudComponent.colorSetting(name: String) = setting<Color4b>(name).get().argb and 0xFFFFFF
 
-/** Drops the server's time updates while it is open, as if the server stopped ticking. */
+/**
+ * Drops the server's time updates while it is open, as if the server stopped ticking.
+ *
+ * @agent claude-opus-5-5
+ */
 private class TimeUpdateBlocker : EventListener, AutoCloseable {
 
     @Suppress("unused")
@@ -259,6 +270,7 @@ private class TimeUpdateBlocker : EventListener, AutoCloseable {
 
 }
 
+/** @agent claude-opus-5-5 */
 class ResourcesGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client { check(HudComponentManager.addComponent(ResourcesHud.id.toString()) === ResourcesHud) }
     run("give $playerName minecraft:totem_of_undying 3")
@@ -296,7 +308,11 @@ class ResourcesGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     }
 })
 
-/** Notifications shown while it is open. */
+/**
+ * Notifications shown while it is open.
+ *
+ * @agent claude-opus-5-5
+ */
 private class NotificationLog : EventListener, AutoCloseable {
 
     val messages: MutableList<String> = Collections.synchronizedList(mutableListOf())
@@ -308,6 +324,7 @@ private class NotificationLog : EventListener, AutoCloseable {
 
 }
 
+/** @agent claude-opus-5-5 */
 class ClockGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     client { check(HudComponentManager.addComponent(ClockHud.id.toString()) === ClockHud) }
     val full = client { ClockHud.text.string }
@@ -350,6 +367,7 @@ class ClockGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     }
 })
 
+/** @agent claude-opus-5-5 */
 class WhereGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     val position = "${origin.x} ${origin.y} ${origin.z}"
     command("where")

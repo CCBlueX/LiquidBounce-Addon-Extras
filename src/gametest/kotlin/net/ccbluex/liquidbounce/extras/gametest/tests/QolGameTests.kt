@@ -21,6 +21,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 
+/** @agent claude-opus-5-5 */
 class LightOverlayGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     enable(ModuleLightOverlay)
     awaitClient("open ground to count as dark at night") {
@@ -38,6 +39,7 @@ class LightOverlayGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     screenshot("LightOverlay")
 })
 
+/** @agent claude-opus-5-5 */
 class NoItemBounceGameTest : SingleplayerGameTest({
     enable(ModuleNoItemBounce)
     give("minecraft:cobblestone", 16)
@@ -52,6 +54,7 @@ class NoItemBounceGameTest : SingleplayerGameTest({
     check(client { ModuleNoItemBounce.flattenedFrames } == 0) { "a bounce was left out while disabled" }
 })
 
+/** @agent claude-opus-5-5 */
 class WaypointsGameTest : SingleplayerGameTest(TestWorld.SURFACE, {
     command("waypoint add Home")
     check(client { ModuleWaypoints.enabled && ModuleWaypoints.waypoints["Home"] == origin }) {

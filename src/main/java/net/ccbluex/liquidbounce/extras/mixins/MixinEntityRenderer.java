@@ -10,7 +10,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** The label above an entity's head, and only that. */
+/**
+ * The label above an entity's head, and only that.
+ *
+ * @agent claude-opus-5-5
+ */
 @Mixin(EntityRenderer.class)
 abstract class MixinEntityRenderer {
 

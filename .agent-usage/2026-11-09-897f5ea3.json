@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-09",
+  "change": "fix(AutoBreed): main hand first, aim inside the hitbox",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 1635, "cachedInput": 4707631, "cacheWrite": 126283, "output": 20668 },
+      "usd": 2.37
+    }
+  ]
+}

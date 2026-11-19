@@ -6,6 +6,8 @@ import net.minecraft.resources.Identifier
 /**
  * Categories group modules by what they are for. A module only leaves [EXTRAS] once enough modules
  * share its purpose to fill a tab of their own.
+ *
+ * @agent claude-fable-5-1
  */
 object ExtrasCategories {
 

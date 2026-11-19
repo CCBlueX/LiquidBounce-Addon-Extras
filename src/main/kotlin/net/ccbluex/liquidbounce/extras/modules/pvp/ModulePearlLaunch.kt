@@ -17,6 +17,8 @@ import net.minecraft.world.item.Items
 
 /**
  * Throws a pearl where we look and, the moment the server teleports us to it, a wind charge at our feet.
+ *
+ * @agent claude-opus-5-5
  */
 object ModulePearlLaunch : ClientModule("PearlLaunch", ExtrasCategories.PVP, disableOnQuit = true) {
 

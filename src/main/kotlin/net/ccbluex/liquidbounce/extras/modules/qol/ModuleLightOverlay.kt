@@ -23,7 +23,11 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Half
 import net.minecraft.world.level.block.state.properties.SlabType
 
-/** Crosses where hostile mobs can spawn: red right now, yellow once the sky goes dark. */
+/**
+ * Crosses where hostile mobs can spawn: red right now, yellow once the sky goes dark.
+ *
+ * @agent claude-fable-5-1
+ */
 object ModuleLightOverlay : ClientModule("LightOverlay", ExtrasCategories.QOL) {
 
     private val horizontalRange by int("HorizontalRange", 8, 1..32, "blocks")
@@ -32,6 +36,7 @@ object ModuleLightOverlay : ClientModule("LightOverlay", ExtrasCategories.QOL) {
     private val color by color("Color", Color4b(225, 25, 25))
     private val potentialColor by color("PotentialColor", Color4b(225, 225, 25))
 
+    /** @agent claude-fable-5-1 */
     enum class Spawn { POTENTIAL, ALWAYS }
 
     val spots: Map<BlockPos, Spawn>

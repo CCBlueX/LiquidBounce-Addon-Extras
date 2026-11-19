@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-11",
+  "change": "feat(NoItemBounce): keep hotbar items from bouncing",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 1613, "cachedInput": 1731743, "cacheWrite": 69992, "output": 9572 },
+      "usd": 1.10
+    }
+  ]
+}

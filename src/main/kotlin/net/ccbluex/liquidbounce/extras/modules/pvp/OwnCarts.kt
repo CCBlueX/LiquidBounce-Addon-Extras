@@ -19,6 +19,8 @@ import net.minecraft.world.entity.EntityTypes
 /**
  * TNT minecarts we put down ourselves, by hand or by a module. The server does not say who placed a cart, so
  * a cart that appears on a rail we just clicked counts as ours.
+ *
+ * @agent claude-opus-5-5
  */
 object OwnCarts : EventListener {
 

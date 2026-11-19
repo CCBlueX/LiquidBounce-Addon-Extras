@@ -16,6 +16,8 @@ import kotlin.time.TimeSource
 /**
  * Clicks over the last second, counted from input: swing packets would also count mining, and item use
  * packets every held right click.
+ *
+ * @agent claude-opus-5-5
  */
 object ClickCounter : EventListener {
 

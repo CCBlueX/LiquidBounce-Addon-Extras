@@ -38,6 +38,8 @@ import kotlin.random.Random
  * Holds the best mace while you fall onto an enemy and can swing it for you: Breach for short falls, Density
  * for long ones. A raised shield takes an axe hit first, which disables it for the mace that follows. An elytra
  * makes way for a chestplate before the impact, since a mace only smashes when you are not gliding.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleMaceAssist : ClientModule("MaceAssist", ExtrasCategories.PVP) {
 
@@ -68,18 +70,21 @@ object ModuleMaceAssist : ClientModule("MaceAssist", ExtrasCategories.PVP) {
     private val switchBack by int("SwitchBack", 100, 0..2000, "ms")
     private val rotations = tree(RotationsValueGroup(this))
 
+    /** @agent claude-opus-5-5 */
     enum class AutoHit(override val tag: String) : Tagged {
         OFF("Off"),
         TRIGGER("Trigger"),
         AIM("Aim"),
     }
 
+    /** @agent claude-opus-5-5 */
     enum class StunTrigger(override val tag: String) : Tagged {
         ALWAYS("Always"),
         CHANCE("Chance"),
         KEY("Key"),
     }
 
+    /** @agent claude-opus-5-5 */
     object StunSlam : ToggleableValueGroup(ModuleMaceAssist, "StunSlam", true) {
         val trigger by enumChoice("Trigger", StunTrigger.ALWAYS)
         val chance by int("Chance", 50, 0..100, "%")

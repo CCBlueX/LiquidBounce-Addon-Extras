@@ -114,7 +114,11 @@ private val modules = arrayOf(
     ModuleDisguise,
 )
 
-/** Entry point, named under the `liquidbounce` entrypoint in `fabric.mod.json`. */
+/**
+ * Entry point, named under the `liquidbounce` entrypoint in `fabric.mod.json`.
+ *
+ * @agent claude-fable-5-1
+ */
 class ExtrasAddon : LiquidBounceAddon() {
 
     override val categories = ExtrasCategories.all

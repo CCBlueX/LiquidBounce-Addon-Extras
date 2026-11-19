@@ -21,6 +21,8 @@ import kotlin.random.Random
 /**
  * Turns the server-side rotation sideways by a random angle for one tick before each hit, then back onto the
  * target, and hits.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleHitFlick : ClientModule("HitFlick", ExtrasCategories.PVP) {
 
@@ -96,6 +98,7 @@ object ModuleHitFlick : ClientModule("HitFlick", ExtrasCategories.PVP) {
 
     private fun pitch(pitch: Float) = pitch.coerceIn(-90f, 90f)
 
+    /** @agent claude-opus-5-5 */
     private enum class Direction(override val tag: String) : Tagged {
         LEFT("Left"),
         RIGHT("Right"),

@@ -15,6 +15,8 @@ import net.minecraft.world.phys.Vec3
 /**
  * Holds a swing at a target that would waste it, because it is still hurt from the last hit or in the air, and lands
  * it through a one-tick rotation the moment that is over.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleHitHold : ClientModule("HitHold", ExtrasCategories.PVP) {
 

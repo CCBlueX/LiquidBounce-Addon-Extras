@@ -10,7 +10,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Name tags and other centred text are measured as components, which never pass `MixinFont`. */
+/**
+ * Name tags and other centred text are measured as components, which never pass `MixinFont`.
+ *
+ * @agent claude-opus-5-5
+ */
 @Mixin(StringSplitter.class)
 abstract class MixinStringSplitter {
 

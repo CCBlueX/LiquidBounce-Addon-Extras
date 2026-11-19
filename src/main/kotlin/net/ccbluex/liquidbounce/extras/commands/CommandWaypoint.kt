@@ -21,7 +21,11 @@ import net.ccbluex.liquidbounce.utils.client.variable
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.Vec3i
 
-/** `.waypoint add|remove|select <name>`, `.waypoint list` and `.waypoint deselect`, on top of [ModuleWaypoints]. */
+/**
+ * `.waypoint add|remove|select <name>`, `.waypoint list` and `.waypoint deselect`, on top of [ModuleWaypoints].
+ *
+ * @agent gpt-6-astra
+ */
 object CommandWaypoint : CommandRegistrar {
 
     override fun register(dispatcher: CommandDispatcher<ClientCommandSource>) {

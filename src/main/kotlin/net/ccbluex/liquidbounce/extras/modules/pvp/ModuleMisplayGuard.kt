@@ -14,6 +14,8 @@ import net.minecraft.world.phys.BlockHitResult
 /**
  * Drops clicks of yours that lose fights. Only what you click yourself is checked, see
  * `MinecraftMisplayGuardMixin`; other modules act as they are told.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleMisplayGuard : ClientModule("MisplayGuard", ExtrasCategories.PVP) {
 

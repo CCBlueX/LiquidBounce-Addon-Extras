@@ -33,6 +33,8 @@ import net.minecraft.world.item.CrossbowItem
 /**
  * The hands of the cart modules: places blocks, puts carts on rails and shoots them, each only after the
  * server has the rotation for it.
+ *
+ * @agent claude-opus-5-5
  */
 internal class CartRig(
     private val owner: ClientModule,
@@ -239,7 +241,11 @@ internal class CartRig(
 
 }
 
-/** Shots the cart modules fire on their own, which [ModuleCartBomb] must not take for yours. */
+/**
+ * Shots the cart modules fire on their own, which [ModuleCartBomb] must not take for yours.
+ *
+ * @agent claude-opus-5-5
+ */
 internal object RigShots {
 
     private const val WINDOW = 2

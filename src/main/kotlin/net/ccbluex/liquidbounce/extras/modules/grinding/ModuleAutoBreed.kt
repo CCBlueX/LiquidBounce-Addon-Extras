@@ -30,6 +30,8 @@ import kotlin.math.min
 /**
  * Feeds adult animals in reach that have a partner nearby. Hearts from the server confirm the feeding; the
  * breeding cooldown that follows never reaches the client, so a confirmed animal is left alone for that long.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleAutoBreed : ClientModule("AutoBreed", ExtrasCategories.GRINDING) {
 

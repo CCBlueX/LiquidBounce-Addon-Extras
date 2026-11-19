@@ -12,7 +12,11 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 
-/** Passages players dig: two-high tunnels, staircases and one-wide shafts. */
+/**
+ * Passages players dig: two-high tunnels, staircases and one-wide shafts.
+ *
+ * @agent gpt-6-sol
+ */
 object ModuleTunnelTrailESP : ClientModule("TunnelTrailESP", ExtrasCategories.BASE_HUNTING) {
 
     private val range by int("Range", 16, 4..32, "blocks")

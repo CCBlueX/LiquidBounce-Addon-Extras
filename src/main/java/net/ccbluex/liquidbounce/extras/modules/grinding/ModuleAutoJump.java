@@ -9,6 +9,8 @@ import net.ccbluex.liquidbounce.features.module.ClientModule;
 /**
  * Presses jump for you. The input event carries this tick's keys, so the jump is as legitimate as a
  * real key press.
+ *
+ * @agent claude-fable-5-1
  */
 public final class ModuleAutoJump extends ClientModule {
 
@@ -38,6 +40,7 @@ public final class ModuleAutoJump extends ClientModule {
         event.setJump(event.getJump() || jump);
     }
 
+    /** @agent claude-fable-5-1 */
     private enum When implements Tagged {
         ALWAYS("Always"),
         MOVING("Moving"),

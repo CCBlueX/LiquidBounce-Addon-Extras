@@ -30,6 +30,8 @@ import net.minecraft.world.phys.Vec3
  * Raises a shield when a close enemy can swing again or runs at you, and lowers it while you fall onto a target, so
  * your own hit can be a critical one. While an axe has the shield disabled, a sword is in hand instead. Gliding,
  * the shield stays down.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleShieldGuard : ClientModule("ShieldGuard", ExtrasCategories.PVP, disableOnQuit = true) {
 

@@ -17,20 +17,34 @@ import net.minecraft.world.phys.Vec3
 // The movement packet of the tick after the request carries the rotation
 private const val STRIKE_TIMEOUT = 3
 
-/** Reach for melee, never more than the server allows. */
+/**
+ * Reach for melee, never more than the server allows.
+ *
+ * @agent claude-opus-5-5
+ */
 internal fun meleeReach(range: Float) = minOf(range.toDouble(), player.entityInteractionRange())
 
-/** Whether [rotation] from the eyes hits [target] within [reach], with nothing in between. */
+/**
+ * Whether [rotation] from the eyes hits [target] within [reach], with nothing in between.
+ *
+ * @agent claude-opus-5-5
+ */
 internal fun hits(target: Entity, rotation: Rotation, reach: Double) =
     isLookingAtEntity(toEntity = target, rotation = rotation, range = reach, throughWallsRange = 0.0) != null
 
-/** The spot of [target] in [reach] closest to where the player looks, or `null` when none is visible. */
+/**
+ * The spot of [target] in [reach] closest to where the player looks, or `null` when none is visible.
+ *
+ * @agent claude-opus-5-5
+ */
 internal fun closestSpot(target: Entity, reach: Double): Vec3? =
     raytraceBox(player.eyePosition, target.boundingBox, reach, 0.0)?.vec
 
 /**
  * Hits [target] at [point] through a rotation the server has for exactly one tick, then lets it snap back. The hit
  * waits for a movement packet that faced the target, which is what Grim checks it against.
+ *
+ * @agent claude-opus-5-5
  */
 internal suspend fun ClientModule.strike(target: Entity, point: Vec3, reach: Double) {
     val rotation = Rotation.lookingAt(point, player.eyePosition)
@@ -41,4 +55,5 @@ internal suspend fun ClientModule.strike(target: Entity, point: Vec3, reach: Dou
     }
 }
 
+/** @agent claude-opus-5-5 */
 private fun facing(target: Entity, reach: Double) = hits(target, RotationManager.serverRotation, reach)

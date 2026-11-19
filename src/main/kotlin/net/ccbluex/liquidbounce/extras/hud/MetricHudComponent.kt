@@ -12,6 +12,8 @@ import net.minecraft.network.chat.Component
 /**
  * A number on the HUD, coloured by how good it is, over a graph of its recent readings. Readings at [good] or
  * better are good, down to [ok] they are ok; a [good] below [ok] means lower is better.
+ *
+ * @agent claude-opus-5-5
  */
 abstract class MetricHudComponent(
     name: String,

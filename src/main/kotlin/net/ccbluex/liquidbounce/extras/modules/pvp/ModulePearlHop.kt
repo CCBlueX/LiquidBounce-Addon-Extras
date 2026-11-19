@@ -22,6 +22,8 @@ import net.minecraft.world.item.Items
 /**
  * Throws a pearl at our feet at a steep angle for a short hop, once or every time something hits us. Legit
  * stages it like a player would, Silent does it without touching the visible slot or view.
+ *
+ * @agent claude-opus-5-5
  */
 object ModulePearlHop : ClientModule("PearlHop", ExtrasCategories.PVP, disableOnQuit = true) {
 
@@ -30,6 +32,7 @@ object ModulePearlHop : ClientModule("PearlHop", ExtrasCategories.PVP, disableOn
     private val delay by intRange("Delay", 1..3, 1..10, "ticks")
     private val turnSpeed by floatRange("TurnSpeed", 20f..35f, 5f..90f, "°")
 
+    /** @agent claude-opus-5-5 */
     private object Auto : ToggleableValueGroup(this, "Auto", false) {
         val delay by intRange("Delay", 2..6, 0..20, "ticks")
         val trigger by enumChoice("Trigger", Trigger.PLAYER_MELEE)
@@ -106,11 +109,13 @@ object ModulePearlHop : ClientModule("PearlHop", ExtrasCategories.PVP, disableOn
         player.inventory.selectedSlot = selected
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class Mode(override val tag: String) : Tagged {
         LEGIT("Legit"),
         SILENT("Silent"),
     }
 
+    /** @agent claude-opus-5-5 */
     private enum class Trigger(override val tag: String, val accepts: (ClientboundDamageEventPacket) -> Boolean) :
         Tagged {
         PLAYER_MELEE("PlayerMelee", { it.sourceType.`is`(DamageTypes.PLAYER_ATTACK) }),

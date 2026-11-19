@@ -19,7 +19,11 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 
-/** Marks where the server played selected sounds. A sound repeating at one spot keeps its marker alive. */
+/**
+ * Marks where the server played selected sounds. A sound repeating at one spot keeps its marker alive.
+ *
+ * @agent gpt-6-sol
+ */
 object ModuleSoundLocator : ClientModule("SoundLocator", ExtrasCategories.BASE_HUNTING) {
 
     private val sounds by sounds(

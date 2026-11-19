@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-09",
+  "change": "feat(hud): history graphs and colour grading for fps, ping and tps",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 679, "cachedInput": 17563471, "cacheWrite": 158545, "output": 68264 },
+      "usd": 6.15
+    }
+  ]
+}

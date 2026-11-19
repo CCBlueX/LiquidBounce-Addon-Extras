@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-08",
+  "change": "feat(Disguise): show the nearest stranger under another name and skin",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 3190, "cachedInput": 49665130, "cacheWrite": 639012, "output": 191454 },
+      "usd": 18.89
+    }
+  ]
+}

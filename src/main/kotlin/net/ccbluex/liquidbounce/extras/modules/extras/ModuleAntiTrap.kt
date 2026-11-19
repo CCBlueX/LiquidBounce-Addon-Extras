@@ -29,6 +29,8 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Keeps trap bait out of your world: spawn packets of the selected entities near you are dropped, and a sign
  * editor the server opens without you placing or clicking that sign never shows, or closes when it already does.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleAntiTrap : ClientModule("AntiTrap", ExtrasCategories.EXTRAS) {
 

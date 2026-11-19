@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-13",
+  "change": "feat(gametest): run the server tests on the shared game test server",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 2557, "cachedInput": 500256677, "cacheWrite": 4673873, "output": 508001 },
+      "usd": 147.61
+    },
+    {
+      "model": "claude-fable-5-2",
+      "provider": "anthropic",
+      "tokens": { "input": 49, "cachedInput": 4372644, "cacheWrite": 63123, "output": 21730 },
+      "usd": 2.75
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 187776, "cachedInput": 957167, "cacheWrite": 283416, "output": 82108 },
+      "usd": 0.13
+    }
+  ]
+}

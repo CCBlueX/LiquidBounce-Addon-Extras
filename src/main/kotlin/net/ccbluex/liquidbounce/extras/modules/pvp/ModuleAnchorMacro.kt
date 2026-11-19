@@ -28,6 +28,8 @@ import net.minecraft.world.phys.Vec3
 /**
  * While its bind is held: places an anchor where you look, charges it and sets it off. With DoubleAnchor, a
  * second one goes into the same spot right after and waits for the target to be hurtable again.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleAnchorMacro : ClientModule("AnchorMacro", ExtrasCategories.PVP, bindAction = InputBind.BindAction.HOLD) {
 
@@ -42,6 +44,7 @@ object ModuleAnchorMacro : ClientModule("AnchorMacro", ExtrasCategories.PVP, bin
     private val guard by boolean("Guard", true)
     private val rotations = tree(RotationsValueGroup(this))
 
+    /** @agent claude-opus-5-5 */
     private object DoubleAnchor : ToggleableValueGroup(ModuleAnchorMacro, "DoubleAnchor", false) {
         val hurtTime by int("HurtTime", 0, 0..10, "ticks")
         val timeout by int("Timeout", 20, 1..40, "ticks")
@@ -133,6 +136,7 @@ object ModuleAnchorMacro : ClientModule("AnchorMacro", ExtrasCategories.PVP, bin
         world.getEntitiesOfClass(LivingEntity::class.java, AABB(anchor).inflate(TARGET_RANGE)) { it.shouldBeAttacked() }
             .minByOrNull { it.distanceToSqr(Vec3.atCenterOf(anchor)) }
 
+    /** @agent claude-opus-5-5 */
     private enum class Switch(override val tag: String) : Tagged {
         SILENT("Silent"),
         VISIBLE("Visible"),

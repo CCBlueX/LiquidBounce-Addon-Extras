@@ -35,6 +35,7 @@ import kotlin.math.hypot
 private val NUMBER = Regex(""": (-?\d+(?:\.\d+)?(?:E-?\d+)?)d$""")
 private val POSITION = Regex("""\[(-?[\d.E-]+)d, (-?[\d.E-]+)d, (-?[\d.E-]+)d]""")
 
+/** @agent claude-opus-5-5 */
 class PearlCatchGameTest : ServerGameTest({
     run("gamerule minecraft:fall_damage false")
     val pearls = objective("pearls", "minecraft.used:minecraft.ender_pearl")
@@ -102,6 +103,7 @@ class PearlCatchGameTest : ServerGameTest({
     awaitOff(ModulePearlCatch)
 })
 
+/** @agent claude-opus-5-5 */
 class PearlLaunchGameTest : ServerGameTest({
     run("gamerule minecraft:fall_damage false")
     val charges = objective("charges", "minecraft.used:minecraft.wind_charge")
@@ -122,6 +124,7 @@ class PearlLaunchGameTest : ServerGameTest({
     awaitServer("entity @a[name=$playerName,scores={$charges=1}]")
 })
 
+/** @agent claude-opus-5-5 */
 class WindGlideGameTest : ServerGameTest(TestWorld.SURFACE, {
     run("gamerule minecraft:fall_damage false")
     val charges = objective("charges", "minecraft.used:minecraft.wind_charge")
@@ -161,6 +164,7 @@ class WindGlideGameTest : ServerGameTest(TestWorld.SURFACE, {
     awaitServer("entity @a[name=$playerName,nbt={OnGround:1b}]", timeout = 400)
 })
 
+/** @agent claude-opus-5-5 */
 class PearlHopGameTest : ServerGameTest({
     run("gamerule minecraft:fall_damage false")
     val pearls = objective("pearls", "minecraft.used:minecraft.ender_pearl")
@@ -228,7 +232,11 @@ private const val STRIP_CLEARANCE = 24
 /** PearlCatch's default Delay. */
 private const val CATCH_DELAY = 66
 
-/** Ticks until the server counts [count] on our [objective], asking every tick. */
+/**
+ * Ticks until the server counts [count] on our [objective], asking every tick.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.ticksUntil(objective: String, count: Int): Int {
     val asked = mutableListOf<Int>()
     repeat(CATCH_DELAY * 3) { tick ->
@@ -244,6 +252,8 @@ private fun GameTestScope.ticksUntil(objective: String, count: Int): Int {
 /**
  * Counts what the server sees us use, starting at zero so that "none yet" can be asked for. Returns the
  * objective's name, which is unique to the test: the scoreboard is shared by every test on the server.
+ *
+ * @agent claude-opus-5-5
  */
 private fun GameTestScope.objective(name: String, criterion: String): String {
     val objective = unique(name)
@@ -252,10 +262,15 @@ private fun GameTestScope.objective(name: String, criterion: String): String {
     return objective
 }
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.awaitOff(module: ClientModule) =
     awaitClient("${module.name} to turn itself off", timeout = 400) { !module.enabled }
 
-/** Runs [command] every tick until the server answers; answers come in order, so the first is the earliest tick. */
+/**
+ * Runs [command] every tick until the server answers; answers come in order, so the first is the earliest tick.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.firstAnswer(command: String, answer: Regex, timeout: Int = 300): MatchResult {
     val since = server.console.size
     repeat(timeout) {
@@ -266,7 +281,11 @@ private fun GameTestScope.firstAnswer(command: String, answer: Regex, timeout: I
     throw AssertionError("The server never answered '$command' with '$answer', see ${server.log}")
 }
 
-/** The highest the server saw us over the next [ticks]. */
+/**
+ * The highest the server saw us over the next [ticks].
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.peak(ticks: Int): Double {
     val since = server.console.size
     repeat(ticks) {
@@ -276,14 +295,22 @@ private fun GameTestScope.peak(ticks: Int): Double {
     return server.console.drop(since).mapNotNull { NUMBER.find(it.message)?.groupValues[1]?.toDouble() }.max()
 }
 
-/** A short hop: the server moved us off the block's center, but not far. */
+/**
+ * A short hop: the server moved us off the block's center, but not far.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.checkHopped() {
     val (x, _, z) = query("data get entity $playerName Pos", POSITION).destructured
     val hop = hypot(x.toDouble() - origin.x - 0.5, z.toDouble() - origin.z - 0.5)
     check(hop in 0.1..2.0) { "hopped $hop blocks" }
 }
 
-/** Pitches of the item uses sent while it is open. */
+/**
+ * Pitches of the item uses sent while it is open.
+ *
+ * @agent claude-opus-5-5
+ */
 private class UsePitches : EventListener, AutoCloseable {
 
     val pitches: MutableList<Float> = Collections.synchronizedList(mutableListOf())
@@ -297,7 +324,11 @@ private class UsePitches : EventListener, AutoCloseable {
 
 }
 
-/** Levels a strip north of [TestWorld.SURFACE]'s pad like the pad itself, in slices small enough for one fill each. */
+/**
+ * Levels a strip north of [TestWorld.SURFACE]'s pad like the pad itself, in slices small enough for one fill each.
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.flatStrip() {
     val from = origin.offset(-STRIP_HALF_WIDTH, 0, -STRIP_LENGTH)
     val to = origin.offset(STRIP_HALF_WIDTH, 0, 0)

@@ -6,4 +6,5 @@ import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryType
 internal val ARROW_TRAJECTORY = trajectoryType("Arrow")
 internal val PEARL_TRAJECTORY = trajectoryType("EnderPearl")
 
+/** @agent claude-opus-5-5 */
 private fun trajectoryType(tag: String) = TrajectoryType.entries.first { it.tag == tag }

@@ -11,7 +11,11 @@ import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.minecraft.world.entity.player.Player
 import java.util.UUID
 
-/** Reports players who are not your friends as they come within the radius. */
+/**
+ * Reports players who are not your friends as they come within the radius.
+ *
+ * @agent gpt-6-astra
+ */
 object ModuleIntruderAlert : ClientModule("IntruderAlert", ExtrasCategories.EXTRAS) {
 
     private const val EXIT_MARGIN = 4

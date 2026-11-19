@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-12",
+  "change": "feat(ShieldGuard): raise a shield against enemies that can swing",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 769264, "cachedInput": 495048067, "cacheWrite": 2224198, "output": 638518 },
+      "usd": 132.65
+    }
+  ]
+}

@@ -35,6 +35,8 @@ import kotlin.math.sqrt
  * around you, spots an enemy could crystal, an enemy coming down on you with a mace, or a sword hit at low
  * health, and optionally while your own ender pearl is in the air. Once nothing threatens you for a while, the
  * slot you had goes back into your hand.
+ *
+ * @agent claude-opus-5-5
  */
 object ModuleTotemSwitch : ClientModule("TotemSwitch", ExtrasCategories.PVP) {
 

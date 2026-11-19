@@ -32,6 +32,7 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 
+/** @agent claude-opus-5-5 */
 class CrystalMacroGameTest : ServerGameTest({
     run("difficulty normal")
     val key = InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_G)
@@ -91,6 +92,7 @@ class CrystalMacroGameTest : ServerGameTest({
     awaitScore("crystals", 2)
 })
 
+/** @agent claude-opus-5-5 */
 class BucketStealGameTest : ServerGameTest({
     run("difficulty normal")
     val water = origin.offset(1, -1, 3)
@@ -163,6 +165,7 @@ class BucketStealGameTest : ServerGameTest({
     awaitServer("block ${water.command} minecraft:water")
 })
 
+/** @agent claude-opus-5-5 */
 class MisplayGuardGameTest : ServerGameTest({
     run("difficulty normal")
     val anchor = origin.offset(0, 0, 2)
@@ -251,6 +254,7 @@ class MisplayGuardGameTest : ServerGameTest({
     awaitServer("block ${anchor.command} minecraft:respawn_anchor[charges=3]")
 })
 
+/** @agent claude-opus-5-5 */
 class TotemSwitchGameTest : ServerGameTest(TestWorld.SURFACE, {
     run("difficulty normal")
     run("gamerule minecraft:natural_health_regeneration false")
@@ -327,23 +331,32 @@ private val AABB_AROUND = AABB(-16.0, -80.0, -16.0, 32.0, 160.0, 32.0)
 
 private val BlockPos.command get() = "$x $y $z"
 
+/** @agent claude-opus-5-5 */
 private fun items(level: Level) =
     level.getEntitiesOfClass(ItemEntity::class.java, AABB_AROUND) { it.item.`is`(Items.TOTEM_OF_UNDYING) }.size
 
+/** @agent claude-opus-5-5 */
 private fun husks(level: Level) =
     level.getEntitiesOfClass(Husk::class.java, AABB_AROUND) { it.isAlive }.size
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.lookAt(point: Vec3) {
     val rotation = Rotation.lookingAt(point, client { it.player!!.eyePosition })
     input.lookAt(rotation.yaw, rotation.pitch)
     ticks(2)
 }
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.rightClick() = input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT)
 
+/** @agent claude-opus-5-5 */
 private fun GameTestScope.awaitSlot(slot: Int, timeout: Int = 200) =
     awaitAnswer("data get entity $playerName SelectedItemSlot", "entity data: $slot", timeout)
 
-/** The scoreboard is shared by every test on the server, so [objective] is the name before [GameTestScope.unique]. */
+/**
+ * The scoreboard is shared by every test on the server, so [objective] is the name before [GameTestScope.unique].
+ *
+ * @agent claude-opus-5-5
+ */
 private fun GameTestScope.awaitScore(objective: String, score: Int) =
     awaitAnswer("scoreboard players get $playerName ${unique(objective)}", "has $score [${unique(objective)}]")

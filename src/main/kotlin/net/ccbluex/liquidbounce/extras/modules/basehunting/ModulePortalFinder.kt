@@ -17,7 +17,11 @@ import net.minecraft.core.BlockPos
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.block.Blocks
 
-/** Lit portals only exist where a player built one. */
+/**
+ * Lit portals only exist where a player built one.
+ *
+ * @agent gpt-6-sol
+ */
 object ModulePortalFinder : ClientModule("PortalFinder", ExtrasCategories.BASE_HUNTING) {
 
     private val color by color("Color", Color4b(160, 80, 255, 90))
