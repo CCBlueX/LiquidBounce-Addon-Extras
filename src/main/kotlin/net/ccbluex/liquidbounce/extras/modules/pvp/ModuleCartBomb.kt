@@ -9,7 +9,6 @@ import net.ccbluex.liquidbounce.event.eventListenerScope
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
 import net.ccbluex.liquidbounce.event.events.KeyEvent
 import net.ccbluex.liquidbounce.event.events.KeybindIsPressedEvent
-import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.event.tickConditional
@@ -24,6 +23,7 @@ import net.ccbluex.liquidbounce.utils.client.SilentHotbar
 import net.ccbluex.liquidbounce.utils.combat.shouldBeAttacked
 import net.ccbluex.liquidbounce.utils.inventory.PlayerInventoryConstraints
 import net.ccbluex.liquidbounce.utils.inventory.Slots
+import net.ccbluex.liquidbounce.utils.inventory.inventoryPlan
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfo
 import net.ccbluex.liquidbounce.utils.render.trajectory.TrajectoryInfoRenderer
 import net.minecraft.core.BlockPos
@@ -139,9 +139,9 @@ object ModuleCartBomb : ClientModule("CartBomb", ExtrasCategories.PVP) {
     }
 
     @Suppress("unused")
-    private val pullHandler = handler<ScheduleInventoryActionEvent> { event ->
+    private val pullHandler = inventoryPlan(Overload.constraints) {
         if (pulling) {
-            event.pullToHotbar(Overload.constraints) { it.isTntCart }
+            pullToHotbar { it.isTntCart }
         }
     }
 

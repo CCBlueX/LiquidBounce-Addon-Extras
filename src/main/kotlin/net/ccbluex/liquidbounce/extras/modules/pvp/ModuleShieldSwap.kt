@@ -1,7 +1,6 @@
 package net.ccbluex.liquidbounce.extras.modules.pvp
 
 import net.ccbluex.liquidbounce.event.events.KeybindIsPressedEvent
-import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.event.tickUntil
@@ -12,6 +11,7 @@ import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.markAsError
 import net.ccbluex.liquidbounce.utils.inventory.HotbarItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.PlayerInventoryConstraints
+import net.ccbluex.liquidbounce.utils.inventory.inventoryPlan
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
@@ -33,9 +33,9 @@ object ModuleShieldSwap : ClientModule("ShieldSwap", ExtrasCategories.PVP, disab
         private set
 
     @Suppress("unused")
-    private val pullHandler = handler<ScheduleInventoryActionEvent> { event ->
+    private val pullHandler = inventoryPlan(constraints) {
         if (pulling) {
-            event.pullToHotbar(constraints, ::isShield)
+            pullToHotbar(::isShield)
         }
     }
 

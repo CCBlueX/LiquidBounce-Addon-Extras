@@ -1,12 +1,11 @@
 package net.ccbluex.liquidbounce.extras.modules.grinding
 
-import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
-import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.utils.inventory.ContainerItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.InventoryAction
 import net.ccbluex.liquidbounce.utils.inventory.InventoryConstraints
+import net.ccbluex.liquidbounce.utils.inventory.inventoryPlan
 import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.inventory.AbstractFurnaceMenu
@@ -40,11 +39,11 @@ object ModuleAutoSmelter : ClientModule("AutoSmelter", ExtrasCategories.GRINDING
     private val constraints = tree(InventoryConstraints())
 
     @Suppress("unused")
-    private val smeltHandler = handler<ScheduleInventoryActionEvent> { event ->
-        val screen = mc.gui.screen() as? AbstractFurnaceScreen<*> ?: return@handler
+    private val smeltHandler = inventoryPlan(constraints) {
+        val screen = mc.gui.screen() as? AbstractFurnaceScreen<*> ?: return@inventoryPlan
         val menu = screen.menu
         if (!menu.carried.isEmpty) {
-            return@handler
+            return@inventoryPlan
         }
 
         val fuel = menu.getSlot(FUEL_SLOT).item
@@ -58,8 +57,8 @@ object ModuleAutoSmelter : ClientModule("AutoSmelter", ExtrasCategories.GRINDING
             fuel.isEmpty && !menu.isLit && isInput(menu, INGREDIENT_SLOT) ->
                 inventory.firstOrNull { isFuel(menu, it) }?.let { refuel(screen, it) }
             else -> null
-        } ?: return@handler
-        event.schedule(constraints, actions)
+        } ?: return@inventoryPlan
+        perform(actions)
     }
 
     private fun isInput(menu: AbstractFurnaceMenu, slot: Int): Boolean {

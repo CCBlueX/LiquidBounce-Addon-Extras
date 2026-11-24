@@ -7,7 +7,7 @@ import net.ccbluex.liquidbounce.event.events.PacketEvent
 import net.ccbluex.liquidbounce.event.events.WorldChangeEvent
 import net.ccbluex.liquidbounce.event.events.WorldRenderEvent
 import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.event.waitSeconds
+import net.ccbluex.liquidbounce.event.waitMillis
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.extras.util.coordinates
 import net.ccbluex.liquidbounce.extras.util.drawMarkers
@@ -70,7 +70,7 @@ object ModuleSoundLocator : ClientModule("SoundLocator", ExtrasCategories.BASE_H
             report("heard", sound.location, pos.coordinates)
         }
         val expiry = eventListenerScope.launch {
-            waitSeconds(lifetime)
+            waitMillis(lifetime * 1000)
             markers.remove(pos)
             expiries.remove(pos)
         }

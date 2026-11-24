@@ -8,11 +8,10 @@ import net.ccbluex.liquidbounce.event.events.AttackEntityEvent
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
 import net.ccbluex.liquidbounce.event.events.MovementInputEvent
 import net.ccbluex.liquidbounce.event.events.RotationUpdateEvent
-import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
 import net.ccbluex.liquidbounce.event.tickUntil
-import net.ccbluex.liquidbounce.event.waitSeconds
+import net.ccbluex.liquidbounce.event.waitMillis
 import net.ccbluex.liquidbounce.event.waitTicks
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.features.module.ClientModule
@@ -23,6 +22,7 @@ import net.ccbluex.liquidbounce.utils.aiming.features.MovementCorrection
 import net.ccbluex.liquidbounce.utils.inventory.InventoryManager
 import net.ccbluex.liquidbounce.utils.inventory.PlayerInventoryConstraints
 import net.ccbluex.liquidbounce.utils.inventory.Slots
+import net.ccbluex.liquidbounce.utils.inventory.inventoryPlan
 import net.ccbluex.liquidbounce.utils.inventory.useHotbarSlotOrOffhand
 import net.ccbluex.liquidbounce.utils.item.isChestArmor
 import net.ccbluex.liquidbounce.utils.item.isGlider
@@ -91,8 +91,8 @@ object ModuleElytraDive : ClientModule("ElytraDive", ExtrasCategories.PVP) {
     private var fetching: ((ItemStack) -> Boolean)? = null
 
     @Suppress("unused")
-    private val fetchHandler = handler<ScheduleInventoryActionEvent> { event ->
-        fetching?.let { event.pullToHotbar(constraints, it) }
+    private val fetchHandler = inventoryPlan(constraints) {
+        fetching?.let { pullToHotbar(it) }
     }
 
     /*
@@ -183,7 +183,7 @@ object ModuleElytraDive : ClientModule("ElytraDive", ExtrasCategories.PVP) {
                         }
                     }
                 } else if (takeOff() && flightTime > 0) {
-                    waitSeconds(flightTime)
+                    waitMillis(flightTime * 1000)
                     if (wearsGlider) {
                         restoreChestplate()
                     }

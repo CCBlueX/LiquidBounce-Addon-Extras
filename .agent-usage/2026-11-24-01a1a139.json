@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-24",
+  "change": "chore: build against liquidbounce 0.43.0",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 470, "cachedInput": 34658809, "cacheWrite": 660001, "output": 83791 },
+      "usd": 13.89
+    }
+  ]
+}

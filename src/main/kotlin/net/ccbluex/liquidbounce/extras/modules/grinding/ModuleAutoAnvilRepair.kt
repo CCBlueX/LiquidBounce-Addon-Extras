@@ -1,12 +1,11 @@
 package net.ccbluex.liquidbounce.extras.modules.grinding
 
-import net.ccbluex.liquidbounce.event.events.ScheduleInventoryActionEvent
-import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.features.module.ClientModule
 import net.ccbluex.liquidbounce.utils.inventory.ContainerItemSlot
 import net.ccbluex.liquidbounce.utils.inventory.InventoryAction
 import net.ccbluex.liquidbounce.utils.inventory.InventoryConstraints
+import net.ccbluex.liquidbounce.utils.inventory.inventoryPlan
 import net.minecraft.client.gui.screens.inventory.AnvilScreen
 import net.minecraft.world.inventory.AnvilMenu
 
@@ -26,11 +25,11 @@ object ModuleAutoAnvilRepair : ClientModule("AutoAnvilRepair", ExtrasCategories.
     private var rejectedMenu = -1
 
     @Suppress("unused")
-    private val repairHandler = handler<ScheduleInventoryActionEvent> { event ->
-        val screen = mc.gui.screen() as? AnvilScreen ?: return@handler
+    private val repairHandler = inventoryPlan(constraints) {
+        val screen = mc.gui.screen() as? AnvilScreen ?: return@inventoryPlan
         val menu = screen.menu
         if (menu.containerId == rejectedMenu || !menu.carried.isEmpty) {
-            return@handler
+            return@inventoryPlan
         }
 
         fun quickMove(slot: Int) = InventoryAction.Click.performQuickMove(screen, ContainerItemSlot(slot))
@@ -44,10 +43,10 @@ object ModuleAutoAnvilRepair : ClientModule("AutoAnvilRepair", ExtrasCategories.
             }
             // Half a pair is a click the server has not confirmed yet; its updates for the clicks before can
             // briefly take it back
-            1 -> return@handler
-            else -> findPair(menu)?.toList()?.map(::quickMove) ?: return@handler
+            1 -> return@inventoryPlan
+            else -> findPair(menu)?.toList()?.map(::quickMove) ?: return@inventoryPlan
         }
-        event.schedule(constraints, actions)
+        perform(actions)
     }
 
     override fun onDisabled() {

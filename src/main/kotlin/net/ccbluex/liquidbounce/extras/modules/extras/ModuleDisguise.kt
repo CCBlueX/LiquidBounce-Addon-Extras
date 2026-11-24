@@ -6,7 +6,7 @@ import net.ccbluex.liquidbounce.config.types.list.Tagged
 import net.ccbluex.liquidbounce.event.events.GameTickEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.tickHandler
-import net.ccbluex.liquidbounce.event.waitSeconds
+import net.ccbluex.liquidbounce.event.waitMillis
 import net.ccbluex.liquidbounce.extras.ExtrasCategories
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.ClientModule
@@ -80,7 +80,7 @@ object ModuleDisguise : ClientModule("Disguise", ExtrasCategories.EXTRAS) {
         skin = withContext(Dispatchers.IO) { fetchSkin(username) }
         if (skin == null) {
             // Mojang turns an address away for a while when it asks too often; ask again later
-            waitSeconds(SKIN_RETRY_SECONDS)
+            waitMillis(SKIN_RETRY_SECONDS * 1000)
             if (skinFetchedFor == username) {
                 skinFetchedFor = null
             }
