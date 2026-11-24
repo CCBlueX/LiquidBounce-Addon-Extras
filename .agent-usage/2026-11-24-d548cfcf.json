@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-24",
+  "change": "docs: screenshots for liquidbounce 0.43.0",
+  "tool": "omp",
+  "models": [
+    {
+      "model": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tokens": { "input": 250, "cachedInput": 18288767, "cacheWrite": 180361, "output": 42359 },
+      "usd": 5.95
+    }
+  ]
+}
